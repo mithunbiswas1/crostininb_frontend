@@ -1,6 +1,6 @@
 // src/app/(pages)/about/page.jsx
 import PageBanner from "@/components/shared/PageBanner";
-import OurStorySection from "./_components/OurStorySection";
+import ChairmanSection from "./_components/ChairmanSection";
 
 export default function AboutPage() {
   return (
@@ -11,10 +11,9 @@ export default function AboutPage() {
         backgroundImage="/about/a_banner.jpg"
       />
 
-      <OurStorySection />
+      <ChairmanSection />
 
-      {/* <ChairmanSection />
-      <MissionVisionSection />
+      {/*  <MissionVisionSection />
       <CoreValuesSection />
       <WhyChooseUsSection />
       <CTASection /> */}
