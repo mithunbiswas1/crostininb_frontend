@@ -7,8 +7,8 @@ export default function SpecialPage() {
   return (
     <main className="bg-black">
       <PageBanner
-        title="Our Delicious Menu"
-        subtitle="Explore our carefully crafted dishes made with fresh ingredients."
+        title="Our Special Menu"
+        subtitle="Discover our chef's signature dishes crafted with fresh ingredients and unforgettable flavors."
         backgroundImage="/specials/b_specials.png"
       />
 
