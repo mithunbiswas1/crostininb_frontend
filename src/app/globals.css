@@ -1,0 +1,119 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+body {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  font-family: var(--font-manrope), sans-serif;
+}
+
+button {
+  cursor: pointer;
+}
+
+:root {
+  --radius: 0.625rem;
+}
+
+@layer utilities {
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+
+    @media (width >= 40rem /* 640px */) {
+      max-width: 40rem /* 640px */;
+    }
+    @media (width >= 48rem /* 768px */) {
+      max-width: 45rem /* 720px */;
+    }
+    @media (width >= 64rem /* 1024px */) {
+      max-width: 60rem /* 960px */;
+    }
+    @media (width >= 80rem /* 1280px */) {
+      max-width: 74em /* 1184px */;
+    }
+    @media (width >= 90rem /* 1440px */) {
+      max-width: 81rem /* 1296px */;
+    }
+  }
+}
+
+@theme inline {
+  /* color */
+  --color-primary: #2ed06e;
+  --color-foreground_primary: #ffe500;
+  --color-background_primary: #ffffff;
+  --color-gray_deeper: #1b1b1b;
+  --color-gray_light: #525252;
+  --color-gray_light_deep: #727272;
+  --color-gray_deep: #737373;
+  --color-gray_accent: #a3a3a3;
+  --color-border_gray: #e5e7eb;
+  --color-border_dark: #12121280;
+  --color-gray_shadow: #404040;
+  --color-ashes: #e6e6e6;
+  --color-success: #00c191;
+  --color-info: #2a6fe7;
+  --color-info_light: #1b69f0;
+  --color-warning: #ffb020;
+  --color-danger: #e54848;
+  --color-white_shade: #fafafa;
+  --color-lvory: #fdfbeb;
+  --color-heading: #1e1e1e;
+
+  /* font */
+  --font-nekst: var(--font-nekst);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-reverse {
+  animation: marquee 25s linear infinite reverse;
+}
+
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
