@@ -84,7 +84,7 @@ export default function SpecialMenu() {
         <div className="text-center mb-12">
           <H2 className="text-gray-50 font-bold">Our Special Menu</H2>
 
-          <p className="mt-4 max-w-2xl mx-auto text-zinc-400">
+          <p className="mt-4 max-w-2xl mx-auto text-gray-300">
             Discover our chef's signature creations, crafted with premium
             ingredients and served fresh to deliver an unforgettable dining
             experience.

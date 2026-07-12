@@ -1,27 +1,23 @@
 // src/app/(pages)/about/page.jsx
-
 import PageBanner from "@/components/shared/PageBanner";
-
-import ChairmanSection from "./_components/ChairmanSection";
-import MissionVisionSection from "./_components/MissionVisionSection";
-import CoreValuesSection from "./_components/CoreValuesSection";
-import WhyChooseUsSection from "./_components/WhyChooseUsSection";
-import CTASection from "./_components/CTASection";
+import OurStorySection from "./_components/OurStorySection";
 
 export default function AboutPage() {
   return (
-    <main>
+    <main className="bg-black">
       <PageBanner
-        title="About Our Company"
-        subtitle="Building innovative digital products that help businesses grow and succeed."
-        backgroundImage="/about/banner.jpg"
+        title="About Our Restaurant"
+        subtitle="Discover our passion for exceptional food, warm hospitality, and unforgettable dining experiences crafted with the freshest ingredients."
+        backgroundImage="/about/a_banner.jpg"
       />
 
-      <ChairmanSection />
+      <OurStorySection />
+
+      {/* <ChairmanSection />
       <MissionVisionSection />
       <CoreValuesSection />
       <WhyChooseUsSection />
-      <CTASection />
+      <CTASection /> */}
     </main>
   );
 }
