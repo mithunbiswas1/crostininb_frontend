@@ -24,14 +24,27 @@ const discountItems = [
 
 export default function FlatDiscount() {
   return (
-    <section className="py-15 bg-linear-to-br from-[#111] via-gray-800 to-gray-900">
+    <section className="py-20 bg-linear-to-br from-black via-gray-[112] to-[#111]">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Heading */}
+        <div className="text-center mb-12">
+          <H2 className="text-gray-50 font-bold">
+            Exclusive Discounts & Offers
+          </H2>
+
+          <p className="mt-4 max-w-2xl mx-auto text-gray-300">
+            Enjoy amazing deals on our signature dishes. Limited time offers
+            available for a truly memorable dining experience.
+          </p>
+        </div>
+
+        {/* Discount Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {discountItems.map((item, index) => (
             <Link
               key={index}
               href="#"
-              className="group relative aspect-4/4 overflow-hidden rounded-sm"
+              className="group relative aspect-4/4 overflow-hidden rounded-sm bg-[#111] border border-zinc-800 hover:border-amber-500/30 transition-colors duration-300"
             >
               {/* Background Image */}
               <Image
@@ -45,7 +58,7 @@ export default function FlatDiscount() {
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/50 to-transparent group-hover:from-black/90 transition-all" />
 
               {/* Discount Badge - Top Right */}
-              <div className="absolute top-3 right-3 backdrop-blur-2xl bg-gray-100 text-primary text-xl sm:text-sm font-bold px-3 py-1.5 rounded-sm shadow-lg">
+              <div className="absolute top-3 right-3 bg-amber-500 text-black text-sm font-bold px-4 py-2 rounded-sm shadow-lg">
                 {item.discount}
               </div>
 
