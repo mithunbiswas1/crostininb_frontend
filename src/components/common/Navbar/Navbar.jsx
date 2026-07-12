@@ -112,13 +112,13 @@ export default function Navbar() {
 
   return (
     <div
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 border-b border-gray-50/20 ${
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 border-b border-gray-50/10 ${
         isScrolled ? "bg-gray-50 shadow-md" : "bg-transparent"
       }`}
     >
-      <nav className="max-w-screen-xl mx-auto flex items-center justify-center px-4 py-1">
+      <nav className="max-w-screen-xl mx-auto flex items-center justify-between px-4 py-1">
         {/* Left Navigation - Desktop */}
-        <div className="hidden lg:flex lg:gap-x-3 items-center">
+        <div className="hidden lg:flex lg:gap-x-3 lg:mr-auto">
           {navigation1.map((item) => (
             <div
               key={item.name}
@@ -139,7 +139,7 @@ export default function Navbar() {
         </div>
 
         {/* Logo - Center */}
-        <div className="flex-shrink-0 mx-4">
+        <div className="flex lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
           <Link href="/" className="flex items-center gap-2">
             <span className="sr-only">Your Company</span>
             <Image
@@ -154,7 +154,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="flex lg:hidden ml-auto">
+        <div className="flex lg:hidden">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
@@ -169,7 +169,7 @@ export default function Navbar() {
         </div>
 
         {/* Right Navigation - Desktop */}
-        <div className="hidden lg:flex lg:gap-x-3 items-center border w-full">
+        <div className="hidden lg:flex lg:gap-x-3 lg:ml-auto">
           {navigation2.map((item) => (
             <div
               key={item.name}
