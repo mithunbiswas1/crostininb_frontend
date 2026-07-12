@@ -16,7 +16,7 @@ const specialMenu = [
     title: "Creamy Alfredo Pasta",
     category: "Pasta",
     price: "$16.99",
-    image: "/home/special_menu/Pasta.png",
+    image: "/home/special_menu/pasta.png",
     description:
       "Rich and creamy Alfredo pasta prepared with parmesan cheese, fresh herbs, and signature sauce.",
   },

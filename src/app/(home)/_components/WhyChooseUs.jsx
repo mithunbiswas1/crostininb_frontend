@@ -63,7 +63,7 @@ export default function WhyChooseUs() {
             {/* Main Image */}
             <div className="absolute left-0 top-0 w-[75%] h-[430px]">
               <Image
-                src="/home/why_choose_us/food.jpg"
+                src="/home/why_choose_us/images.jpg"
                 alt="Restaurant Food"
                 fill
                 className="object-cover"
