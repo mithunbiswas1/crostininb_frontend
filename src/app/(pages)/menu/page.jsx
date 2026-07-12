@@ -170,7 +170,7 @@ export default function MenuPage() {
       <PageBanner
         title="Our Delicious Menu"
         subtitle="Explore our carefully crafted dishes made with fresh ingredients."
-        backgroundImage="/about/banner.jpg"
+        backgroundImage="/menu/menu_banner.jpg"
       />
 
       <section className="max-w-7xl mx-auto px-5 py-20">

@@ -1,6 +1,6 @@
 // src/components/shared/PageBanner.jsx
 
-import { H1, H6 } from "@/components/ui/Typography";
+import { H3, P } from "@/components/ui/Typography";
 
 export default function PageBanner({ title, subtitle, backgroundImage }) {
   return (
@@ -15,9 +15,9 @@ export default function PageBanner({ title, subtitle, backgroundImage }) {
       <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative z-10 text-center max-w-4xl mt-10 px-4">
-        <H1 className="text-gray-50">{title}</H1>
+        <H3 className="text-gray-50">{title}</H3>
 
-        <H6 className="text-gray-50 mt-2">{subtitle}</H6>
+        <P className="text-gray-50 mt-2">{subtitle}</P>
       </div>
     </section>
   );
