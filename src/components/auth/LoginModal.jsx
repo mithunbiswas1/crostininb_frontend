@@ -114,7 +114,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-lg w-full max-w-md mx-4 z-10">
+      <div className="relative bg-gray-50 rounded-lg w-full max-w-md mx-4 z-10">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -145,7 +145,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                   onChange={handleChange}
                   placeholder="Enter Mobile Number"
                   disabled={otpSent}
-                  className={`flex-1 border border-gray-300 rounded-r-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-black bg-white ${
+                  className={`flex-1 border border-gray-300 rounded-r-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-black bg-gray-50 ${
                     otpSent ? "bg-gray-50 text-gray-500" : ""
                   } ${errors.mobile ? "border-red-500" : ""}`}
                 />
@@ -167,7 +167,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                   value={formData.otp}
                   onChange={handleChange}
                   placeholder="Enter OTP"
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-black bg-white ${
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-black bg-gray-50 ${
                     errors.otp ? "border-red-500" : ""
                   }`}
                 />
@@ -201,7 +201,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
             <button
               type="submit"
               disabled={otpLoading || verifyLoading}
-              className={`w-full bg-primary text-white py-3 rounded-md font-medium hover:bg-primary-dark transition ${
+              className={`w-full bg-primary text-gray-50 py-3 rounded-md font-medium hover:bg-primary-dark transition ${
                 otpLoading || verifyLoading
                   ? "opacity-70 cursor-not-allowed"
                   : ""

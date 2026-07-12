@@ -6,7 +6,7 @@ import { H2, H3, P } from "@/components/ui/Typography";
 
 function ProjectCard({ item, reverse }) {
   return (
-    <div className="group grid lg:grid-cols-2 overflow-hidden bg-white">
+    <div className="group grid lg:grid-cols-2 overflow-hidden bg-gray-50">
       {/* Image */}
       <div
         className={`relative h-60 sm:h-72 md:h-80 lg:h-auto lg:min-h-[500px] ${
@@ -48,7 +48,7 @@ function ProjectCard({ item, reverse }) {
 
 export default function ProjectsSection({ projectsData }) {
   return (
-    <section className="py-12 lg:py-15 bg-white">
+    <section className="py-12 lg:py-15 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="max-w-3xl mb-10 lg:mb-20">

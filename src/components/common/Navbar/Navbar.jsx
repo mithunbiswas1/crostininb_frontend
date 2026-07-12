@@ -18,72 +18,56 @@ import { HiBars3 } from "react-icons/hi2";
 import { FaXmark } from "react-icons/fa6";
 
 const navigation = [
-  { name: "Home", href: "/" },
+  {
+    name: "Home",
+    href: "/",
+  },
   {
     name: "Menu",
     href: "/menu",
+  },
+  {
+    name: "Dining Room",
+    href: "/dining-room",
   },
   {
     name: "About",
     href: "/about",
   },
   {
-    name: "Services",
+    name: "Order Online",
+    href: "/order-online",
+  },
+  {
+    name: "Specials",
+    href: "/specials",
+  },
+  {
+    name: "Catering",
+    href: "/catering",
+  },
+  {
+    name: "Items",
     href: "#",
     subMenu: [
       {
-        name: "App Development",
-        href: "/app-development",
+        name: "Photos",
+        href: "/photos",
       },
-      { name: "Web Development", href: "/web-development" },
-      { name: "UI/UX Design", href: "/ui-ux-design" },
       {
-        name: "Software Development",
-        href: "/software-development",
+        name: "Dishes",
+        href: "/dishes",
       },
-      { name: "E-commerce Solutions", href: "/ecommerce-solutions" },
-      { name: "AI & Automation", href: "/ai-automation" },
-      { name: "Search Engine Optimization", href: "/seo" },
-      { name: "Digital Marketing", href: "/digital-marketing" },
+      {
+        name: "Salads",
+        href: "/salads",
+      },
+      {
+        name: "Pizza",
+        href: "/pizza",
+      },
     ],
-    subColumn: 2,
-  },
-  // {
-  //   name: "Solutions",
-  //   href: "#",
-  //   subMenu: [
-  //     {
-  //       name: "Enterprise Resource Planning (ERP)",
-  //       href: "/enterprise-resource-planning",
-  //     },
-  //     {
-  //       name: "Human Resource Management System (HRMS)",
-  //       href: "/human-resource-management",
-  //     },
-  //     {
-  //       name: "Customer Relationship Management (CRM)",
-  //       href: "/customer-relationship-management",
-  //     },
-  //     {
-  //       name: "Inventory Management System (IMS)",
-  //       href: "/inventory-management-system",
-  //     },
-  //     { name: "SaaS Product Development", href: "/saas-development" },
-  //     { name: "API Integration Services", href: "/api-integration" },
-  //   ],
-  //   subColumn: 2,
-  // },
-  {
-    name: "Projects",
-    href: "/projects",
-  },
-  {
-    name: "Package",
-    href: "/package",
-  },
-  {
-    name: "Case Studies",
-    href: "/case-studies",
+    subColumn: 1,
   },
 ];
 
@@ -93,11 +77,6 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
-
-  // Static data
-  const staticData = {
-    phone: "0480308226",
-  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -128,8 +107,8 @@ export default function Navbar() {
 
   return (
     <div
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 border-b border-white/20 ${
-        isScrolled ? "bg-white shadow-md" : "bg-transparent"
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 border-b border-gray-50/20 ${
+        isScrolled ? "bg-gray-50 shadow-md" : "bg-transparent"
       }`}
     >
       <nav className="max-w-screen-xl mx-auto flex items-center justify-between px-4 py-1">
@@ -138,11 +117,11 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <span className="sr-only">Your Company</span>
             <Image
-              src={isScrolled ? "/logo_black.png" : "/logo_white.png"}
+              src={isScrolled ? "/logo.avif" : "/logo.avif"}
               alt="Your Company Logo"
               width={200}
-              height={40}
-              className="h-8 w-auto"
+              height={80}
+              className="h-15 w-auto"
               priority
             />
           </Link>
@@ -158,7 +137,7 @@ export default function Navbar() {
             <span className="sr-only">Open main menu</span>
             <HiBars3
               aria-hidden="true"
-              className={` ${isScrolled ? "text-black" : "text-white"} h-6 w-6`}
+              className={` ${isScrolled ? "text-black" : "text-gray-50"} h-6 w-6`}
             />
           </button>
         </div>
@@ -176,7 +155,7 @@ export default function Navbar() {
                 <Link
                   href={item.href}
                   className={`text-sm font-bold  py-4 px-3 ${
-                    isScrolled ? "text-black" : "text-white"
+                    isScrolled ? "text-black" : "text-gray-50"
                   }`}
                 >
                   {item.name}
@@ -188,13 +167,13 @@ export default function Navbar() {
                     {openSubMenu === item.name ? (
                       <FaChevronUp
                         className={`h-3 w-3 ${
-                          isScrolled ? "text-black" : "text-white"
+                          isScrolled ? "text-black" : "text-gray-50"
                         }`}
                       />
                     ) : (
                       <FaChevronDown
                         className={`h-3 w-3 ${
-                          isScrolled ? "text-black" : "text-white"
+                          isScrolled ? "text-black" : "text-gray-50"
                         }`}
                       />
                     )}
@@ -212,7 +191,7 @@ export default function Navbar() {
                   className="pt-1 absolute left-0 right-0 w-screen"
                 >
                   <div
-                    className={` lg:-ml-45 bg-black text-white p-4 rounded-md shadow-md grid ${
+                    className={` lg:-ml-45 bg-black text-gray-50 p-4 rounded-md shadow-md grid ${
                       item.subColumn === 2
                         ? "grid-cols-2 max-w-lg"
                         : "grid-cols-3 max-w-screen-md"
@@ -242,7 +221,7 @@ export default function Navbar() {
         <div className="hidden lg:flex lg:justify-end">
           <Link
             href="/contact"
-            className="flex items-center justify-center gap-2 w-auto min-w-36 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary transition-all duration-300"
+            className="flex items-center justify-center gap-2 w-auto min-w-36 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-gray-50 shadow-sm hover:bg-primary transition-all duration-300"
           >
             <span>Contact Us</span>
           </Link>
@@ -257,7 +236,7 @@ export default function Navbar() {
           >
             <Link href="#" className="-m-1.5 p-1.5">
               <Image
-                src={isScrolled ? "/logo_black.png" : "/logo_white.png"}
+                src={isScrolled ? "/logo.avif" : "/logo.avif"}
                 alt="Your Company Logo"
                 width={200}
                 height={40}
@@ -268,12 +247,12 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="rounded-md text-white"
+              className="rounded-md text-gray-50"
             >
               <span className="sr-only">Close menu</span>
               <FaXmark
                 aria-hidden="true"
-                className={`h-6 w-6 ${isScrolled ? "text-black" : "text-white"}`}
+                className={`h-6 w-6 ${isScrolled ? "text-black" : "text-gray-50"}`}
               />
             </button>
           </div>
@@ -287,7 +266,7 @@ export default function Navbar() {
                     pathname === item.href ||
                     item.subMenu?.some((sub) => sub.href === pathname)
                       ? "border-b-2 border-primary text-primary"
-                      : "text-white"
+                      : "text-gray-50"
                   }`}
                 >
                   <Link
@@ -302,7 +281,7 @@ export default function Navbar() {
                   {item.subMenu && (
                     <button
                       onClick={() => toggleSubMenu(item.name)}
-                      className="ml-4 bg-primary text-white p-2 rounded-md"
+                      className="ml-4 bg-primary text-gray-50 p-2 rounded-md"
                     >
                       {openSubMenu === item.name ? (
                         <FaChevronUp
@@ -310,7 +289,7 @@ export default function Navbar() {
                             pathname === item.href ||
                             item.subMenu?.some((sub) => sub.href === pathname)
                               ? "text-primary"
-                              : "text-white"
+                              : "text-gray-50"
                           }`}
                         />
                       ) : (
@@ -319,7 +298,7 @@ export default function Navbar() {
                             pathname === item.href ||
                             item.subMenu?.some((sub) => sub.href === pathname)
                               ? "text-primary"
-                              : "text-white"
+                              : "text-gray-50"
                           }`}
                         />
                       )}
@@ -341,7 +320,7 @@ export default function Navbar() {
                         key={subItem.name}
                         href={subItem.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block text-md font-light text-white text-left pl-12"
+                        className="block text-md font-light text-gray-50 text-left pl-12"
                       >
                         {subItem.name}
                       </Link>
@@ -354,27 +333,27 @@ export default function Navbar() {
             {/* Only Mobile Contact Link */}
             <Link
               href="/contact"
-              className="mt-10 flex items-center justify-center gap-2 w-auto min-w-36 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary transition-all duration-300"
+              className="mt-10 flex items-center justify-center gap-2 w-auto min-w-36 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-gray-50 shadow-sm hover:bg-primary transition-all duration-300"
             >
               <span>Contact Us</span>
             </Link>
           </div>
 
-          <div className="text-white px-4 pt-12 pb-4 space-y-4">
+          <div className="text-gray-50 px-4 pt-12 pb-4 space-y-4">
             {/* Contact */}
             <div className="pt-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-4">
-                  <div className=" text-white group-hover:text-primary transition-all duration-300 text-2xl">
+                  <div className=" text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
                     <FaMapMarkerAlt />
                   </div>
-                  <p className="text-white text-lg">
+                  <p className="text-gray-50 text-lg">
                     Level 2, 8-12 King Street, Rockdale, NSW 2216
                   </p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className=" text-white group-hover:text-primary transition-all duration-300 text-2xl">
+                  <div className=" text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
                     <FaEnvelope />
                   </div>
                   <p className="text-primary text-lg">
@@ -385,7 +364,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className=" text-white group-hover:text-primary transition-all duration-300 text-2xl">
+                  <div className=" text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
                     <FaPhone />
                   </div>
                   <p className="text-primary text-lg">

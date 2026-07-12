@@ -49,7 +49,7 @@ const Input = forwardRef(
           aria-invalid={!!error}
           suppressHydrationWarning={true}
           className={cn(
-            "w-full rounded-md border border-border_gray bg-white text-base focus:outline-none focus:ring-1 focus:ring-primary py-3 px-4",
+            "w-full rounded-md border border-border_gray bg-gray-50 text-base focus:outline-none focus:ring-1 focus:ring-primary py-3 px-4",
             prefix ? "pl-10" : "",
             suffix ? "pr-10" : "",
             error && "border-red-500 focus:ring-red-500",

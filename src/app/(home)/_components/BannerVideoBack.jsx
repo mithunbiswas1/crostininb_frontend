@@ -18,7 +18,7 @@ export const BannerVideoBack = () => {
       </video>
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-xs" />
     </div>
   );
 };

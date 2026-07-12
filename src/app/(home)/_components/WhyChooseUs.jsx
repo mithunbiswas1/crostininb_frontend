@@ -40,12 +40,12 @@ export default function WhyChooseUs() {
                     <div>
                       <Icon
                         size={38}
-                        className="text-white"
+                        className="text-gray-50"
                         strokeWidth={1.5}
                       />
                     </div>
                     <div>
-                      <h3 className="text-white text-lg font-semibold uppercase">
+                      <h3 className="text-gray-50 text-lg font-semibold uppercase">
                         {item.title}
                       </h3>
                       <p className="mt-2 text-sm leading-6 text-zinc-400">

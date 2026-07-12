@@ -19,7 +19,7 @@ const DropdownMenuContent = forwardRef(
     <div
       ref={ref}
       className={cn(
-        "z-50 min-w-55 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.08)]",
+        "z-50 min-w-55 overflow-hidden rounded-lg border border-gray-100 bg-gray-50 shadow-[0_10px_40px_rgba(0,0,0,0.08)]",
         className,
       )}
       {...props}
@@ -171,7 +171,7 @@ const DropDown = ({
                 {section.items?.map((item) => (
                   <div
                     className={cn(
-                      "flex items-center gap-1.5 bg-white_shade mx-2 p-2 text-[13px] font-medium outline-none transition-all disabled:pointer-events-none disabled:opacity-50 rounded-md",
+                      "flex items-center gap-1.5 bg-gray-50_shade mx-2 p-2 text-[13px] font-medium outline-none transition-all disabled:pointer-events-none disabled:opacity-50 rounded-md",
                       className,
                     )}
                     key={item.id}

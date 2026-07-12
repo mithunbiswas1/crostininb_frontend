@@ -130,7 +130,7 @@ const tabs = Object.keys(projectsData);
 
 function ProjectCard({ item, reverse }) {
   return (
-    <div className="group grid lg:grid-cols-2 overflow-hidden bg-white">
+    <div className="group grid lg:grid-cols-2 overflow-hidden bg-gray-50">
       {/* Image */}
       <div
         className={`relative h-[240px] sm:h-[300px] lg:h-auto lg:min-h-[500px] ${
@@ -160,16 +160,14 @@ function ProjectCard({ item, reverse }) {
         <H3 className="font-bold mb-4 leading-tight">{item.title}</H3>
 
         {/* Description */}
-        <P className="text-gray-600 mb-6 leading-7">
-          {item.description}
-        </P>
+        <P className="text-gray-600 mb-6 leading-7">{item.description}</P>
 
         {/* Technologies */}
         <div className="flex flex-wrap gap-2 mb-6">
           {item.technologies.map((tech, techIndex) => (
             <span
               key={techIndex}
-              className="rounded-full bg-white px-3 py-1 text-xs font-medium border border-gray-200"
+              className="rounded-full bg-gray-50 px-3 py-1 text-xs font-medium border border-gray-200"
             >
               {tech}
             </span>
@@ -194,7 +192,7 @@ export default function ProjectsShowcaseSection() {
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
   return (
-    <section className="py-15 bg-white">
+    <section className="py-15 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="max-w-3xl mb-16 lg:mb-20">
@@ -211,7 +209,7 @@ export default function ProjectsShowcaseSection() {
         <div className="lg:border-t lg:border-gray-300">
           <div className="lg:grid lg:grid-cols-[320px_1fr]">
             {/* Mobile Tabs */}
-            <div className="lg:hidden sticky top-10 bg-white z-20 border-b border-gray-300">
+            <div className="lg:hidden sticky top-10 bg-gray-50 z-20 border-b border-gray-300">
               <div className="overflow-x-auto">
                 <div className="flex w-max gap-2 px-4 py-4">
                   {tabs.map((tab) => (
@@ -221,7 +219,7 @@ export default function ProjectsShowcaseSection() {
                       className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all
                         ${
                           activeTab === tab
-                            ? "bg-primary text-white"
+                            ? "bg-primary text-gray-50"
                             : "bg-gray-200 hover:bg-gray-300"
                         }`}
                     >
@@ -242,7 +240,7 @@ export default function ProjectsShowcaseSection() {
                     className={`mx-3 my-1 px-4 py-3 text-left text-lg rounded-full transition-all
                       ${
                         activeTab === tab
-                          ? "bg-primary text-white font-semibold"
+                          ? "bg-primary text-gray-50 font-semibold"
                           : "hover:bg-gray-200"
                       }`}
                   >

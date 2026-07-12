@@ -88,7 +88,7 @@ const Select = forwardRef(
             onFocus={() => setIsOpen(true)}
             onBlur={() => setIsOpen(false)}
             className={cn(
-              "py-2 2xl:py-2.5 w-full rounded-md border border-border_gray bg-white px-4 pr-10 appearance-none focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer",
+              "py-2 2xl:py-2.5 w-full rounded-md border border-border_gray bg-gray-50 px-4 pr-10 appearance-none focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer",
               error && "border-red-500 focus:ring-red-500",
               disabled && "opacity-50 cursor-not-allowed",
               className,

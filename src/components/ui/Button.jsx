@@ -13,36 +13,36 @@ const buttonVariants = cva(
         primary:
           "bg-primary hover:bg-primary/90 text-foreground_primary border border-transparent",
         secondary:
-          "bg-foreground_primary hover:bg-foreground_primary/85 text-primary hover:text-white font-bold border border-transparent",
+          "bg-foreground_primary hover:bg-foreground_primary/85 text-primary hover:text-gray-50 font-bold border border-transparent",
         success:
-          "bg-success hover:bg-success/90 text-white border border-transparent",
-        info: "bg-info hover:bg-info/90 text-white border border-transparent",
+          "bg-success hover:bg-success/90 text-gray-50 border border-transparent",
+        info: "bg-info hover:bg-info/90 text-gray-50 border border-transparent",
         warning:
-          "bg-warning hover:bg-warning/90 text-white border border-transparent",
+          "bg-warning hover:bg-warning/90 text-gray-50 border border-transparent",
         danger:
-          "bg-danger hover:bg-danger/90 text-white border border-transparent",
+          "bg-danger hover:bg-danger/90 text-gray-50 border border-transparent",
         ashes:
           "bg-ashes hover:bg-ashes/90 text-black border border-transparent",
         disabled:
           "bg-gray_200 text-border_gray cursor-not-allowed border border-transparent",
         outline_default:
-          "bg-transparent text-foreground_primary font-medium border border-foreground_primary/20 hover:bg-foreground_primary hover:text-white",
+          "bg-transparent text-foreground_primary font-medium border border-foreground_primary/20 hover:bg-foreground_primary hover:text-gray-50",
         outline_primary:
           "bg-transparent text-primary border border-primary hover:bg-primary hover:text-foreground_primary",
         outline_secondary:
           "bg-transparent text-primary border border-primary/20 hover:border-primary",
         outline_success:
-          "bg-transparent text-success border border-success hover:bg-success hover:text-white",
+          "bg-transparent text-success border border-success hover:bg-success hover:text-gray-50",
         outline_info:
-          "bg-transparent text-info border border-info hover:bg-info hover:text-white",
+          "bg-transparent text-info border border-info hover:bg-info hover:text-gray-50",
         outline_warning:
-          "bg-transparent text-warning border border-warning hover:bg-warning hover:text-white",
+          "bg-transparent text-warning border border-warning hover:bg-warning hover:text-gray-50",
         outline_danger:
-          "bg-transparent text-danger border border-danger hover:bg-danger hover:text-white",
+          "bg-transparent text-danger border border-danger hover:bg-danger hover:text-gray-50",
         outline_disabled:
           "bg-transparent text-gray_500 border border-gray_500 cursor-not-allowed",
         outline_icon:
-          "backdrop-blur-xs text-info border border-info! hover:bg-foreground_primary hover:text-white",
+          "backdrop-blur-xs text-info border border-info! hover:bg-foreground_primary hover:text-gray-50",
       },
       size: {
         default: "px-4 xl:px-5 py-2 xl:py-2.5 text-sm",

@@ -4,30 +4,43 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FaLinkedinIn, FaFacebookF } from "react-icons/fa";
-import { SiDouban } from "react-icons/si";
+import { FaInstagram, FaFacebookF, FaTripadvisor } from "react-icons/fa";
+import { SiGooglemaps } from "react-icons/si";
+import { Clock, Phone, MapPin, Mail, ChefHat, Utensils } from "lucide-react";
+import { H2, P } from "@/components/ui/Typography";
 
 const navigationLinks = [
-  { label: "About", href: "/about" },
-  { label: "Case Studies", href: "/case-studies" },
+  { label: "Our Story", href: "/about" },
+  { label: "Menu", href: "/menu" },
+  { label: "Reservations", href: "/reservations" },
+  { label: "Private Events", href: "/events" },
   { label: "Contact", href: "/contact" },
 ];
 
 const socialLinks = [
   {
-    icon: FaLinkedinIn,
-    href: "https://linkedin.com",
-    label: "LinkedIn",
+    icon: FaInstagram,
+    href: "https://instagram.com",
+    label: "Instagram",
+    color: "hover:text-pink-500",
   },
   {
     icon: FaFacebookF,
     href: "https://facebook.com",
     label: "Facebook",
+    color: "hover:text-blue-600",
   },
   {
-    icon: SiDouban,
+    icon: FaTripadvisor,
+    href: "https://tripadvisor.com",
+    label: "TripAdvisor",
+    color: "hover:text-green-600",
+  },
+  {
+    icon: SiGooglemaps,
     href: "#",
-    label: "Dou",
+    label: "Google Maps",
+    color: "hover:text-red-500",
   },
 ];
 
@@ -46,33 +59,64 @@ const legalLinks = [
   },
 ];
 
+const openingHours = [
+  { day: "Monday - Thursday", hours: "11:00 AM - 10:00 PM" },
+  { day: "Friday - Saturday", hours: "11:00 AM - 11:30 PM" },
+  { day: "Sunday", hours: "12:00 PM - 9:00 PM" },
+];
+
 export default function Footer() {
   return (
-    <footer className="bg-[#2A2D33] text-white">
-      <div className="max-w-7xl mx-auto px-4 pt-10">
+    <footer className="bg-gradient-to-b from-[#1a1410] to-[#0d0a08] text-gray-50 border-t border-amber-900/20">
+      <div className="max-w-7xl mx-auto px-4 pt-16 pb-8">
         {/* Top */}
-        <div className="grid lg:grid-cols-[2fr_1fr_1.5fr_1fr] gap-12">
-          {/* Logo */}
-          <Link href="/">
+        <div className="grid lg:grid-cols-[2fr_1fr_1.5fr_1.2fr] gap-12">
+          {/* Brand */}
+          <div>
             <Image
-              src="/logo_white.png"
-              alt="Logicraft IT"
-              width={320}
-              height={100}
-              className="h-auto w-full max-w-50"
+              src="/logo.avif"
+              alt="Your Company Logo"
+              width={200}
+              height={40}
+              className="h-20 w-auto"
+              priority
             />
-          </Link>
+
+            <P className="text-gray-400 text-sm leading-relaxed max-w-sm mt-4">
+              Where culinary artistry meets warm hospitality. Every dish tells a
+              story of passion, quality, and unforgettable flavors.
+            </P>
+
+            <div className="flex gap-4 mt-6">
+              {socialLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    aria-label={item.label}
+                    className={`w-10 h-10 rounded-full bg-gray-50/5 border border-gray-50/10 flex items-center justify-center text-gray-400 hover:bg-gray-50/10 hover:border-amber-400/50 transition-all duration-300 ${item.color}`}
+                  >
+                    <Icon size={18} />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Navigation */}
           <div>
-            <h4 className="font-bold mb-5 text-white">Useful Link</h4>
-            <ul className="space-y-5 text-gray-300">
+            <h4 className="font-bold mb-5 text-amber-400 text-sm uppercase tracking-wider">
+              Quick Links
+            </h4>
+            <ul className="space-y-3 text-gray-400">
               {navigationLinks.map((item) => (
                 <li key={item.label}>
                   <Link
                     href={item.href}
-                    className="text-lg hover:text-gray-300 transition-colors"
+                    className="text-sm hover:text-amber-400 transition-colors duration-300 flex items-center gap-2 group"
                   >
+                    <span className="w-0 group-hover:w-3 h-px bg-amber-400 transition-all duration-300"></span>
                     {item.label}
                   </Link>
                 </li>
@@ -80,67 +124,77 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Opening Hours */}
           <div>
-            <h4 className="font-bold mb-5 text-white">Address</h4>
-
-            <div className="space-y-5 text-gray-300">
-              <p>
-                Street 47 W 13th St,
-                <br />
-                New York, NY 10011, USA
-              </p>
-
-              <p className="font-semibold">+1 (555) 123-4567</p>
-
-              <a
-                href="mailto:info@logicraftit.com"
-                className="text-lg hover:text-gray-300 transition-colors"
-              >
-                info@logicraftit.com
-              </a>
+            <h4 className="font-bold mb-5 text-amber-400 text-sm uppercase tracking-wider">
+              Opening Hours
+            </h4>
+            <div className="space-y-3">
+              {openingHours.map((item, index) => (
+                <div key={index} className="flex flex-col">
+                  <span className="text-gray-50 text-sm font-medium">
+                    {item.day}
+                  </span>
+                  <span className="text-gray-400 text-sm flex items-center gap-2">
+                    <Clock size={14} className="text-amber-400" />
+                    {item.hours}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Email + Social */}
-          <div className="">
-            <h4 className="font-bold mb-5 text-white">Social</h4>
+          {/* Contact */}
+          <div>
+            <h4 className="font-bold mb-5 text-amber-400 text-sm uppercase tracking-wider">
+              Get in Touch
+            </h4>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <MapPin size={18} className="text-amber-400 mt-0.5 shrink-0" />
+                <p className="text-gray-400 text-sm">
+                  47 W 13th St,
+                  <br />
+                  New York, NY 10011, USA
+                </p>
+              </div>
 
-            <div className="flex lg:justify-end gap-4 mt-4">
-              {socialLinks.map((item) => {
-                const Icon = item.icon;
+              <div className="flex items-center gap-3">
+                <Phone size={18} className="text-amber-400 shrink-0" />
+                <a
+                  href="tel:+15551234567"
+                  className="text-gray-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  +1 (555) 123-4567
+                </a>
+              </div>
 
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    aria-label={item.label}
-                    className="w-14 h-14 rounded-full bg-white text-[#2A2D33] flex items-center justify-center hover:scale-105 transition-transform"
-                  >
-                    <Icon size={24} />
-                  </Link>
-                );
-              })}
+              <div className="flex items-center gap-3">
+                <Mail size={18} className="text-amber-400 shrink-0" />
+                <a
+                  href="mailto:info@gourmethaven.com"
+                  className="text-gray-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  info@gourmethaven.com
+                </a>
+              </div>
+
+              {/* Reservation CTA */}
+              <Link
+                href="/reservations"
+                className="inline-block mt-4 bg-amber-500 hover:bg-amber-600 text-gray-50 text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105"
+              >
+                Reserve a Table
+              </Link>
             </div>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="mt-8 py-4 flex flex-col lg:flex-row justify-between gap-6 border-t border-white/10">
-          <p className="text-white/80">Copyright © 2026 Logicraft IT</p>
 
-          <div className="flex flex-wrap gap-8 lg:gap-12">
-            {legalLinks.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="text-white/80 hover:text-white transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
+        <P className="mt-12 pt-6 border-t text-center">
+          Copyright © 2026 GourmetHaven. All rights reserved.
+        </P>
       </div>
     </footer>
   );

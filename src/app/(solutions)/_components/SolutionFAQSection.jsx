@@ -63,7 +63,7 @@ export default function SolutionFAQSection() {
           <div className="lg:sticky lg:top-24 h-fit">
             <H2 className="font-bold mb-8">FAQ About ERP</H2>
 
-            <div className="bg-white p-8 lg:p-10 rounded-sm">
+            <div className="bg-gray-50 p-8 lg:p-10 rounded-sm">
               <H3 className="mb-5">
                 Everything you need to know before starting ERP
               </H3>
@@ -76,7 +76,7 @@ export default function SolutionFAQSection() {
 
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center px-7 py-4 bg-black text-white rounded-full font-medium hover:opacity-90 transition"
+                className="inline-flex items-center justify-center px-7 py-4 bg-black text-gray-50 rounded-full font-medium hover:opacity-90 transition"
               >
                 Talk to Experts
               </Link>
@@ -90,7 +90,7 @@ export default function SolutionFAQSection() {
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="bg-white border-0 px-6 lg:px-8"
+                  className="bg-gray-50 border-0 px-6 lg:px-8"
                 >
                   <AccordionTrigger className="text-left text-lg font-semibold py-8 hover:no-underline">
                     {faq.question}

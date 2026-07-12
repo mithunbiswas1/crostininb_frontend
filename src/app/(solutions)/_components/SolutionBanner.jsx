@@ -15,7 +15,7 @@ export default function SolutionBanner({
   buttonLink,
 }) {
   return (
-    <section className="relative min-h-screen overflow-hidden text-white">
+    <section className="relative min-h-screen overflow-hidden text-gray-50">
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image src={image} alt={title} fill priority className="object-cover" />
@@ -30,7 +30,7 @@ export default function SolutionBanner({
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 min-h-screen flex items-center pt-16">
         <div className="max-w-3xl">
-          <H1 className="text-white font-bold mb-6">{title}</H1>
+          <H1 className="text-gray-50 font-bold mb-6">{title}</H1>
 
           <P className="text-gray-200 mb-10 leading-8">{description}</P>
 

@@ -37,7 +37,7 @@ const projects = [
 
 function ProjectCard({ item, reverse }) {
   return (
-    <div className="group grid lg:grid-cols-2 overflow-hidden bg-white">
+    <div className="group grid lg:grid-cols-2 overflow-hidden bg-gray-50">
       {/* Image */}
       <div
         className={`relative h-60 sm:h-72 md:h-80 lg:h-auto lg:min-h-[500px] ${
@@ -58,9 +58,7 @@ function ProjectCard({ item, reverse }) {
           reverse ? "lg:order-2" : "lg:order-1"
         }`}
       >
-        <H3 className="font-bold mb-4 lg:mb-5 max-w-lg">
-          {item.title}
-        </H3>
+        <H3 className="font-bold mb-4 lg:mb-5 max-w-lg">{item.title}</H3>
 
         <P className="text-gray-600 mb-6 lg:mb-8 max-w-xl lg:leading-7">
           {item.description}
@@ -81,7 +79,7 @@ function ProjectCard({ item, reverse }) {
 
 export default function ProjectsSection() {
   return (
-    <section className="py-12 lg:py-15 bg-white">
+    <section className="py-12 lg:py-15 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="max-w-3xl mb-10 lg:mb-20">
@@ -99,11 +97,7 @@ export default function ProjectsSection() {
         {/* Projects */}
         <div className="space-y-px bg-gray-200 overflow-hidden">
           {projects.map((item, index) => (
-            <ProjectCard
-              key={index}
-              item={item}
-              reverse={index % 2 !== 0}
-            />
+            <ProjectCard key={index} item={item} reverse={index % 2 !== 0} />
           ))}
         </div>
       </div>

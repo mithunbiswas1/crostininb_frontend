@@ -57,7 +57,7 @@ function StepCard({ step, dark }) {
   return (
     <div
       className={`p-8 lg:p-10 flex flex-col ${
-        dark ? "bg-black text-white" : "bg-gray-100 text-black"
+        dark ? "bg-black text-gray-50" : "bg-gray-100 text-black"
       }`}
     >
       {/* Step Number */}

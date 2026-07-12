@@ -25,7 +25,7 @@ export default function ContactSection() {
             <div className="mt-16 space-y-6">
               <div className="flex items-center gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-black">
-                  <Mail className="h-5 w-5 text-white" />
+                  <Mail className="h-5 w-5 text-gray-50" />
                 </div>
 
                 <span className="text-xl lg:text-2xl font-semibold">
@@ -35,7 +35,7 @@ export default function ContactSection() {
 
               <div className="flex items-center gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-black">
-                  <Phone className="h-5 w-5 text-white" />
+                  <Phone className="h-5 w-5 text-gray-50" />
                 </div>
 
                 <span className="text-xl lg:text-2xl font-semibold">
@@ -45,7 +45,7 @@ export default function ContactSection() {
 
               <div className="flex items-center gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-black">
-                  <Map className="h-5 w-5 text-white" />
+                  <Map className="h-5 w-5 text-gray-50" />
                 </div>
 
                 <span className="text-xl lg:text-2xl font-semibold">
@@ -99,7 +99,7 @@ export default function ContactSection() {
 
             <button
               type="submit"
-              className="h-20 w-full rounded-full bg-black text-lg font-semibold text-white transition hover:opacity-90"
+              className="h-20 w-full rounded-full bg-black text-lg font-semibold text-gray-50 transition hover:opacity-90"
             >
               Send Message
             </button>

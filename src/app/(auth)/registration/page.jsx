@@ -108,7 +108,7 @@ const RegisterForm = () => {
 
   return (
     <div className="p-4">
-      <div className="block lg:hidden bg-primary text-white px-4 py-8 rounded-md">
+      <div className="block lg:hidden bg-primary text-gray-50 px-4 py-8 rounded-md">
         <h2 className="text-2xl font-semibold mb-4">
           {otpSent ? "Verify OTP" : "Join us today!"}
         </h2>
@@ -119,8 +119,8 @@ const RegisterForm = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center lg:max-w-3xl mx-auto lg:my-10 p-4 bg-white lg:min-h-140 shadow border border-gray-200 lg:rounded-sm">
-        <div className="hidden lg:block lg:col-span-2 lg:h-full bg-primary text-white p-8 rounded-md">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center lg:max-w-3xl mx-auto lg:my-10 p-4 bg-gray-50 lg:min-h-140 shadow border border-gray-200 lg:rounded-sm">
+        <div className="hidden lg:block lg:col-span-2 lg:h-full bg-primary text-gray-50 p-8 rounded-md">
           <h2 className="text-2xl font-semibold mb-6">
             {otpSent ? "Verify OTP" : "Join us today!"}
           </h2>
@@ -244,7 +244,7 @@ const RegisterForm = () => {
             <button
               type="submit"
               disabled={regLoading || otpLoading || verifyLoading}
-              className={`w-full bg-primary text-white py-3 rounded-md font-medium hover:bg-primary-dark transition ${
+              className={`w-full bg-primary text-gray-50 py-3 rounded-md font-medium hover:bg-primary-dark transition ${
                 regLoading || otpLoading || verifyLoading
                   ? "opacity-70 cursor-not-allowed"
                   : ""

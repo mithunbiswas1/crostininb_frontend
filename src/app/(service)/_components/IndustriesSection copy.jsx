@@ -64,7 +64,7 @@ const industries = [
 
 function IndustryCard({ industry }) {
   return (
-    <div className="group border border-gray-200 bg-white p-4 lg:p-6 transition hover:border-gray-300">
+    <div className="group border border-gray-200 bg-gray-50 p-4 lg:p-6 transition hover:border-gray-300">
       <H4 className="font-bold mb-4">{industry.title}</H4>
 
       <P className="text-gray-600 mb-8">{industry.description}</P>
@@ -108,8 +108,8 @@ export default function IndustriesSection() {
           ))}
 
           {/* CTA Card */}
-          <div className="bg-black text-white p-4 flex flex-col justify-center items-center text-center min-h-[240px]">
-            <H4 className="text-white font-bold mb-6">
+          <div className="bg-black text-gray-50 p-4 flex flex-col justify-center items-center text-center min-h-[240px]">
+            <H4 className="text-gray-50 font-bold mb-6">
               Let's Turn Your Vision Into a Market-Leading Mobile App
             </H4>
 

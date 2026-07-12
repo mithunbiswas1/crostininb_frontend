@@ -5,7 +5,7 @@ import { H2, P } from "@/components/ui/Typography";
 
 export default function CTASection() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <H2>Ready to Create Your Success Story?</H2>
 
@@ -16,7 +16,7 @@ export default function CTASection() {
 
         <Link
           href="/contact"
-          className="inline-block mt-8 px-8 py-4 bg-primary text-white rounded-xl hover:opacity-90 transition"
+          className="inline-block mt-8 px-8 py-4 bg-primary text-gray-50 rounded-xl hover:opacity-90 transition"
         >
           Start Your Project
         </Link>

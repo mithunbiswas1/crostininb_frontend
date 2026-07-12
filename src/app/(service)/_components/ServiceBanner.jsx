@@ -9,7 +9,7 @@ import { H1, P } from "@/components/ui/Typography";
 
 export default function ServiceBanner({ bannerData }) {
   return (
-    <section className="relative min-h-screen bg-linear-to-r from-[#0B0C0A] via-[#0B0C0A] to-[#0B0C0A] text-white overflow-hidden">
+    <section className="relative min-h-screen bg-linear-to-r from-[#0B0C0A] via-[#0B0C0A] to-[#0B0C0A] text-gray-50 overflow-hidden">
       {/* Mobile Background Image */}
       <div className="absolute inset-0 lg:hidden">
         <Image
@@ -25,7 +25,7 @@ export default function ServiceBanner({ bannerData }) {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 min-h-screen flex items-center pt-16">
         <div className="max-w-3xl">
-          <H1 className="text-white font-bold mb-6">{bannerData?.title}</H1>
+          <H1 className="text-gray-50 font-bold mb-6">{bannerData?.title}</H1>
 
           <P className="text-gray-300 text-lg mb-10">
             {bannerData?.description}

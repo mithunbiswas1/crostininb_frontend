@@ -1,7 +1,10 @@
 // src/app/(home)/page.jsx
+
 import Banner from "./_components/Banner";
 import { BannerVideoBack } from "./_components/BannerVideoBack";
+import FlatDiscount from "./_components/FlatDiscount";
 import SpecialMenu from "./_components/SpecialMenu";
+import TestimonialsSection from "./_components/TestimonialsSection";
 import WhyChooseUs from "./_components/WhyChooseUs";
 
 const bannerContent = {
@@ -24,11 +27,10 @@ export default async function Home() {
         <Banner bannerContent={bannerContent} />
       </section>
 
+      <FlatDiscount />
       <SpecialMenu />
       <WhyChooseUs />
-
-      {/* <AtAGlanceSection /> */}
-      {/* <TestimonialsSection /> */}
+      <TestimonialsSection />
     </main>
   );
 }

@@ -63,7 +63,7 @@ export default function CoreValuesSection() {
             return (
               <div
                 key={index}
-                className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-3 lg:p-6 transition-all duration-300 hover:-translate-y-0.3 hover:border-primary hover:shadow-xs"
+                className="group relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-3 lg:p-6 transition-all duration-300 hover:-translate-y-0.3 hover:border-primary hover:shadow-xs"
               >
                 {/* Gradient Accent */}
                 <div className="absolute inset-x-0 top-0 h-1 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />

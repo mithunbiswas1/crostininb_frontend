@@ -11,7 +11,7 @@ export default function MissionVisionSection() {
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Mission */}
-          <div className="bg-white rounded-xl p-8 flex flex-col justify-between min-h-120">
+          <div className="bg-gray-50 rounded-xl p-8 flex flex-col justify-between min-h-120">
             <div className="relative h-full max-h-70 w-auto flex justify-center">
               <Image
                 src="/about/mission.png"
@@ -34,7 +34,7 @@ export default function MissionVisionSection() {
           </div>
 
           {/* Vision */}
-          <div className="bg-white rounded-xl p-8 flex flex-col justify-between min-h-120">
+          <div className="bg-gray-50 rounded-xl p-8 flex flex-col justify-between min-h-120">
             <div>
               <H3 className="mb-4">Vision</H3>
 

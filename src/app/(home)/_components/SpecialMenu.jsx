@@ -82,7 +82,7 @@ export default function SpecialMenu() {
       <div className="max-w-7xl mx-auto px-4">
         {/* Heading */}
         <div className="text-center mb-12">
-          <H2 className="text-white font-bold">Our Special Menu</H2>
+          <H2 className="text-gray-50 font-bold">Our Special Menu</H2>
 
           <p className="mt-4 max-w-2xl mx-auto text-zinc-400">
             Discover our chef's signature creations, crafted with premium
@@ -110,7 +110,9 @@ export default function SpecialMenu() {
 
               {/* Content */}
               <div className="mt-4">
-                <h3 className="text-white text-sm font-medium">{item.title}</h3>
+                <h3 className="text-gray-50 text-sm font-medium">
+                  {item.title}
+                </h3>
 
                 <div className="mt-2">
                   <span className="text-amber-400 font-semibold">

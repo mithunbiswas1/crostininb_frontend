@@ -63,7 +63,9 @@ function PricingCard({ plan }) {
   return (
     <div
       className={`rounded-3xl border p-8 h-full flex flex-col ${
-        isDark ? "bg-black text-white border-black" : "bg-white border-gray-200"
+        isDark
+          ? "bg-black text-gray-50 border-black"
+          : "bg-gray-50 border-gray-200"
       }`}
     >
       <div>
@@ -71,7 +73,7 @@ function PricingCard({ plan }) {
           <h3 className="text-2xl font-semibold">{plan.name}</h3>
 
           {plan.badge && (
-            <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-medium text-white">
+            <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-medium text-gray-50">
               🔥 {plan.badge}
             </span>
           )}
@@ -105,8 +107,8 @@ function PricingCard({ plan }) {
         <button
           className={`mt-10 h-14 w-full rounded-full font-medium transition ${
             isDark
-              ? "bg-white text-black hover:bg-gray-100"
-              : "bg-black text-white hover:opacity-90"
+              ? "bg-gray-50 text-black hover:bg-gray-100"
+              : "bg-black text-gray-50 hover:opacity-90"
           }`}
         >
           {plan.buttonText}
@@ -118,7 +120,7 @@ function PricingCard({ plan }) {
 
 export default function PricingSection() {
   return (
-    <section className="bg-white py-16">
+    <section className="bg-gray-50 py-16">
       <div className="max-w-7xl mx-auto px-4">
         {/* Heading */}
         <div className="max-w-4xl mb-10">

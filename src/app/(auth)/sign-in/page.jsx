@@ -82,16 +82,16 @@ const SignInForm = () => {
   return (
     <div className="p-4">
       {/* Mobile promo panel */}
-      <div className="block lg:hidden bg-primary text-white px-4 py-8 rounded-md">
+      <div className="block lg:hidden bg-primary text-gray-50 px-4 py-8 rounded-md">
         <h2 className="text-2xl font-semibold mb-4">Welcome Back!</h2>
         <p className="text-gray-200">
           Login with your mobile number to continue
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center lg:max-w-3xl mx-auto lg:my-10 p-4 bg-white lg:min-h-140 shadow border border-gray-200 lg:rounded-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center lg:max-w-3xl mx-auto lg:my-10 p-4 bg-gray-50 lg:min-h-140 shadow border border-gray-200 lg:rounded-sm">
         {/* Desktop promo panel */}
-        <div className="hidden lg:block lg:col-span-2 lg:h-full bg-primary text-white p-8 rounded-md">
+        <div className="hidden lg:block lg:col-span-2 lg:h-full bg-primary text-gray-50 p-8 rounded-md">
           <h2 className="text-2xl font-semibold mb-6">
             Looks like you're new here!
           </h2>
@@ -152,7 +152,7 @@ const SignInForm = () => {
             <button
               type="submit"
               disabled={otpLoading || verifyLoading}
-              className={`w-full bg-primary text-white py-3 rounded-md font-medium hover:bg-primary-dark transition ${
+              className={`w-full bg-primary text-gray-50 py-3 rounded-md font-medium hover:bg-primary-dark transition ${
                 otpLoading || verifyLoading
                   ? "opacity-70 cursor-not-allowed"
                   : ""

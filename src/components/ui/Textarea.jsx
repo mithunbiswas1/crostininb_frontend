@@ -30,7 +30,7 @@ const Textarea = React.forwardRef(
           disabled={disabled}
           aria-invalid={!!error}
           className={cn(
-            "flex w-full rounded-md border border-border_gray bg-white px-4 py-3 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50 resize-none",
+            "flex w-full rounded-md border border-border_gray bg-gray-50 px-4 py-3 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50 resize-none",
             error && "border-red-500 focus:ring-red-500",
             className,
           )}

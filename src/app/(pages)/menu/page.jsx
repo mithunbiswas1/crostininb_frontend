@@ -177,7 +177,7 @@ export default function MenuPage() {
         <div className="text-center mb-14">
           <p className="text-orange-500 uppercase tracking-[5px]">Food Menu</p>
 
-          <h2 className="text-5xl font-bold text-white mt-3">
+          <h2 className="text-5xl font-bold text-gray-50 mt-3">
             Our Special Menu
           </h2>
         </div>
@@ -187,7 +187,6 @@ export default function MenuPage() {
             <MenuCard key={item.id} item={item} />
           ))}
         </div>
-
       </section>
     </main>
   );

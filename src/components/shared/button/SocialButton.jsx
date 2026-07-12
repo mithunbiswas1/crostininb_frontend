@@ -4,7 +4,7 @@ import { Button } from "../../ui/Button";
 export default function SocialButton({ icon: Icon, label, accent }) {
   return (
     <Button
-      className="flex w-full items-center justify-center gap-3 rounded-md border border-border_gray bg-white px-4 py-3 text-base font-semibold text-gray-800 shadow-sm transition hover:-translate-y-px hover:shadow md:text-sm hover:cursor-pointer"
+      className="flex w-full items-center justify-center gap-3 rounded-md border border-border_gray bg-gray-50 px-4 py-3 text-base font-semibold text-gray-800 shadow-sm transition hover:-translate-y-px hover:shadow md:text-sm hover:cursor-pointer"
       type="button"
     >
       <Image

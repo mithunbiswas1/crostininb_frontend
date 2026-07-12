@@ -6,7 +6,7 @@ function ProcessCard({ step, dark }) {
   return (
     <div
       className={`p-8 lg:p-10 flex flex-col ${
-        dark ? "bg-black text-white" : "bg-gray-100 text-black"
+        dark ? "bg-black text-gray-50" : "bg-gray-100 text-black"
       }`}
     >
       <div className="text-6xl lg:text-7xl font-bold tracking-tight">
@@ -24,9 +24,9 @@ function ProcessCard({ step, dark }) {
   );
 }
 
-export default function DevelopmentProcessSection({developmentProcessData}) {
+export default function DevelopmentProcessSection({ developmentProcessData }) {
   return (
-    <section className="py-15 bg-white">
+    <section className="py-15 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="max-w-4xl mb-10">

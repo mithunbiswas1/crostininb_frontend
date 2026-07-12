@@ -16,7 +16,7 @@ export default function CTASection() {
 
         <Link
           href="/contact"
-          className="inline-block mt-8 px-8 py-4 bg-primary text-white rounded-xl"
+          className="inline-block mt-8 px-8 py-4 bg-primary text-gray-50 rounded-xl"
         >
           Contact Us
         </Link>

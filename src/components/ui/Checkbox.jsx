@@ -14,12 +14,12 @@ const checkboxVariants = cva(
         primary:
           "data-[state=checked]:bg-primary data-[state=checked]:text-foreground_primary",
         success:
-          "data-[state=checked]:bg-success data-[state=checked]:text-white",
-        info: "data-[state=checked]:bg-info data-[state=checked]:text-white",
+          "data-[state=checked]:bg-success data-[state=checked]:text-gray-50",
+        info: "data-[state=checked]:bg-info data-[state=checked]:text-gray-50",
         warning:
-          "data-[state=checked]:bg-warning data-[state=checked]:text-white",
+          "data-[state=checked]:bg-warning data-[state=checked]:text-gray-50",
         danger:
-          "data-[state=checked]:bg-danger data-[state=checked]:text-white",
+          "data-[state=checked]:bg-danger data-[state=checked]:text-gray-50",
       },
     },
     defaultVariants: {

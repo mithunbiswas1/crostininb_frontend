@@ -217,7 +217,7 @@ export default async function CaseStudyDetailPage({ params }) {
   }
 
   return (
-    <main className="bg-white">
+    <main className="bg-gray-50">
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center pt-16">
         <div className="absolute inset-0">
@@ -233,12 +233,12 @@ export default async function CaseStudyDetailPage({ params }) {
 
         <div className="relative w-full max-w-7xl mx-auto px-4 py-20">
           <div className="mb-4">
-            <span className="bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
+            <span className="bg-primary text-gray-50 px-4 py-2 rounded-full text-sm font-semibold">
               {study.category}
             </span>
           </div>
-          <H1 className="text-white mb-6">{study.title}</H1>
-          <div className="flex flex-wrap gap-6 text-white">
+          <H1 className="text-gray-50 mb-6">{study.title}</H1>
+          <div className="flex flex-wrap gap-6 text-gray-50">
             <div>
               <span className="text-gray-300">Client:</span>
               <p className="font-semibold">{study.client}</p>
@@ -277,7 +277,7 @@ export default async function CaseStudyDetailPage({ params }) {
                   {study.technologies.map((tech, index) => (
                     <span
                       key={index}
-                      className="bg-white px-3 py-1 rounded-full text-sm"
+                      className="bg-gray-50 px-3 py-1 rounded-full text-sm"
                     >
                       {tech}
                     </span>
@@ -358,13 +358,13 @@ export default async function CaseStudyDetailPage({ params }) {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="px-8 py-4 bg-primary text-white rounded-xl hover:opacity-90 transition"
+              className="px-8 py-4 bg-primary text-gray-50 rounded-xl hover:opacity-90 transition"
             >
               Contact Us
             </Link>
             <Link
               href="/case-studies"
-              className="px-8 py-4 border-2 border-primary text-primary rounded-xl hover:bg-primary hover:text-white transition"
+              className="px-8 py-4 border-2 border-primary text-primary rounded-xl hover:bg-primary hover:text-gray-50 transition"
             >
               View More Case Studies
             </Link>

@@ -10,7 +10,7 @@ export default function MissionVisionSection() {
         <H2 className="text-center mb-12">Mission & Vision</H2>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-2xl">
+          <div className="bg-gray-50 p-8 rounded-2xl">
             <Target size={50} />
 
             <H3 className="mt-4">Our Mission</H3>
@@ -21,7 +21,7 @@ export default function MissionVisionSection() {
             </P>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl">
+          <div className="bg-gray-50 p-8 rounded-2xl">
             <Eye size={50} />
 
             <H3 className="mt-4">Our Vision</H3>

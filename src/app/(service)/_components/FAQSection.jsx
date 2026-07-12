@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/Accordion";
 
-export default function FAQSection({faqData}) {
+export default function FAQSection({ faqData }) {
   return (
     <section className="py-15 bg-gray-100">
       <div className="max-w-7xl mx-auto px-4">
@@ -20,16 +20,14 @@ export default function FAQSection({faqData}) {
           <div className="lg:sticky lg:top-24 h-fit">
             <H2 className="font-bold mb-8">{faqData.heading}</H2>
 
-            <div className="bg-white p-4 lg:p-8 rounded-sm">
+            <div className="bg-gray-50 p-4 lg:p-8 rounded-sm">
               <H3 className="mb-5">{faqData.sidebarTitle}</H3>
 
-              <P className="text-gray-600 mb-8">
-                {faqData.sidebarDescription}
-              </P>
+              <P className="text-gray-600 mb-8">{faqData.sidebarDescription}</P>
 
               <Link
                 href={faqData.sidebarButtonLink}
-                className="inline-flex items-center justify-center px-7 py-4 bg-black text-white rounded-full font-medium hover:opacity-90 transition"
+                className="inline-flex items-center justify-center px-7 py-4 bg-black text-gray-50 rounded-full font-medium hover:opacity-90 transition"
               >
                 {faqData.sidebarButtonText}
               </Link>
@@ -43,7 +41,7 @@ export default function FAQSection({faqData}) {
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="bg-white border-0 px-4 lg:px-6"
+                  className="bg-gray-50 border-0 px-4 lg:px-6"
                 >
                   <AccordionTrigger className="text-left text-lg font-semibold py-8 hover:no-underline">
                     {faq.question}

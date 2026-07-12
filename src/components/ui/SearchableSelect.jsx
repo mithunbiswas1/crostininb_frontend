@@ -156,7 +156,7 @@ const SearchableSelect = ({
             }
             disabled={disabled}
             className={cn(
-              "w-full rounded-md border border-border_gray bg-white text-base focus:outline-none focus:ring-1 focus:ring-primary py-3 px-4 pr-10",
+              "w-full rounded-md border border-border_gray bg-gray-50 text-base focus:outline-none focus:ring-1 focus:ring-primary py-3 px-4 pr-10",
               error && "border-red-500 focus:ring-red-500",
               disabled && "opacity-50 cursor-not-allowed",
               className,
@@ -190,7 +190,7 @@ const SearchableSelect = ({
 
         {/* Dropdown menu */}
         {isOpen && !disabled && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-border_gray rounded-md shadow-lg max-h-60 overflow-auto">
+          <div className="absolute z-50 w-full mt-1 bg-gray-50 border border-border_gray rounded-md shadow-lg max-h-60 overflow-auto">
             {filteredOptions.length > 0 ? (
               <ul ref={listRef} className="py-1">
                 {filteredOptions.map((option, index) => (

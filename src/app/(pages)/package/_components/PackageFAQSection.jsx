@@ -61,7 +61,7 @@ export default function PackageFAQSection() {
           <div className="lg:sticky lg:top-20 h-fit">
             <H2 className="font-bold mb-8">Frequently Asked Questions</H2>
 
-            <div className="bg-white p-4 lg:p-8 rounded-sm">
+            <div className="bg-gray-50 p-4 lg:p-8 rounded-sm">
               <H3 className="mb-5">
                 Flexible packages built for every stage of growth
               </H3>
@@ -75,7 +75,7 @@ export default function PackageFAQSection() {
 
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center px-7 py-4 bg-black text-white rounded-full font-medium hover:opacity-90 transition"
+                className="inline-flex items-center justify-center px-7 py-4 bg-black text-gray-50 rounded-full font-medium hover:opacity-90 transition"
               >
                 Talk to the Team
               </Link>
@@ -89,7 +89,7 @@ export default function PackageFAQSection() {
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="bg-white border-0 px-4 lg:px-6"
+                  className="bg-gray-50 border-0 px-4 lg:px-6"
                 >
                   <AccordionTrigger className="text-left text-lg font-semibold py-8 hover:no-underline">
                     {faq.question}

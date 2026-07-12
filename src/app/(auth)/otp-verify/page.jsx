@@ -33,7 +33,7 @@ const OtpPage = () => {
 
   return (
     <div className="p-4">
-      <div className="max-w-md mx-auto my-20 p-6 bg-white shadow border border-gray-200 rounded-sm">
+      <div className="max-w-md mx-auto my-20 p-6 bg-gray-50 shadow border border-gray-200 rounded-sm">
         <h2 className="text-2xl font-semibold mb-4">Enter OTP</h2>
         <p className="text-gray-500 mb-6">
           Enter the 6-digit OTP sent to your mobile number
@@ -53,7 +53,7 @@ const OtpPage = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary text-white py-3 rounded-md font-medium hover:bg-primary-dark transition"
+            className="w-full bg-primary text-gray-50 py-3 rounded-md font-medium hover:bg-primary-dark transition"
           >
             Verify OTP →
           </button>
@@ -70,7 +70,10 @@ const OtpPage = () => {
               Resend
             </button>
           </span>
-          <Link href="/sign-in" className="text-primary underline cursor-pointer">
+          <Link
+            href="/sign-in"
+            className="text-primary underline cursor-pointer"
+          >
             Change Number
           </Link>
         </div>

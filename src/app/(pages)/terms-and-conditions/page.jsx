@@ -4,9 +4,9 @@ import { H1, H2, H6, P } from "@/components/ui/Typography";
 
 function TermsBanner() {
   return (
-    <section className="relative bg-[#2A2D33] text-white py-24">
+    <section className="relative bg-[#2A2D33] text-gray-50 py-24">
       <div className="max-w-7xl mx-auto px-4 text-center">
-        <H1 className="text-white font-bold">Terms & Conditions</H1>
+        <H1 className="text-gray-50 font-bold">Terms & Conditions</H1>
 
         <H6 className="mt-6 text-gray-200 max-w-2xl mx-auto">
           These Terms & Conditions govern your use of Logicraft IT services,

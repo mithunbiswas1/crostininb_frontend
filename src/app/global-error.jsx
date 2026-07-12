@@ -18,7 +18,7 @@ export default function GlobalError({ error, reset }) {
       </head>
 
       <body>
-        <main className="min-h-screen flex items-center justify-center bg-white px-6">
+        <main className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
           <div className="max-w-xl text-center">
             <h1 className="text-6xl font-bold text-red-600 mb-4">Error</h1>
 

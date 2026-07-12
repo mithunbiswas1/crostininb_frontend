@@ -144,7 +144,7 @@ const caseStudies = [
 function CaseStudyCard({ study }) {
   return (
     <Link href={`/case-studies/${study.slug}`} className="group block">
-      <div className="bg-white rounded-sm border border-gray-200">
+      <div className="bg-gray-50 rounded-sm border border-gray-200">
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
           <Image
@@ -154,7 +154,7 @@ function CaseStudyCard({ study }) {
             className="object-cover"
           />
           <div className="absolute top-3 left-3">
-            <span className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
+            <span className="bg-primary text-gray-50 px-3 py-1 rounded-full text-sm font-semibold">
               {study.category}
             </span>
           </div>

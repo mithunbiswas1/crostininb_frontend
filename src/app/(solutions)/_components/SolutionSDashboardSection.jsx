@@ -65,7 +65,7 @@ function DashboardCard({ item, reverse }) {
 
 export default function SolutionSDashboardSection() {
   return (
-    <section className="py-15 bg-white">
+    <section className="py-15 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="max-w-4xl mb-12">

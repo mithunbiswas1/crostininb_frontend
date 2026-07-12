@@ -67,7 +67,7 @@ const Footer = () => {
 
   // STATIC SOCIAL / SETTINGS DATA
   const data = {
-    footer_logo: "/logo_white.png",
+    footer_logo: "/logo.avif",
     facebook: "#",
     instagram: "#",
     twitter: "#",
@@ -78,7 +78,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#0f0f0f] text-white pt-12 pb-6">
+    <footer className="bg-[#0f0f0f] text-gray-50 pt-12 pb-6">
       <div className="container mx-auto px-4">
         {/* LOGO */}
         <div>
@@ -205,7 +205,7 @@ const Footer = () => {
                       className="text-4xl text-gray-400 hover:text-primary transition-colors cursor-pointer bg-gray-800 px-2"
                       title={method.name}
                     />
-                    <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-gray-50 bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                       {method.name}
                     </span>
                   </div>

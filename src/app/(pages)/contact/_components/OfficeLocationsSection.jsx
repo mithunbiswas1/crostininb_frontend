@@ -32,7 +32,7 @@ const offices = [
 
 export default function OfficeLocationsSection() {
   return (
-    <section className="bg-white py-20 lg:py-28">
+    <section className="bg-gray-50 py-20 lg:py-28">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="max-w-2xl">

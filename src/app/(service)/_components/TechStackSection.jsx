@@ -210,7 +210,7 @@ const iconMap = {
 
 export default function TechStackSection({ techStackData }) {
   return (
-    <section className="py-15 bg-white">
+    <section className="py-15 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="grid lg:grid-cols-2 gap-10 mb-16 lg:mb-20">

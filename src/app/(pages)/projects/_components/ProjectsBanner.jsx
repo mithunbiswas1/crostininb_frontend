@@ -15,9 +15,9 @@ export default function ProjectsBanner() {
       <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative z-10 text-center max-w-4xl mt-10 px-4">
-        <H1 className="text-white">Our Projects</H1>
+        <H1 className="text-gray-50">Our Projects</H1>
 
-        <H6 className="text-white mt-2">
+        <H6 className="text-gray-50 mt-2">
           We deliver world-class digital solutions across industries.
         </H6>
       </div>

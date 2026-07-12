@@ -17,7 +17,7 @@ const ThreeDot = ({
         // Logic for selected state (Black background, yellow text)
         selected
           ? "bg-[#1A1A1A] text-[#E2E623]"
-          : "bg-white text-gray-800 hover:bg-gray-50",
+          : "bg-gray-50 text-gray-800 hover:bg-gray-50",
         className,
       )}
       {...props}

@@ -29,7 +29,7 @@ const typographyVariants = cva("transition-colors", {
       muted: "text-gray_light",
       gray: "text-gray_deep",
       accent: "text-gray_accent",
-      white: "text-white",
+      white: "text-gray-50",
       danger: "text-danger",
       success: "text-success",
       info: "text-info",

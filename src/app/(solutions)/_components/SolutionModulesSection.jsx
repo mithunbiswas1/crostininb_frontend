@@ -37,7 +37,7 @@ const modules = [
 
 function ModuleCard({ item }) {
   return (
-    <div className="group border border-gray-200 bg-white p-6 lg:p-8 transition hover:border-gray-300">
+    <div className="group border border-gray-200 bg-gray-50 p-6 lg:p-8 transition hover:border-gray-300">
       <H4 className="font-bold mb-4">{item.title}</H4>
 
       <P className="text-gray-600">{item.description}</P>
@@ -47,7 +47,7 @@ function ModuleCard({ item }) {
 
 export default function SolutionModulesSection() {
   return (
-    <section className="py-15 bg-white">
+    <section className="py-15 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="max-w-3xl mb-12">
