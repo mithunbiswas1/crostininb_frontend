@@ -31,7 +31,7 @@ const navigation1 = [
     href: "/dining-room",
   },
   {
-    name: "About",
+    name: "About Us",
     href: "/about",
   },
 ];
@@ -52,24 +52,24 @@ const navigation2 = [
   {
     name: "Items",
     href: "#",
-    subMenu: [
-      {
-        name: "Photos",
-        href: "/photos",
-      },
-      {
-        name: "Dishes",
-        href: "/dishes",
-      },
-      {
-        name: "Salads",
-        href: "/salads",
-      },
-      {
-        name: "Pizza",
-        href: "/pizza",
-      },
-    ],
+    // subMenu: [
+    //   {
+    //     name: "Photos",
+    //     href: "/photos",
+    //   },
+    //   {
+    //     name: "Dishes",
+    //     href: "/dishes",
+    //   },
+    //   {
+    //     name: "Salads",
+    //     href: "/salads",
+    //   },
+    //   {
+    //     name: "Pizza",
+    //     href: "/pizza",
+    //   },
+    // ],
     subColumn: 1,
   },
 ];
@@ -127,7 +127,7 @@ export default function Navbar() {
               <div className="flex items-center">
                 <Link
                   href={item.href}
-                  className={`text-sm font-bold py-4 px-3 hover:text-primary transition-colors duration-300 ${
+                  className={`text-base font-bold py-4 px-3 hover:text-primary transition-colors duration-300 ${
                     pathname === item.href ? "text-primary" : isScrolled ? "text-black" : "text-gray-50"
                   }`}
                 >
@@ -180,7 +180,7 @@ export default function Navbar() {
               <div className="flex items-center">
                 <Link
                   href={item.href}
-                  className={`text-sm font-bold py-4 px-3 hover:text-primary transition-colors duration-300 flex items-center gap-1 ${
+                  className={`text-base font-bold py-4 px-3 hover:text-primary transition-colors duration-300 flex items-center gap-1 ${
                     pathname === item.href || 
                     (item.subMenu && item.subMenu.some(sub => sub.href === pathname))
                       ? "text-primary" 

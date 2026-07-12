@@ -8,17 +8,16 @@ import { ArrowRight } from "lucide-react";
 
 export default function Banner() {
   return (
-    <section className="max-w-5xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col justify-center pt-8 md:pt-16">
+    <section className="max-w-7xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col justify-center pt-8 md:pt-16">
       <div className="space-y-4 ">
         {/* Title */}
-        <H1 className="text-primary">
+        <H1 className="text-primary leading-tight">
           Unforgettable <br />
-          <span className="text-gray-50">Flavor in Every</span> <br />
-          Bite
+          <span className="text-gray-50">Flavor in Every</span> Bite
         </H1>
 
         {/* Description */}
-        <H6 className="text-gray-50/90 max-w-3xl">
+        <H6 className="text-gray-50/90 max-w-5xl">
           Crafted with the freshest ingredients and served with warmth, every
           meal is a celebration of flavor, quality, and unforgettable moments.
           Our award-winning chefs bring culinary excellence to your table.
