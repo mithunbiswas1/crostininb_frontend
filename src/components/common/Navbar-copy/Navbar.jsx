@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 import { HiBars3 } from "react-icons/hi2";
 import { FaXmark } from "react-icons/fa6";
 
-const navigation1 = [
+const navigation = [
   {
     name: "Home",
     href: "/",
@@ -34,9 +34,6 @@ const navigation1 = [
     name: "About",
     href: "/about",
   },
-];
-
-const navigation2 = [
   {
     name: "Order Online",
     href: "/order-online",
@@ -74,13 +71,11 @@ const navigation2 = [
   },
 ];
 
-// Combine both navigations for mobile menu
-const navigation = [...navigation1, ...navigation2];
-
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
 
   useEffect(() => {
@@ -116,30 +111,9 @@ export default function Navbar() {
         isScrolled ? "bg-gray-50 shadow-md" : "bg-transparent"
       }`}
     >
-      <nav className="max-w-screen-xl mx-auto flex items-center justify-center px-4 py-1">
-        {/* Left Navigation - Desktop */}
-        <div className="hidden lg:flex lg:gap-x-3 items-center">
-          {navigation1.map((item) => (
-            <div
-              key={item.name}
-              className="relative transition-all duration-300"
-            >
-              <div className="flex items-center">
-                <Link
-                  href={item.href}
-                  className={`text-sm font-bold py-4 px-3 hover:text-primary transition-colors duration-300 ${
-                    pathname === item.href ? "text-primary" : isScrolled ? "text-black" : "text-gray-50"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Logo - Center */}
-        <div className="flex-shrink-0 mx-4">
+      <nav className="max-w-screen-xl mx-auto flex items-center justify-between px-4 py-1">
+        {/* Logo */}
+        <div className="flex ">
           <Link href="/" className="flex items-center gap-2">
             <span className="sr-only">Your Company</span>
             <Image
@@ -154,7 +128,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="flex lg:hidden ml-auto">
+        <div className="flex lg:hidden">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
@@ -168,74 +142,89 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Right Navigation - Desktop */}
-        <div className="hidden lg:flex lg:gap-x-3 items-center border w-full">
-          {navigation2.map((item) => (
+        {/* Desktop Navigation */}
+        <div className="hidden lg:flex lg:gap-x-3">
+          {navigation.map((item) => (
             <div
               key={item.name}
-              className="relative transition-all duration-300"
+              className="relative transition-all duration-300 group-hover:translate-y-full"
               onMouseEnter={() => item.subMenu && setOpenSubMenu(item.name)}
               onMouseLeave={() => setOpenSubMenu(null)}
             >
               <div className="flex items-center">
                 <Link
                   href={item.href}
-                  className={`text-sm font-bold py-4 px-3 hover:text-primary transition-colors duration-300 flex items-center gap-1 ${
-                    pathname === item.href || 
-                    (item.subMenu && item.subMenu.some(sub => sub.href === pathname))
-                      ? "text-primary" 
-                      : isScrolled ? "text-black" : "text-gray-50"
+                  className={`text-sm font-bold  py-4 px-3 ${
+                    isScrolled ? "text-black" : "text-gray-50"
                   }`}
                 >
                   {item.name}
-                  {item.subMenu && (
-                    <span className="ml-1">
-                      {openSubMenu === item.name ? (
-                        <FaChevronUp className="h-3 w-3" />
-                      ) : (
-                        <FaChevronDown className="h-3 w-3" />
-                      )}
-                    </span>
-                  )}
                 </Link>
+
+                {/* Submenu toggle arrow */}
+                {item.subMenu && (
+                  <>
+                    {openSubMenu === item.name ? (
+                      <FaChevronUp
+                        className={`h-3 w-3 ${
+                          isScrolled ? "text-black" : "text-gray-50"
+                        }`}
+                      />
+                    ) : (
+                      <FaChevronDown
+                        className={`h-3 w-3 ${
+                          isScrolled ? "text-black" : "text-gray-50"
+                        }`}
+                      />
+                    )}
+                  </>
+                )}
               </div>
 
-              {/* Submenu with updated design */}
+              {/* Submenu for Services with animation */}
               {item.subMenu && openSubMenu === item.name && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute left-1/2 transform -translate-x-1/2 pt-2"
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="pt-1 absolute left-0 right-0 w-screen"
                 >
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl min-w-[220px] overflow-hidden border border-gray-200 dark:border-gray-700">
-                    {/* Decorative top bar */}
-                    <div className="h-1 bg-primary"></div>
-                    
-                    <div className="py-2">
-                      {item.subMenu.map((subItem) => (
-                        <Link
-                          key={subItem.name}
-                          href={subItem.href}
-                          className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${
-                            pathname === subItem.href 
-                              ? "text-primary bg-primary/5" 
-                              : "text-gray-700 dark:text-gray-200"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                            {subItem.name}
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
+                  <div
+                    className={` lg:-ml-45 bg-black text-gray-50 p-4 rounded-md shadow-md grid ${
+                      item.subColumn === 2
+                        ? "grid-cols-2 max-w-lg"
+                        : "grid-cols-3 max-w-screen-md"
+                    } ${
+                      isScrolled
+                        ? "border-t-8 border-t-gray-300 border-l border-r border-b border-gray-500"
+                        : "border-t-8 border-t-gray-300 border-l border-r border-b border-gray-500"
+                    } gap-x-4 gap-y-2`}
+                  >
+                    {item.subMenu.map((subItem) => (
+                      <Link
+                        key={subItem.name}
+                        href={subItem.href}
+                        className="block text-sm hover:bg-primary/90 hover:text-gray-200 rounded-md px-4 py-2"
+                      >
+                        {subItem.name}
+                      </Link>
+                    ))}
                   </div>
                 </motion.div>
               )}
             </div>
           ))}
+        </div>
+
+        {/* Desktop Contact */}
+        <div className="hidden lg:flex lg:justify-end">
+          <Link
+            href="/contact"
+            className="flex items-center justify-center gap-2 w-auto min-w-36 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-gray-50 shadow-sm hover:bg-primary transition-all duration-300"
+          >
+            <span>Contact Us</span>
+          </Link>
         </div>
       </nav>
 
