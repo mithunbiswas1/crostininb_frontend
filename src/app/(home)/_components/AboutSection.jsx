@@ -1,4 +1,5 @@
 import { H2 } from "@/components/ui/Typography";
+import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 
 const images = [
@@ -33,9 +34,13 @@ export default function AboutSection() {
               item and a culinary icon.
             </p>
 
-            <button className="mt-10 border border-[#b89b6d] text-white px-8 py-3 hover:bg-[#b89b6d] hover:text-black duration-300">
-              Discover More +
-            </button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="mt-10 border-2 border-amber-400/40 text-gray-50 hover:bg-gray-50/10 text-base font-semibold rounded-xl backdrop-blur-sm transition-all"
+            >
+              Discover More {" "} +
+            </Button>
           </div>
 
           {/* Right Images */}
@@ -44,7 +49,7 @@ export default function AboutSection() {
               {images.map((img, index) => (
                 <div
                   key={index}
-                  className="relative h-[380px] border border-[#8f7452] overflow-hidden"
+                  className="relative md:h-[380px] h-[200px] border border-[#8f7452] overflow-hidden"
                 >
                   <Image
                     src={img}

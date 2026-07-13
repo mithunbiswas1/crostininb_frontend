@@ -127,7 +127,7 @@ export default function SpecialMenu() {
           </div>
 
           {/* Menu Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {specialMenu.map((item) => (
               <div
                 key={item.id}
