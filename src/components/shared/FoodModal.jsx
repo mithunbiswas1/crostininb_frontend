@@ -12,7 +12,7 @@ export const FoodModal = ({ item, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-[#1a1a1a] border border-zinc-700 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-[#1a1a1a] border border-zinc-700 rounded-lg max-w-4xl w-full max-h-[80vh] lg:max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
