@@ -5,15 +5,16 @@
 import { H1, H6 } from "@/components/ui/Typography";
 import { Button } from "@/components/ui/Button";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Banner() {
   return (
-    <section className="max-w-7xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col justify-center pt-8 md:pt-16">
+    <section className="max-w-7xl mx-auto px-4 lg:px-20 pt-8 md:pt-16 relative z-10 min-h-screen flex flex-col justify-center">
       <div className="space-y-4 ">
         {/* Title */}
         <H1 className="text-primary leading-tight">
           Unforgettable <br />
-          <span className="text-gray-50">Flavor in Every</span> Bite
+          <span className="text-amber-400/80">Flavor in Every</span> Bite
         </H1>
 
         {/* Description */}
@@ -27,20 +28,22 @@ export default function Banner() {
         <div className="flex flex-col items-center sm:flex-row gap-4 pt-4">
           <Button
             size="lg"
-            className="bg-primary hover:bg-green-600 border-2 border-primary text-gray-50 text-base font-semibold rounded-full transition-all"
+            className="bg-primary hover:bg-green-600 border-2 border-amber-400/40 text-gray-50 text-base font-semibold rounded-xl transition-all"
           >
             Reserve a Table
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
 
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-2 border-gray-50 text-gray-50 hover:bg-gray-50/10 text-base font-semibold rounded-full backdrop-blur-sm transition-all"
-          >
-            View Our Menu
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
+          <Link href="/menu">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-2 border-amber-400/40 text-gray-50 hover:bg-gray-50/10 text-base font-semibold rounded-xl backdrop-blur-sm transition-all"
+            >
+              View Our Menu
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

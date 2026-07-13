@@ -231,7 +231,7 @@ export default async function CaseStudyDetailPage({ params }) {
           <div className="absolute inset-0 bg-black/70" />
         </div>
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 py-20">
+        <div className="relative w-full max-w-7xl mx-auto px-4 lg:px-20 lg:px-20 py-20">
           <div className="mb-4">
             <span className="bg-primary text-gray-50 px-4 py-2 rounded-full text-sm font-semibold">
               {study.category}
@@ -253,7 +253,7 @@ export default async function CaseStudyDetailPage({ params }) {
 
       {/* Overview Section */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
           <div className="grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
               <H2 className="mb-6">Project Overview</H2>
@@ -310,7 +310,7 @@ export default async function CaseStudyDetailPage({ params }) {
       {/* Screenshots Section */}
       {study.images && study.images.length > 0 && (
         <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
             <H2 className="text-center mb-12">Project Gallery</H2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {study.images.map((image, index) => (

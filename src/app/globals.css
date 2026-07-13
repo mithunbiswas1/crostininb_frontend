@@ -43,7 +43,8 @@ button {
 
 @theme inline {
   /* color */
-  --color-primary: #2ed06e;
+  --color-primary: #97c93d;
+  --color-secondary: #ea580c;
   --color-foreground_primary: #ffe500;
   --color-background_primary: #ffffff;
   --color-gray_deeper: #1b1b1b;

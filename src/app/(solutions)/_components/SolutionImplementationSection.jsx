@@ -80,7 +80,7 @@ function StepCard({ step, dark }) {
 export default function SolutionImplementationSection() {
   return (
     <section className="py-15 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         {/* Header */}
         <div className="max-w-4xl mb-12">
           <H2 className="font-bold mb-6">

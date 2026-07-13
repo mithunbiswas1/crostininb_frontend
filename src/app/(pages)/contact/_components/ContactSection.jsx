@@ -9,7 +9,7 @@ import { Mail, Map, Phone } from "lucide-react";
 export default function ContactSection() {
   return (
     <section className="bg-gray-100 py-20 lg:py-28">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Left Content */}
           <div className="flex flex-col justify-between">

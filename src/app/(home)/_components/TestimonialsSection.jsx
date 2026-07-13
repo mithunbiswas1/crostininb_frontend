@@ -113,7 +113,7 @@ function TestimonialCard({ t }) {
 export default function TestimonialsSection() {
   return (
     <section className="py-20 bg-linear-to-b from-[#0a0a0a] via-[#111] to-[#0a0a0a] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 mb-12 text-center">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20 mb-12 text-center">
         <H2 className="font-bold text-gray-50">
           What Our <span className="text-amber-400">Guests</span> Say
         </H2>

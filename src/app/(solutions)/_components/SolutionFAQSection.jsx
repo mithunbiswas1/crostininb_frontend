@@ -57,7 +57,7 @@ const faqs = [
 export default function SolutionFAQSection() {
   return (
     <section className="py-15 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         <div className="grid lg:grid-cols-2 gap-10">
           {/* Sticky Left Panel */}
           <div className="lg:sticky lg:top-24 h-fit">

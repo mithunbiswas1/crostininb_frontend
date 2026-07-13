@@ -79,7 +79,7 @@ const specialMenu = [
 export default function SpecialMenu() {
   return (
     <section className="bg-black py-20">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         {/* Heading */}
         <div className="text-center mb-12">
           <H2 className="text-gray-50 font-bold">Our Special Menu</H2>

@@ -82,7 +82,7 @@ function IndustryCard({ industry }) {
 export default function SolutionIndustriesSection() {
   return (
     <section className="py-15 bg-[#F8F8F8]">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         {/* Header */}
         <div className="grid lg:grid-cols-2 gap-10 mb-16">
           <div>

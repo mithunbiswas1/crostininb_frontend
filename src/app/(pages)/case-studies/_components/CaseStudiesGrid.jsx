@@ -201,7 +201,7 @@ function CaseStudyCard({ study }) {
 export default function CaseStudiesGrid() {
   return (
     <section className="py-15 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
           <H2 className="font-bold mb-4">Success Stories That Inspire</H2>

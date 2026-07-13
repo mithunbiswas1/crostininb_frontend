@@ -67,10 +67,10 @@ const openingHours = [
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-[#1a1410] to-[#0d0a08] text-gray-50 border-t border-amber-900/20">
-      <div className="max-w-7xl mx-auto px-4 pt-16 pb-8">
+    <footer className="bg-linear-to-b from-[#1a1410] to-[#0d0a08] text-gray-50 border-t border-amber-900/20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 pt-16 pb-8">
         {/* Top */}
-        <div className="grid lg:grid-cols-[2fr_1fr_1.5fr_1.2fr] gap-12">
+        <div className="grid lg:grid-cols-3 gap-12 justify-between">
           {/* Brand */}
           <div>
             <Image
@@ -102,26 +102,6 @@ export default function Footer() {
                 );
               })}
             </div>
-          </div>
-
-          {/* Navigation */}
-          <div>
-            <h4 className="font-bold mb-5 text-amber-400 text-sm uppercase tracking-wider">
-              Quick Links
-            </h4>
-            <ul className="space-y-3 text-gray-400">
-              {navigationLinks.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-sm hover:text-amber-400 transition-colors duration-300 flex items-center gap-2 group"
-                  >
-                    <span className="w-0 group-hover:w-3 h-px bg-amber-400 transition-all duration-300"></span>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Opening Hours */}
@@ -178,14 +158,6 @@ export default function Footer() {
                   info@gourmethaven.com
                 </a>
               </div>
-
-              {/* Reservation CTA */}
-              <Link
-                href="/reservations"
-                className="inline-block mt-4 bg-amber-500 hover:bg-amber-600 text-gray-50 text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:scale-105"
-              >
-                Reserve a Table
-              </Link>
             </div>
           </div>
         </div>

@@ -53,7 +53,7 @@ function StatCard({ value, label }) {
 export default function AtAGlanceSection() {
   return (
     <section className="py-15 bg-[#2A2D33] text-white">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         <H2 className="text-white font-bold mb-10 lg:mb-16">
           Soft Industry Alliance at a glance
         </H2>

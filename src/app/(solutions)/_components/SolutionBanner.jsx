@@ -28,7 +28,7 @@ export default function SolutionBanner({
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 min-h-screen flex items-center pt-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-20 lg:px-20 min-h-screen flex items-center pt-16">
         <div className="max-w-3xl">
           <H1 className="text-gray-50 font-bold mb-6">{title}</H1>
 

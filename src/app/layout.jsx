@@ -16,6 +16,30 @@ const manrope = Manrope({
   variable: "--font-manrope",
 });
 
+export const metadata = {
+  metadataBase: new URL("https://yourdomain.com"),
+
+  title: {
+    default: "Crostini | Authentic Restaurant & Pizza",
+    template: "%s | Crostini",
+  },
+
+  description:
+    "Enjoy authentic Italian cuisine, handcrafted pizzas, fresh pasta, salads, desserts, and more at Crostini NB. Dine in, order online, or book catering for your next event.",
+
+  keywords: [
+    "Italian Restaurant",
+    "Pizza",
+    "Pasta",
+    "Italian Food",
+    "Restaurant",
+    "Catering",
+    "Order Online",
+    "Dining",
+    "Crostini NB",
+  ],
+};
+
 export default async function RootLayout({ children }) {
   return (
     <html lang="en">

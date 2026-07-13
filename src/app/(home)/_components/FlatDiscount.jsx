@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { H2, H4, H5 } from "@/components/ui/Typography";
+import { H2, H4, H5, P } from "@/components/ui/Typography";
 
 const discountItems = [
   {
@@ -24,18 +24,18 @@ const discountItems = [
 
 export default function FlatDiscount() {
   return (
-    <section className="py-20 bg-linear-to-br from-black via-gray-[112] to-[#111]">
-      <div className="max-w-7xl mx-auto px-4">
+    <section className="py-10 lg:py-20 bg-linear-to-br from-black via-gray-[112] to-[#111]">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20">
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 lg:mb-12">
           <H2 className="text-gray-50 font-bold">
             Exclusive Discounts & Offers
           </H2>
 
-          <p className="mt-4 max-w-2xl mx-auto text-gray-300">
+          <P className="mt-3 max-w-2xl mx-auto text-gray-300">
             Enjoy amazing deals on our signature dishes. Limited time offers
             available for a truly memorable dining experience.
-          </p>
+          </P>
         </div>
 
         {/* Discount Cards */}
@@ -64,7 +64,7 @@ export default function FlatDiscount() {
 
               {/* Title - Bottom Left */}
               <div className="absolute bottom-4 left-4 right-4">
-                <H5 className="text-gray-50 text-sm sm:text-base md:text-lg font-bold leading-tight">
+                <H5 className="text-gray-50 font-bold leading-tight">
                   {item.title}
                 </H5>
               </div>

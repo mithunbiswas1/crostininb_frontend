@@ -42,7 +42,7 @@ export default function SuccessStoriesSection() {
 
   return (
     <section className="py-15 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <H2 className="font-bold">Our Success Stories</H2>

@@ -53,7 +53,7 @@ const values = [
 export default function CoreValuesSection() {
   return (
     <section className="py-15 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         <H2 className="text-center mb-10">Our Core Values</H2>
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">

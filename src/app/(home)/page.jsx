@@ -8,6 +8,7 @@ import TestimonialsSection from "./_components/TestimonialsSection";
 import WhyChooseUs from "./_components/WhyChooseUs";
 import AboutSection from "./_components/AboutSection";
 import OurFeatures from "./_components/OurFeatures";
+import ChefSpecial from "./_components/ChefSpecial";
 
 const bannerContent = {
   subtitle: "Text Us",
@@ -30,6 +31,7 @@ export default async function Home() {
       </section>
 
       <FlatDiscount />
+      <ChefSpecial />
       <SpecialMenu />
       <WhyChooseUs />
       <AboutSection />

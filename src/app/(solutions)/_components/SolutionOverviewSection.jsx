@@ -23,7 +23,7 @@ const overviewPoints = [
 export default function SolutionOverviewSection() {
   return (
     <section className="py-15 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         {/* Header */}
         <div className="max-w-4xl mb-10">
           <H2 className="font-bold mb-6">

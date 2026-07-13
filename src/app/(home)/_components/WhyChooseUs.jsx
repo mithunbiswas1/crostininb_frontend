@@ -28,7 +28,7 @@ const features = [
 export default function WhyChooseUs() {
   return (
     <section className="bg-[#0b0f10] py-20">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left Content */}
           <div className="bg-[#111617] border border-zinc-800 p-8 md:p-10">

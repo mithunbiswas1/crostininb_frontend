@@ -5,7 +5,7 @@ import { H2, P } from "@/components/ui/Typography";
 export default function ChairmanSection() {
   return (
     <section className="py-15">
-      <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20 grid lg:grid-cols-2 gap-12 items-center">
         {/* Image */}
         <div>
           <Image

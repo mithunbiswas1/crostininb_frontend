@@ -201,7 +201,7 @@ const menuSections = [
 export default function FavoriteList() {
   return (
     <section className="py-20 bg-black">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20">
         {/* Heading */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">

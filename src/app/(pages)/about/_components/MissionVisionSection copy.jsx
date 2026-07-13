@@ -6,7 +6,7 @@ import { H2, H3, P } from "@/components/ui/Typography";
 export default function MissionVisionSection() {
   return (
     <section className="py-20 bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         <H2 className="text-center mb-12">Mission & Vision</H2>
 
         <div className="grid md:grid-cols-2 gap-8">

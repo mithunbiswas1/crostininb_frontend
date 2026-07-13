@@ -48,7 +48,7 @@ function ModuleCard({ item }) {
 export default function SolutionModulesSection() {
   return (
     <section className="py-15 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
         {/* Header */}
         <div className="max-w-3xl mb-12">
           <H2 className="font-bold mb-6">

@@ -27,24 +27,25 @@ const navigation1 = [
     href: "/menu",
   },
   {
-    name: "Dining Room",
-    href: "/dining-room",
+    name: "Specials",
+    href: "/specials",
   },
   {
-    name: "About Us",
-    href: "/about",
+    name: "Order Online",
+    href: "/order-online",
   },
 ];
 
 const navigation2 = [
   {
-    name: "Order Online",
-    href: "/order-online",
+    name: "About Us",
+    href: "/about",
   },
   {
-    name: "Specials",
-    href: "/specials",
+    name: "Dining Room",
+    href: "/dining-room",
   },
+
   {
     name: "Catering",
     href: "/catering",
@@ -112,11 +113,11 @@ export default function Navbar() {
 
   return (
     <div
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 border-b border-gray-50/10 ${
-        isScrolled ? "bg-gray-50 shadow-md" : "bg-transparent"
-      }`}
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 border-amber-50/10 bg-transparent ${isScrolled ? "border-none" : "border-b"}`}
     >
-      <nav className="max-w-screen-xl mx-auto flex items-center justify-between px-4 py-1">
+      <nav
+        className={`max-w-7xl mx-auto lg:mx-20 flex items-center justify-between transition-all duration-300 ${isScrolled ? "px-2 py-0 backdrop-blur-2xl bg-white/60 shadow-md my-0.5 rounded-xl" : "py-4"}`}
+      >
         {/* Left Navigation - Desktop */}
         <div className="hidden lg:flex lg:gap-x-3 lg:mr-auto">
           {navigation1.map((item) => (
@@ -127,8 +128,14 @@ export default function Navbar() {
               <div className="flex items-center">
                 <Link
                   href={item.href}
-                  className={`text-base font-bold py-4 px-3 hover:text-primary transition-colors duration-300 ${
-                    pathname === item.href ? "text-primary" : isScrolled ? "text-black" : "text-gray-50"
+                  className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 ${
+                    pathname === item.href
+                      ? isScrolled
+                        ? "text-secondary"
+                        : "text-primary"
+                      : isScrolled
+                        ? "text-black hover:text-secondary"
+                        : "text-gray-50 hover:text-primary"
                   }`}
                 >
                   {item.name}
@@ -139,15 +146,14 @@ export default function Navbar() {
         </div>
 
         {/* Logo - Center */}
-        <div className="flex lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
+        <div className="flex lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 pb-1">
           <Link href="/" className="flex items-center gap-2">
-            <span className="sr-only">Your Company</span>
             <Image
               src={isScrolled ? "/logo.avif" : "/logo.avif"}
               alt="Your Company Logo"
               width={200}
               height={80}
-              className="h-15 w-auto"
+              className={`w-auto transition-all duration-300 ${isScrolled ? "h-12" : "h-20"}`}
               priority
             />
           </Link>
@@ -180,11 +186,14 @@ export default function Navbar() {
               <div className="flex items-center">
                 <Link
                   href={item.href}
-                  className={`text-base font-bold py-4 px-3 hover:text-primary transition-colors duration-300 flex items-center gap-1 ${
-                    pathname === item.href || 
-                    (item.subMenu && item.subMenu.some(sub => sub.href === pathname))
-                      ? "text-primary" 
-                      : isScrolled ? "text-black" : "text-gray-50"
+                  className={`text-base font-bold py-4 px-3 transition-colors duration-300 flex items-center gap-1 ${
+                    pathname === item.href ||
+                    (item.subMenu &&
+                      item.subMenu.some((sub) => sub.href === pathname))
+                      ? "text-primary"
+                      : isScrolled
+                        ? "text-black hover:text-secondary"
+                        : "text-gray-50 hover:text-primary"
                   }`}
                 >
                   {item.name}
@@ -212,15 +221,15 @@ export default function Navbar() {
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl min-w-[220px] overflow-hidden border border-gray-200 dark:border-gray-700">
                     {/* Decorative top bar */}
                     <div className="h-1 bg-primary"></div>
-                    
+
                     <div className="py-2">
                       {item.subMenu.map((subItem) => (
                         <Link
                           key={subItem.name}
                           href={subItem.href}
                           className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${
-                            pathname === subItem.href 
-                              ? "text-primary bg-primary/5" 
+                            pathname === subItem.href
+                              ? "text-primary bg-primary/5"
                               : "text-gray-700 dark:text-gray-200"
                           }`}
                         >
