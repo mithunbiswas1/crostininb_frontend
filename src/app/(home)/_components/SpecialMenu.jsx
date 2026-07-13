@@ -113,7 +113,7 @@ export default function SpecialMenu() {
 
   return (
     <>
-      <section className="bg-black py-20">
+      <section className="bg-black py-10 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-20">
           {/* Heading */}
           <div className="text-center mb-12">

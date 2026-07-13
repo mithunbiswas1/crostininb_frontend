@@ -1,6 +1,8 @@
 import { H2 } from "@/components/ui/Typography";
 import { Button } from "@/components/ui/Button";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const images = [
   "/home/about/a_cart1.jpg",
@@ -10,37 +12,35 @@ const images = [
 
 export default function AboutSection() {
   return (
-    <section className="bg-black py-20">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="bg-black py-10 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20">
         <div className="grid lg:grid-cols-2 gap-14 items-center">
           {/* Left Content */}
           <div>
-            <p className="text-[#b89b6d] uppercase tracking-[6px] text-base mb-5 flex items-center gap-3">
-              <span className="w-16 h-[1px] bg-[#b89b6d]"></span>
-              About Us
+
+             <H2 className="text-gray-50 font-bold">
+            About Us
+          </H2>
+
+            <p className="text-gray-300 mt-4 leading-8 max-w-xl">
+                 We are passionate about serving delicious fast food made with premium ingredients, authentic recipes, and exceptional care. Every meal is freshly prepared to deliver rich flavors, quick service, and an unforgettable dining experience that keeps you coming back for more.
             </p>
 
-            <H2 className="text-gray-50 font-bold leading-tight uppercase">
-              We Always Provide
-              <br />
-              Quality Fast Foods
-              <br />
-              For You
-            </H2>
-
-            <p className="text-gray-300 mt-7 leading-8 max-w-md">
+            <p className="text-gray-300 mt-7 leading-8 max-w-xl">
               A hamburger is a type of sandwich made from a patty of ground
               beef, served within a split bread roll. It's a popular fast-food
               item and a culinary icon.
             </p>
-
-            <Button
-              size="lg"
-              variant="outline"
-              className="mt-10 border-2 border-amber-400/40 text-gray-50 hover:bg-gray-50/10 text-base font-semibold rounded-xl backdrop-blur-sm transition-all"
-            >
-              Discover More {" "} +
-            </Button>
+            <Link href="/menu">
+              <Button
+                size="lg"
+                variant="outline"
+                className="mt-10 border-2 border-amber-400/40 text-gray-50 hover:bg-gray-50/10 text-base font-semibold rounded-xl backdrop-blur-sm transition-all"
+              >
+                Discover More
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
           </div>
 
           {/* Right Images */}

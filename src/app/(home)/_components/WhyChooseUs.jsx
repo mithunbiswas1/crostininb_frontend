@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { BadgeCheck, ChefHat, BookOpen } from "lucide-react";
+import { H2 } from "@/components/ui/Typography";
 
 const features = [
   {
@@ -27,8 +28,20 @@ const features = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="bg-[#0b0f10] py-20">
-      <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20">
+    <section className="bg-[#0b0f10] py-10 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20">
+        {/* Heading */}
+        <div className="text-center mb-12">
+          <H2 className="text-gray-50 font-bold">
+            The Taste of <span className="text-amber-400 pl-1">True Excellence</span>
+          </H2>
+
+          <p className="mt-4 max-w-2xl mx-auto text-gray-300">
+            Discover what makes every meal unforgettable—from authentic flavors
+            and premium ingredients to creative recipes crafted with passion.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left Content */}
           <div className="bg-[#111617] border border-zinc-800 p-8 md:p-10">

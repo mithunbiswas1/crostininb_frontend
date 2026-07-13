@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { H2 } from "@/components/ui/Typography";
 
 const services = [
   {
@@ -25,23 +26,17 @@ const services = [
 
 export default function OurFeatures() {
   return (
-    <section className="bg-[#141518] py-24 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5">
+    <section className="bg-[#0b0f10] py-10 lg:py-20 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 lg:px-20">
         {/* Heading */}
-        <div className="text-center mb-14">
-          <p className="text-[#b89b6d] uppercase tracking-[4px] text-sm">
-            We Provide Best Service
+        <div className="text-center mb-12">
+          <H2 className="text-gray-50 font-bold"> Why Choose Us</H2>
+
+          <p className="mt-4 max-w-2xl mx-auto text-gray-300">
+            Experience the perfect blend of delicious flavors, premium
+            ingredients, and exceptional service that keeps our customers coming
+            back.
           </p>
-
-          <div className="flex justify-center items-center gap-3 my-3">
-            <span className="w-10 h-px bg-[#b89b6d]" />
-            <span className="w-2 h-2 rounded-full bg-[#b89b6d]" />
-            <span className="w-10 h-px bg-[#b89b6d]" />
-          </div>
-
-          <h2 className="text-white text-4xl font-bold uppercase">
-            Why Choose Us
-          </h2>
         </div>
 
         {/* Cards */}

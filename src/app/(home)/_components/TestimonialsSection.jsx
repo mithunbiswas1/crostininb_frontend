@@ -1,8 +1,7 @@
 // src/app/(home)/_components/TestimonialsSection.jsx
-
 import Image from "next/image";
 import { H2, H6, P } from "@/components/ui/Typography";
-import { Star, Quote, ChefHat, Utensils } from "lucide-react";
+import { Star, Quote, Utensils } from "lucide-react";
 
 const testimonials = [
   {
@@ -115,10 +114,10 @@ export default function TestimonialsSection() {
     <section className="py-20 bg-linear-to-b from-[#0a0a0a] via-[#111] to-[#0a0a0a] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 lg:px-20 lg:px-20 mb-12 text-center">
         <H2 className="font-bold text-gray-50">
-          What Our <span className="text-amber-400">Guests</span> Say
+          What Our <span className="text-amber-400 pl-1">Guests</span> Say
         </H2>
 
-        <P className="mt-4 max-w-2xl mx-auto text-gray-400">
+        <P className="mt-4 max-w-2xl mx-auto  text-gray-300">
           Real stories from real people who've experienced the magic of our
           restaurant. See why our guests keep coming back for more.
         </P>

@@ -25,7 +25,7 @@ export default function Banner() {
         </H6>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col items-center sm:flex-row gap-4 pt-4">
+        <div className="flex flex-col items-start sm:flex-row sm:items-center gap-4 pt-4">
           <Button
             size="lg"
             className="bg-primary hover:bg-green-600 border-2 border-amber-400/40 text-gray-50 text-base font-semibold rounded-xl transition-all"
