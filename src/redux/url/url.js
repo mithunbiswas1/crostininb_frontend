@@ -1,10 +1,7 @@
 // src/redux/url/url.js
 
-// Base URL
-export const baseUriBackend =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === "production_mode" 
-    ? process.env.NEXT_PUBLIC_API_PROD_URL
-    : process.env.NEXT_PUBLIC_API_LOCAL_URL;
+// export const baseUriBackend = "https://backend.logicraftit.com/";
+export const baseUriBackend = "http://localhost:8005/";
 
 // API Base
 export const API_BASE_URL = baseUriBackend + "api/v1/";
