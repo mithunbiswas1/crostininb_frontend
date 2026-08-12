@@ -1,5 +1,3 @@
-// src/app/layout.jsx
-
 import { Manrope } from "next/font/google";
 
 import "./globals.css";
@@ -10,6 +8,8 @@ import { Toaster } from "sonner";
 import Footer from "@/components/common/Footer/Footer.jsx";
 import ReduxProvider from "@/redux/reduxProvider/ReduxProvider";
 import Navbar from "@/components/common/Navbar/Navbar.jsx";
+import CartDrawer from "@/components/shared/CartDrawer";
+import FixedCartButton from "@/components/shared/FixedCartButton";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -48,9 +48,10 @@ export default async function RootLayout({ children }) {
           <Navbar />
           {children}
           <Footer />
+          <FixedCartButton />
+          <CartDrawer />
+          <Toaster />
         </ReduxProvider>
-
-        <Toaster />
       </body>
     </html>
   );

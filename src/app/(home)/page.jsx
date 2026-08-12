@@ -10,29 +10,52 @@ import AboutSection from "./_components/AboutSection";
 import OurFeatures from "./_components/OurFeatures";
 import ChefSpecial from "./_components/ChefSpecial";
 
-const bannerContent = {
-  subtitle: "Text Us",
-
-  cta: {
-    text: "Get in touch",
-    icon: "PhoneIcon",
-    link: "/contact",
-  },
-};
+import { getCardItems } from "@/lib/getItems";
+import { getHomeBannerList } from "@/lib/getHomeBannerApi";
+import { getHomeCompanyList } from "@/lib/getHomeCompanyApi";
+import { getHomeIndustryList } from "@/lib/getHomeIndustry";
+import { getTestimonialList } from "@/lib/getTestimonialApi";
 
 export async function generateMetadata() {}
 
 export default async function Home() {
+  // Fetch all data in parallel for better performance
+  const [
+    flatDiscountData,
+    specialMenuData,
+    chefSpecialData,
+    banners,
+    companies,
+    industries,
+    testimonials,
+  ] = await Promise.all([
+    getCardItems({ limit: 3, sections: "6a780fd4d2e5dfda5ce63991" }),
+    getCardItems({ limit: 8, sections: "6a76b8e413fb4c5b2edaf4b2" }),
+    getCardItems({ limit: 8, sections: "6a7c162075f50850dfe38c32" }),
+    getHomeBannerList(),
+    getHomeCompanyList(),
+    getHomeIndustryList(),
+    getTestimonialList(),
+  ]);
+
+  // Extract items from response
+  const flatDiscountItems = flatDiscountData?.data?.items || [];
+  const specialMenuItems = specialMenuData?.data?.items || [];
+  const chefSpecialItems = chefSpecialData?.data?.items || [];
+
   return (
     <main className="">
       <section className="relative w-full min-h-[70vh] lg:min-h-screen overflow-hidden">
-        <BannerVideoBack />
-        <Banner bannerContent={bannerContent} />
+        <BannerVideoBack banners={banners} />
+        <Banner banners={banners} />
       </section>
 
-      <FlatDiscount />
-      <ChefSpecial />
-      <SpecialMenu />
+      {flatDiscountItems.length > 0 && (
+        <FlatDiscount items={flatDiscountItems} />
+      )}
+      {chefSpecialItems.length > 0 && <ChefSpecial items={chefSpecialItems} />}
+      {specialMenuItems.length > 0 && <SpecialMenu items={specialMenuItems} />}
+
       <WhyChooseUs />
       <AboutSection />
       <OurFeatures />

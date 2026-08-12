@@ -12,10 +12,13 @@ import {
   FaChevronUp,
 } from "react-icons/fa";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { HiBars3 } from "react-icons/hi2";
 import { FaXmark } from "react-icons/fa6";
+import { getActiveCategories } from "@/lib/getCategory";
+import { useSelector, useDispatch } from "react-redux";
+import { setLogout } from "@/redux/features/Slice/authSlice";
 
 const navigation1 = [
   {
@@ -31,58 +34,131 @@ const navigation1 = [
     href: "/specials",
   },
   {
-    name: "Order Online",
-    href: "/order-online",
+    name: "Items",
+    href: "#",
+    subMenu: [],
+    subColumn: 1,
   },
 ];
 
 const navigation2 = [
   {
-    name: "About Us",
-    href: "/about",
+    name: "Order Online",
+    href: "/order-online",
   },
-  {
-    name: "Dining Room",
-    href: "/dining-room",
-  },
-
   {
     name: "Catering",
     href: "/catering",
   },
   {
-    name: "Items",
+    name: "Account",
     href: "#",
-    // subMenu: [
-    //   {
-    //     name: "Photos",
-    //     href: "/photos",
-    //   },
-    //   {
-    //     name: "Dishes",
-    //     href: "/dishes",
-    //   },
-    //   {
-    //     name: "Salads",
-    //     href: "/salads",
-    //   },
-    //   {
-    //     name: "Pizza",
-    //     href: "/pizza",
-    //   },
-    // ],
-    subColumn: 1,
+    isAccount: true,
+    subMenu: [
+      {
+        name: "Dashboard",
+        href: "/dashboard",
+        showFor: ["admin", "super_admin", "author"],
+      },
+      {
+        name: "My Orders",
+        href: "/orders",
+        showFor: ["admin", "super_admin", "author", "customer"],
+      },
+      {
+        name: "My Profile",
+        href: "/profile",
+        showFor: ["admin", "super_admin", "author", "customer"],
+      },
+      {
+        name: "Logout",
+        href: "#",
+        isLogout: true,
+        showFor: ["admin", "super_admin", "author", "customer"],
+      },
+    ],
   },
 ];
 
-// Combine both navigations for mobile menu
-const navigation = [...navigation1, ...navigation2];
-
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  const userRole = user?.role || null;
+
+  // Fetch categories for submenu
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getActiveCategories();
+        const categoryData = data?.data || [];
+
+        const subMenuItems = categoryData.map((category) => ({
+          name: category.name,
+          href: `/menu/${category.slug}`,
+        }));
+
+        setCategories(subMenuItems);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Update navigation1 with dynamic submenu
+  const updatedNavigation1 = navigation1.map((item) => {
+    if (item.name === "Items") {
+      return {
+        ...item,
+        subMenu: categories,
+      };
+    }
+    return item;
+  });
+
+  // Update navigation2 - show login/register if not logged in
+  const updatedNavigation2 = navigation2.map((item) => {
+    if (item.isAccount && !isLoggedIn) {
+      return {
+        ...item,
+        subMenu: [
+          {
+            name: "Login",
+            href: "/login",
+          },
+          {
+            name: "Register",
+            href: "/register",
+          },
+        ],
+      };
+    }
+    if (item.isAccount && isLoggedIn) {
+      // Filter submenu items based on user role
+      const filteredSubMenu = item.subMenu.filter((subItem) => {
+        if (!subItem.showFor) return true;
+        return subItem.showFor.includes(userRole);
+      });
+
+      return {
+        ...item,
+        subMenu: filteredSubMenu,
+      };
+    }
+    return item;
+  });
+
+  // Combine both navigations for mobile menu
+  const navigation = [...updatedNavigation1, ...updatedNavigation2];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -111,6 +187,12 @@ export default function Navbar() {
     setOpenSubMenu((prev) => (prev === menuName ? null : menuName));
   };
 
+  // Handle logout with Redux
+  const handleLogout = () => {
+    dispatch(setLogout());
+    router.push("/");
+  };
+
   return (
     <div
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 border-amber-50/10 bg-transparent ${isScrolled ? "border-none" : "border-b"}`}
@@ -121,16 +203,20 @@ export default function Navbar() {
         >
           {/* Left Navigation - Desktop */}
           <div className="hidden lg:flex lg:gap-x-3 lg:mr-auto">
-            {navigation1.map((item) => (
+            {updatedNavigation1.map((item) => (
               <div
                 key={item.name}
                 className="relative transition-all duration-300"
+                onMouseEnter={() => item.subMenu && setOpenSubMenu(item.name)}
+                onMouseLeave={() => setOpenSubMenu(null)}
               >
                 <div className="flex items-center">
                   <Link
                     href={item.href}
-                    className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 ${
-                      pathname === item.href
+                    className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 flex items-center gap-1 ${
+                      pathname === item.href ||
+                      (item.subMenu &&
+                        item.subMenu.some((sub) => sub.href === pathname))
                         ? isScrolled
                           ? "text-secondary"
                           : "text-primary"
@@ -140,8 +226,52 @@ export default function Navbar() {
                     }`}
                   >
                     {item.name}
+                    {item.subMenu && item.subMenu.length > 0 && (
+                      <span className="ml-1">
+                        {openSubMenu === item.name ? (
+                          <FaChevronUp className="h-3 w-3" />
+                        ) : (
+                          <FaChevronDown className="h-3 w-3" />
+                        )}
+                      </span>
+                    )}
                   </Link>
                 </div>
+
+                {/* Submenu with dynamic categories */}
+                {item.subMenu &&
+                  openSubMenu === item.name &&
+                  item.subMenu.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute left-1/2 transform -translate-x-1/2 pt-2"
+                    >
+                      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl min-w-[220px] overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <div className="h-1 bg-primary"></div>
+                        <div className="py-2">
+                          {item.subMenu.map((subItem) => (
+                            <Link
+                              key={subItem.name}
+                              href={subItem.href}
+                              className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${
+                                pathname === subItem.href
+                                  ? "text-primary bg-primary/5"
+                                  : "text-gray-700 dark:text-gray-200"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                                {subItem.name}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
               </div>
             ))}
           </div>
@@ -176,76 +306,116 @@ export default function Navbar() {
           </div>
 
           {/* Right Navigation - Desktop */}
-          <div className="hidden lg:flex lg:gap-x-3 lg:ml-auto">
-            {navigation2.map((item) => (
+          <div className="hidden lg:flex lg:gap-x-3 lg:ml-auto items-center">
+            {/* Order Online & Catering */}
+            {navigation2.slice(0, 2).map((item) => (
               <div
                 key={item.name}
                 className="relative transition-all duration-300"
-                onMouseEnter={() => item.subMenu && setOpenSubMenu(item.name)}
-                onMouseLeave={() => setOpenSubMenu(null)}
               >
                 <div className="flex items-center">
                   <Link
                     href={item.href}
-                    className={`text-base font-bold py-4 px-3 transition-colors duration-300 flex items-center gap-1 ${
-                      pathname === item.href ||
-                      (item.subMenu &&
-                        item.subMenu.some((sub) => sub.href === pathname))
-                        ? "text-primary"
+                    className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 ${
+                      pathname === item.href
+                        ? isScrolled
+                          ? "text-secondary"
+                          : "text-primary"
                         : isScrolled
                           ? "text-black hover:text-secondary"
                           : "text-gray-50 hover:text-primary"
                     }`}
                   >
                     {item.name}
-                    {item.subMenu && (
-                      <span className="ml-1">
-                        {openSubMenu === item.name ? (
-                          <FaChevronUp className="h-3 w-3" />
-                        ) : (
-                          <FaChevronDown className="h-3 w-3" />
-                        )}
-                      </span>
-                    )}
                   </Link>
                 </div>
-
-                {/* Submenu with updated design */}
-                {item.subMenu && openSubMenu === item.name && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute left-1/2 transform -translate-x-1/2 pt-2"
-                  >
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl min-w-[220px] overflow-hidden border border-gray-200 dark:border-gray-700">
-                      {/* Decorative top bar */}
-                      <div className="h-1 bg-primary"></div>
-
-                      <div className="py-2">
-                        {item.subMenu.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            href={subItem.href}
-                            className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${
-                              pathname === subItem.href
-                                ? "text-primary bg-primary/5"
-                                : "text-gray-700 dark:text-gray-200"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                              {subItem.name}
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
               </div>
             ))}
+
+            {/* Account */}
+            <div
+              className="relative transition-all duration-300"
+              onMouseEnter={() => setOpenSubMenu("Account")}
+              onMouseLeave={() => setOpenSubMenu(null)}
+            >
+              <div className="flex items-center">
+                <button
+                  className={`text-base font-bold py-4 px-3 transition-colors duration-300 flex items-center gap-1 ${
+                    isScrolled
+                      ? "text-black hover:text-secondary"
+                      : "text-gray-50 hover:text-primary"
+                  }`}
+                >
+                  <span>Account</span>
+                  <span className="ml-1">
+                    {openSubMenu === "Account" ? (
+                      <FaChevronUp className="h-3 w-3" />
+                    ) : (
+                      <FaChevronDown className="h-3 w-3" />
+                    )}
+                  </span>
+                </button>
+              </div>
+
+              {/* Account Submenu */}
+              {openSubMenu === "Account" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 pt-2"
+                >
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl min-w-[200px] overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="h-1 bg-primary"></div>
+                    <div className="py-2">
+                      {isLoggedIn ? (
+                        // Logged in menu items - filtered by role
+                        <>
+                          {updatedNavigation2
+                            .find((item) => item.isAccount)
+                            ?.subMenu.map((subItem) =>
+                              subItem.isLogout ? (
+                                <button
+                                  key="logout"
+                                  onClick={handleLogout}
+                                  className="block w-full text-left px-6 py-3 text-sm hover:bg-red-50 transition-colors duration-200 text-red-600"
+                                >
+                                  Logout
+                                </button>
+                              ) : (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className="block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 text-gray-700 dark:text-gray-200"
+                                >
+                                  {subItem.name}
+                                </Link>
+                              ),
+                            )}
+                        </>
+                      ) : (
+                        // Logged out menu items
+                        <>
+                          <Link
+                            href="/login"
+                            className="block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 text-gray-700 dark:text-gray-200"
+                          >
+                            Login
+                          </Link>
+                          <Link
+                            href="/register"
+                            className="block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 text-gray-700 dark:text-gray-200"
+                          >
+                            Register
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
           </div>
         </nav>
 
@@ -298,8 +468,7 @@ export default function Navbar() {
                       {item.name}
                     </Link>
 
-                    {/* Button to toggle submenu */}
-                    {item.subMenu && (
+                    {item.subMenu && item.subMenu.length > 0 && (
                       <button
                         onClick={() => toggleSubMenu(item.name)}
                         className="ml-4 bg-primary text-gray-50 p-2 rounded-md"
@@ -328,26 +497,33 @@ export default function Navbar() {
                   </div>
 
                   {/* Submenu - Only display if open */}
-                  {item.subMenu && openSubMenu === item.name && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2 }}
-                      className="mt-2 space-y-3 max-h-[300px]"
-                    >
-                      {item.subMenu.map((subItem) => (
-                        <Link
-                          key={subItem.name}
-                          href={subItem.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block text-md font-light text-gray-50 text-left pl-12"
-                        >
-                          {subItem.name}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
+                  {item.subMenu &&
+                    openSubMenu === item.name &&
+                    item.subMenu.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className="mt-2 space-y-3 max-h-[300px]"
+                      >
+                        {item.subMenu.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            onClick={() => {
+                              setMobileMenuOpen(false);
+                              if (subItem.isLogout) {
+                                handleLogout();
+                              }
+                            }}
+                            className="block text-md font-light text-gray-50 text-left pl-12"
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
                 </div>
               ))}
 
@@ -365,7 +541,7 @@ export default function Navbar() {
               <div className="pt-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-4">
-                    <div className=" text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
+                    <div className="text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
                       <FaMapMarkerAlt />
                     </div>
                     <p className="text-gray-50 text-lg">
@@ -374,7 +550,7 @@ export default function Navbar() {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className=" text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
+                    <div className="text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
                       <FaEnvelope />
                     </div>
                     <p className="text-primary text-lg">
@@ -385,7 +561,7 @@ export default function Navbar() {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className=" text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
+                    <div className="text-gray-50 group-hover:text-primary transition-all duration-300 text-2xl">
                       <FaPhone />
                     </div>
                     <p className="text-primary text-lg">

@@ -9,6 +9,11 @@ export const endpoints = {
     otpVerifyLogin: "otp-verify",
   },
 
+  // Order endpoints
+  order: {
+    createOrder: "create-order",
+  },
+
   //Product API
   product: {
     product: "product",
@@ -23,12 +28,6 @@ export const endpoints = {
   //Profile API
   profile: {
     profile: "profile",
-  },
-
-  //Order API
-  order: {
-    order: "order",
-    coupon: "coupon",
   },
 
   //Pages API
