@@ -19,6 +19,8 @@ import { FaXmark } from "react-icons/fa6";
 import { getActiveCategories } from "@/lib/getCategory";
 import { useSelector, useDispatch } from "react-redux";
 import { setLogout } from "@/redux/features/Slice/authSlice";
+import { toast } from "sonner";
+import { useLogoutMutation } from "@/redux/features/profileApi";
 
 const navigation1 = [
   {
@@ -90,6 +92,9 @@ export default function Navbar() {
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const [categories, setCategories] = useState([]);
 
+  // Logout mutation
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
+
   const userRole = user?.role || null;
 
   // Fetch categories for submenu
@@ -137,7 +142,7 @@ export default function Navbar() {
           },
           {
             name: "Register",
-            href: "/register",
+            href: "/registration",
           },
         ],
       };
@@ -187,10 +192,19 @@ export default function Navbar() {
     setOpenSubMenu((prev) => (prev === menuName ? null : menuName));
   };
 
-  // Handle logout with Redux
-  const handleLogout = () => {
-    dispatch(setLogout());
-    router.push("/");
+  // Handle logout with API
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+      dispatch(setLogout());
+      toast.success("Logged out successfully!");
+      router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error(
+        error?.data?.message || "Failed to logout. Please try again.",
+      );
+    }
   };
 
   return (
@@ -379,9 +393,10 @@ export default function Navbar() {
                                 <button
                                   key="logout"
                                   onClick={handleLogout}
-                                  className="block w-full text-left px-6 py-3 text-sm hover:bg-red-50 transition-colors duration-200 text-red-600"
+                                  disabled={isLoggingOut}
+                                  className="block w-full text-left px-6 py-3 text-sm hover:bg-red-50 transition-colors duration-200 text-red-600 disabled:opacity-50"
                                 >
-                                  Logout
+                                  {isLoggingOut ? "Logging out..." : "Logout"}
                                 </button>
                               ) : (
                                 <Link

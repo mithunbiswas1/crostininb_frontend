@@ -1,3 +1,5 @@
+// src/redux/apiSlice/apiSlice.js
+
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_BASE_URL } from "@/redux/url/url";
 
@@ -50,6 +52,7 @@ export const apiSlice = createApi({
     "Orders",
     "ProductReviews",
     "Tracking",
+    "Order",
   ],
   endpoints: () => ({}),
 });

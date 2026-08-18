@@ -1,4 +1,4 @@
-// src/app/(pages)/layout.jsx
+// src/app/(home)/layout.jsx
 
 import Footer from "@/components/common/Footer/Footer";
 import Navbar from "@/components/common/Navbar/Navbar";

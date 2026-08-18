@@ -43,11 +43,12 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${nekst.variable}`}>
+      <body
+        className={`${manrope.variable} ${nekst.variable}`}
+        cz-shortcut-listen="true"
+      >
         <ReduxProvider>
-          <Navbar />
           {children}
-          <Footer />
           <FixedCartButton />
           <CartDrawer />
           <Toaster />

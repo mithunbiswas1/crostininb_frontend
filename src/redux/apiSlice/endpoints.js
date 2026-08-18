@@ -12,6 +12,9 @@ export const endpoints = {
   // Order endpoints
   order: {
     createOrder: "create-order",
+    getOrdersByUser: "get-orders-by-user",
+    getOrderById: "get-order-by-id",
+    cancelOrder: "cancel-order",
   },
 
   //Product API
@@ -25,9 +28,12 @@ export const endpoints = {
     productReview: "product-review",
   },
 
-  //Profile API
+  // Profile endpoints
   profile: {
-    profile: "profile",
+    getProfile: "profile",
+    updateProfile: "update-profile",
+    updatePassword: "update-password",
+    logout: "logout",
   },
 
   //Pages API
