@@ -13,7 +13,6 @@ import ChefSpecial from "./_components/ChefSpecial";
 import { getCardItems } from "@/lib/getItems";
 import { getHomeBannerList } from "@/lib/getHomeBannerApi";
 import { getHomeCompanyList } from "@/lib/getHomeCompanyApi";
-import { getHomeIndustryList } from "@/lib/getHomeIndustry";
 import { getTestimonialList } from "@/lib/getTestimonialApi";
 
 export async function generateMetadata() {}
@@ -21,22 +20,23 @@ export async function generateMetadata() {}
 export default async function Home() {
   // Fetch all data in parallel for better performance
   const [
+    banners,
     flatDiscountData,
     specialMenuData,
     chefSpecialData,
-    banners,
     companies,
-    industries,
-    testimonials,
+    testimonialsData,
   ] = await Promise.all([
+    getHomeBannerList(),
     getCardItems({ limit: 3, sections: "6a780fd4d2e5dfda5ce63991" }),
     getCardItems({ limit: 8, sections: "6a76b8e413fb4c5b2edaf4b2" }),
     getCardItems({ limit: 8, sections: "6a7c162075f50850dfe38c32" }),
-    getHomeBannerList(),
     getHomeCompanyList(),
-    getHomeIndustryList(),
     getTestimonialList(),
   ]);
+
+  // Extract testimonials from response
+  const testimonials = testimonialsData?.data?.testimonials || [];
 
   // Extract items from response
   const flatDiscountItems = flatDiscountData?.data?.items || [];
@@ -59,7 +59,8 @@ export default async function Home() {
       <WhyChooseUs />
       <AboutSection />
       <OurFeatures />
-      <TestimonialsSection />
+
+      <TestimonialsSection testimonials={testimonials} />
     </main>
   );
 }
