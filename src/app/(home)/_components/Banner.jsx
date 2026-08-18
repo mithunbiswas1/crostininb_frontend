@@ -45,7 +45,7 @@ export default function Banner({ banners }) {
             Our award-winning chefs bring culinary excellence to your table.
           </H6>
           <div className="flex flex-col items-start sm:flex-row sm:items-center gap-4 pt-4">
-            <Link href="/special">
+            <Link href="/specials">
               <Button
                 size="lg"
                 className="bg-primary hover:bg-green-600 border-2 border-amber-400/40 text-gray-50 text-base font-semibold rounded-xl transition-all"
