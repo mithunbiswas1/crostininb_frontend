@@ -14,6 +14,7 @@ import { getCardItems } from "@/lib/getItems";
 import { getHomeBannerList } from "@/lib/getHomeBannerApi";
 import { getHomeCompanyList } from "@/lib/getHomeCompanyApi";
 import { getTestimonialList } from "@/lib/getTestimonialApi";
+import { getAbout } from "@/lib/getAboutApi";
 
 export async function generateMetadata() {}
 
@@ -24,24 +25,27 @@ export default async function Home() {
     flatDiscountData,
     specialMenuData,
     chefSpecialData,
-    companies,
+    about,
+    companiesData,
     testimonialsData,
   ] = await Promise.all([
     getHomeBannerList(),
     getCardItems({ limit: 3, sections: "6a780fd4d2e5dfda5ce63991" }),
     getCardItems({ limit: 8, sections: "6a76b8e413fb4c5b2edaf4b2" }),
     getCardItems({ limit: 8, sections: "6a7c162075f50850dfe38c32" }),
+    getAbout(),
     getHomeCompanyList(),
     getTestimonialList(),
   ]);
 
-  // Extract testimonials from response
-  const testimonials = testimonialsData?.data?.testimonials || [];
+  console.log(about, "fdghjk");
 
   // Extract items from response
   const flatDiscountItems = flatDiscountData?.data?.items || [];
   const specialMenuItems = specialMenuData?.data?.items || [];
   const chefSpecialItems = chefSpecialData?.data?.items || [];
+  const testimonials = testimonialsData?.data?.testimonials || [];
+  const companies = companiesData?.data?.companies || [];
 
   return (
     <main className="">
@@ -57,8 +61,9 @@ export default async function Home() {
       {specialMenuItems.length > 0 && <SpecialMenu items={specialMenuItems} />}
 
       <WhyChooseUs />
-      <AboutSection />
-      <OurFeatures />
+      <AboutSection aboutData={about} />
+
+      <OurFeatures companies={companies} />
 
       <TestimonialsSection testimonials={testimonials} />
     </main>

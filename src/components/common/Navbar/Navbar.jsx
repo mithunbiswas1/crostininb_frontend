@@ -49,8 +49,8 @@ const navigation2 = [
     href: "/order-online",
   },
   {
-    name: "Catering",
-    href: "/catering",
+    name: "About",
+    href: "/about",
   },
   {
     name: "Account",
