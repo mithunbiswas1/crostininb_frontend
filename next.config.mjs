@@ -19,8 +19,22 @@ const nextConfig = {
         pathname: "/**",
       },
       {
+        protocol: "http",
+        hostname: "**",
+      },
+      {
         protocol: "https",
         hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "backend.logicraftit.org",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "backend.logicraftit.org",
+        pathname: "/**",
       },
     ],
   },
