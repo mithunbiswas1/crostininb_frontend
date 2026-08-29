@@ -4,17 +4,16 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  Check,
-  Plus,
-} from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { baseUriBackend } from "@/redux/url/url";
-import { singleAddToCartsList } from "@/redux/features/Slice/CartDrawerSlice";
+import {
+  singleAddToCartsList,
+  clearCartsList,
+  setBuyNowItem,
+} from "@/redux/features/Slice/CartDrawerSlice";
 
 // Helper function to get image URL
 const getImageUrl = (path) => {
@@ -26,119 +25,9 @@ const getImageUrl = (path) => {
   return `${baseUriBackend}${cleanPath}`;
 };
 
-// Addon Card Component
-const AddonCard = ({ item }) => {
+export default function ItemDetailClient({ item }) {
   const dispatch = useDispatch();
-  const { cartsList } = useSelector((state) => state.cartDrawer);
-  const [isAdding, setIsAdding] = useState(false);
-
-  // Get first variation
-  const variation =
-    item.variations && item.variations.length > 0 ? item.variations[0] : null;
-  const price =
-    variation?.variation_offer_price || variation?.variation_regular_price || 0;
-  const hasDiscount =
-    variation?.variation_offer_price &&
-    variation?.variation_offer_price < variation?.variation_regular_price;
-
-  // Check if in cart
-  const isInCart = cartsList.some((cartItem) => cartItem.productId === item.id);
-
-  const handleAddToCart = () => {
-    if (!variation) return;
-
-    setIsAdding(true);
-    dispatch(
-      singleAddToCartsList({
-        productId: item.id,
-        name: item.name,
-        image: item.image,
-        price: price,
-        variationName: variation.variation_name || null,
-        variationPrice: variation.variation_regular_price || null,
-        variationOfferPrice: variation.variation_offer_price || null,
-      }),
-    );
-
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 500);
-  };
-
-  return (
-    <div className="bg-[#111] border border-zinc-800 rounded-lg overflow-hidden hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5 flex group">
-      <Link
-        href={`/items/${item.slug}`}
-        className="relative w-24 md:w-28 aspect-square flex-shrink-0"
-      >
-        <Image
-          src={getImageUrl(item.image)}
-          alt={item.name}
-          fill
-          className="object-cover"
-        />
-        {item.is_addon && (
-          <span className="absolute top-1 left-1 bg-purple-600 text-white text-[8px] px-1.5 py-0.5 rounded">
-            Addon
-          </span>
-        )}
-      </Link>
-      <div className="flex-1 p-3 flex items-center justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <Link href={`/items/${item.slug}`}>
-            <h4 className="text-white font-semibold text-sm line-clamp-1 group-hover:text-amber-400 transition-colors">
-              {item.name}
-            </h4>
-          </Link>
-          <p className="text-gray-400 text-xs line-clamp-2 mt-0.5">
-            {item.short_description || item.description?.substring(0, 60) || ""}
-          </p>
-        </div>
-
-        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-          <div className="text-right">
-            {hasDiscount ? (
-              <>
-                <span className="text-amber-400 font-semibold text-sm">
-                  ${variation.variation_offer_price}
-                </span>
-                <span className="text-gray-500 text-xs line-through ml-1.5">
-                  ${variation.variation_regular_price}
-                </span>
-              </>
-            ) : (
-              <span className="text-white font-semibold text-sm">${price}</span>
-            )}
-          </div>
-          <button
-            onClick={handleAddToCart}
-            disabled={isAdding || isInCart || !item.is_available}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-              isInCart
-                ? "bg-green-600 text-white"
-                : isAdding
-                  ? "bg-green-600 text-white"
-                  : item.is_available
-                    ? "bg-amber-500 text-black hover:bg-amber-600"
-                    : "bg-zinc-700 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            {isInCart ? (
-              <Check size={16} />
-            ) : isAdding ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Plus size={16} />
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default function ItemDetailClient({ item, addonItems = [] }) {
-  const dispatch = useDispatch();
+  const router = useRouter();
   const { cartsList } = useSelector((state) => state.cartDrawer);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedVariation, setSelectedVariation] = useState(null);
@@ -283,6 +172,32 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     }, 500);
   };
 
+  // Handle Buy Now - Set buy now item and go to checkout
+  const handleBuyNow = () => {
+    // Check if variation is selected (if more than 1 variation)
+    if (item.variations && item.variations.length > 1 && !selectedVariation) {
+      return;
+    }
+
+    // Create buy now item
+    const buyNowItem = {
+      productId: item.id,
+      name: item.name,
+      image: item.image,
+      price: getCurrentPrice(),
+      variationName: selectedVariation?.variation_name || null,
+      variationPrice: selectedVariation?.variation_regular_price || null,
+      variationOfferPrice: selectedVariation?.variation_offer_price || null,
+      quantity: 1,
+    };
+
+    // Set buy now item in Redux and localStorage
+    dispatch(setBuyNowItem(buyNowItem));
+
+    // Navigate to checkout with buy now mode
+    router.push("/checkout?mode=buynow");
+  };
+
   // Check if variation selection is required (more than 1 variation)
   const isVariationRequired = item.variations && item.variations.length > 1;
   const hasMultipleVariations = item.variations && item.variations.length > 1;
@@ -388,28 +303,15 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
             {/* Content Section */}
             <div className="p-6 md:p-10">
               {/* Category */}
-              {item.categories && item.categories.length > 0 ? (
+              {item.category?.name && (
                 <span className="inline-block text-sm text-amber-400 font-medium mb-2">
-                  {item.categories.map((c) => c?.name || c).join(", ")}
+                  {item.category.name}
                 </span>
-              ) : (
-                item.category?.name && (
-                  <span className="inline-block text-sm text-amber-400 font-medium mb-2">
-                    {item.category.name}
-                  </span>
-                )
               )}
 
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
                 {item.name}
               </h1>
-
-              {/* Addon Badge */}
-              {item.is_addon && (
-                <span className="inline-block bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full mb-3">
-                  Addon Item
-                </span>
-              )}
 
               {/* Price Range - Only show if multiple variations */}
               {priceRange && (
@@ -577,6 +479,21 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                     "Add to Cart"
                   )}
                 </button>
+
+                {/* Buy Now Button - Direct checkout with buy now mode */}
+                <button
+                  disabled={isAddToCartDisabled}
+                  onClick={handleBuyNow}
+                  className={`flex-1 font-bold py-3 px-6 rounded-lg transition-colors duration-200 ${
+                    !isAddToCartDisabled
+                      ? "bg-amber-500 hover:bg-amber-600 text-black"
+                      : "bg-zinc-700 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  {isVariationRequired && !isVariationSelected
+                    ? "Select Variation"
+                    : "Instant Order"}
+                </button>
               </div>
             </div>
           </div>
@@ -591,23 +508,6 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
             </div>
           )}
         </div>
-
-        {/* Addon Items Section */}
-        {addonItems && addonItems.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Addon Items
-              <span className="text-sm font-normal text-gray-400 ml-2">
-                ({addonItems.length})
-              </span>
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {addonItems.map((addon) => (
-                <AddonCard key={addon.id} item={addon} />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

@@ -63,7 +63,7 @@ export default async function Home() {
       <WhyChooseUs />
       <AboutSection aboutData={about} />
 
-      <OurFeatures companies={companies} />
+      {/* <OurFeatures companies={companies} /> */}
 
       <TestimonialsSection testimonials={testimonials} />
     </main>

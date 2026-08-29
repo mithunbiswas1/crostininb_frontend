@@ -12,6 +12,7 @@ export async function getListItems({
   sortBy = "createdAt",
   is_active = true,
   is_available = true,
+  is_addon = false,
 } = {}) {
   const validPage = Math.max(1, parseInt(page) || 1);
 
@@ -24,7 +25,9 @@ export async function getListItems({
   params.append("is_available", is_available);
 
   if (search) params.append("search", search);
-  if (category) params.append("category", category);
+  if (category) params.append("categories", category);
+  if (is_addon !== undefined && is_addon !== "")
+    params.append("is_addon", is_addon);
 
   const url = `${API_BASE_URL}get-all-items?${params.toString()}&_t=${Date.now()}`;
 
@@ -49,6 +52,7 @@ export async function getCardItems({
   sections = "",
   sortBy = "createdAt",
   is_available = true,
+  is_addon = false,
 } = {}) {
   const validPage = Math.max(1, parseInt(page) || 1);
 
@@ -60,8 +64,10 @@ export async function getCardItems({
   params.append("is_available", is_available);
 
   if (search) params.append("search", search);
-  if (category) params.append("category", category);
+  if (category) params.append("categories", category);
   if (sections) params.append("sections", sections);
+  if (is_addon !== undefined && is_addon !== "")
+    params.append("is_addon", is_addon);
 
   const url = `${API_BASE_URL}get-card-items?${params.toString()}&_t=${Date.now()}`;
 
@@ -94,7 +100,7 @@ export async function getItemBySlug(slug) {
 // Get items by category ID
 export async function getItemsByCategory(
   categoryId,
-  { limit = 10, order = "desc", page = 1 } = {},
+  { limit = 10, order = "desc", page = 1, is_addon = false } = {},
 ) {
   const validPage = Math.max(1, parseInt(page) || 1);
 
@@ -102,6 +108,8 @@ export async function getItemsByCategory(
   params.append("limit", limit.toString());
   params.append("order", order);
   params.append("page", validPage.toString());
+  if (is_addon !== undefined && is_addon !== "")
+    params.append("is_addon", is_addon);
 
   const url = `${API_BASE_URL}get-items-by-category/${categoryId}?${params.toString()}&_t=${Date.now()}`;
 
@@ -130,6 +138,7 @@ export async function getItemsByCategorySlug(
     sortBy = "createdAt",
     minPrice = "",
     maxPrice = "",
+    is_addon = false,
   } = {},
 ) {
   const validPage = Math.max(1, parseInt(page) || 1);
@@ -146,9 +155,11 @@ export async function getItemsByCategorySlug(
   if (sections) params.append("sections", sections);
   if (minPrice) params.append("minPrice", minPrice);
   if (maxPrice) params.append("maxPrice", maxPrice);
+  if (is_addon !== undefined && is_addon !== "")
+    params.append("is_addon", is_addon);
 
   const url = `${API_BASE_URL}get-items-by-category-slug/${categorySlug}?${params.toString()}&_t=${Date.now()}`;
-
+  console.log(url, "urlddd");
   const res = await fetch(url, {
     cache: "no-store",
   });
