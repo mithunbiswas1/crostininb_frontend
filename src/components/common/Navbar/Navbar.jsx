@@ -419,7 +419,7 @@ export default function Navbar() {
                             Login
                           </Link>
                           <Link
-                            href="/register"
+                            href="/registration"
                             className="block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 text-gray-700 dark:text-gray-200"
                           >
                             Register
