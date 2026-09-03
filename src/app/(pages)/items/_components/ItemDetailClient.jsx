@@ -26,27 +26,408 @@ const getImageUrl = (path) => {
   return `${baseUriBackend}${cleanPath}`;
 };
 
-// Addon Card Component
-const AddonCard = ({ item }) => {
+// ==================== SIZE SELECTOR ====================
+const SizeSelector = ({
+  sizes,
+  selectedSize,
+  onSelect,
+  hasCrusts,
+  isCrustSelected,
+  selectedCrust,
+}) => {
+  if (!sizes || sizes.length === 0) return null;
+
+  const isDisabled = hasCrusts && !isCrustSelected;
+
+  // Get available sizes from selected crust
+  const getAvailableSizes = () => {
+    if (!selectedCrust || !selectedCrust.size) return [];
+    const available = [];
+    if (selectedCrust.size.small) available.push("Small");
+    if (selectedCrust.size.medium) available.push("Medium");
+    if (selectedCrust.size.large) available.push("Large");
+    return available;
+  };
+
+  const availableSizes = getAvailableSizes();
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3">
+        Select Size <span className="text-red-500">*</span>
+        {isDisabled && (
+          <span className="text-xs text-amber-400 ml-2">
+            (Select crust first)
+          </span>
+        )}
+        {!isDisabled && hasCrusts && availableSizes.length > 0 && (
+          <span className="text-xs text-gray-500 ml-2">
+            Available: {availableSizes.join(", ")}
+          </span>
+        )}
+      </h3>
+      <div className="flex flex-wrap gap-3">
+        {sizes.map((size, index) => {
+          // Check if this size is available for selected crust
+          const isSizeAvailable =
+            !hasCrusts ||
+            (hasCrusts &&
+              isCrustSelected &&
+              selectedCrust?.size?.[size.name.toLowerCase()] === true);
+
+          const isSelected = selectedSize?.name === size.name;
+
+          return (
+            <button
+              key={index}
+              onClick={() => isSizeAvailable && onSelect(size)}
+              disabled={!isSizeAvailable}
+              className={`px-6 py-3 rounded-xl text-sm font-medium transition-all min-w-[100px] text-center ${
+                !isSizeAvailable
+                  ? "bg-zinc-800/30 text-gray-600 cursor-not-allowed border border-zinc-700/50"
+                  : isSelected
+                    ? "bg-amber-500 text-black shadow-lg shadow-amber-500/30 scale-105"
+                    : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700"
+              }`}
+            >
+              <div className="font-bold">{size.name}</div>
+              <div className="text-xs opacity-70">${size.price}</div>
+              {!isSizeAvailable && hasCrusts && isCrustSelected && (
+                <div className="text-[8px] text-gray-500 mt-0.5">
+                  Unavailable
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      {isDisabled && (
+        <p className="text-xs text-amber-400/70 mt-2">
+          Please select a crust first to see available sizes
+        </p>
+      )}
+      {!isDisabled && hasCrusts && availableSizes.length === 0 && (
+        <p className="text-xs text-red-400/70 mt-2">
+          This crust has no available sizes. Please select another crust.
+        </p>
+      )}
+    </div>
+  );
+};
+
+// ==================== CRUST SELECTOR ====================
+const CrustSelector = ({ crusts, selectedCrust, onSelect }) => {
+  if (!crusts || crusts.length === 0) return null;
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3">
+        Choose Crust <span className="text-red-500">*</span>
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {crusts.map((crust) => {
+          const crustId = crust._id || crust.id;
+          const selectedId = selectedCrust?._id || selectedCrust?.id;
+          const isSelected = crustId === selectedId;
+
+          return (
+            <button
+              key={crustId}
+              onClick={() => onSelect(crust)}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all text-left ${
+                isSelected
+                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                  : "border-zinc-700 hover:border-zinc-500"
+              }`}
+            >
+              <div className="flex items-center gap-3 p-3">
+                {/* Image */}
+                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
+                  <Image
+                    src={getImageUrl(crust.image)}
+                    alt={crust.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+
+                {/* Name */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-medium text-sm line-clamp-1">
+                    {crust.name}
+                  </h4>
+                </div>
+
+                {/* Selection Indicator */}
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                    isSelected
+                      ? "border-amber-500 bg-amber-500"
+                      : "border-zinc-600"
+                  }`}
+                >
+                  {isSelected && <Check size={12} className="text-black" />}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ==================== SEASONING SELECTOR ====================
+const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
+  if (!seasonings || seasonings.length === 0) return null;
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3">Seasonings</h3>
+      <div className="flex flex-wrap gap-2">
+        {seasonings.map((seasoning, index) => {
+          const isSelected = selectedSeasonings.some(
+            (s) => s.name === seasoning.name,
+          );
+          return (
+            <button
+              key={index}
+              onClick={() => onSelect(seasoning)}
+              className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                isSelected
+                  ? "bg-amber-500 text-black font-semibold"
+                  : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+              }`}
+            >
+              {seasoning.name}
+              {isSelected && <Check size={12} className="inline ml-1" />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ==================== ADDON CARD (Section Wise - Dynamic Categories) ====================
+const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
+  if (!addons || addons.length === 0) return null;
+
+  // Track selected variant for each addon - default light
+  const [selectedVariants, setSelectedVariants] = useState({});
+
+  // Auto-select light variant for each addon when selected
+  useEffect(() => {
+    const defaultVariants = {};
+    addons.forEach((addon) => {
+      const addonId = addon._id || addon.id;
+      if (addon.variants && addon.variants.length > 0) {
+        const lightVariant =
+          addon.variants.find((v) => v.name === "light") || addon.variants[0];
+        if (!selectedVariants[addonId]) {
+          defaultVariants[addonId] = lightVariant;
+        }
+      }
+    });
+    if (Object.keys(defaultVariants).length > 0) {
+      setSelectedVariants((prev) => ({
+        ...prev,
+        ...defaultVariants,
+      }));
+    }
+  }, [addons]);
+
+  const handleVariantSelect = (addonId, variant) => {
+    setSelectedVariants((prev) => ({
+      ...prev,
+      [addonId]: variant,
+    }));
+  };
+
+  // Format category name - capitalize and replace underscores with spaces
+  const formatCategoryName = (cat) => {
+    if (!cat) return "Other";
+    return cat
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3 capitalize">
+        {formatCategoryName(category)}
+      </h3>
+      <div className="grid grid-cols-1 gap-3">
+        {addons.map((addon) => {
+          const addonId = addon._id || addon.id;
+          const isSelected = selectedAddons.some(
+            (a) => (a._id || a.id) === addonId,
+          );
+          const selectedVariant = selectedVariants[addonId];
+
+          return (
+            <div
+              key={addonId}
+              onClick={() => onSelect(addon)}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                isSelected
+                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                  : "border-zinc-700 hover:border-zinc-500"
+              }`}
+            >
+              {/* Card Content - Top Row */}
+              <div className="flex items-center gap-3 p-3">
+                {/* Image */}
+                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
+                  <Image
+                    src={getImageUrl(addon.image)}
+                    alt={addon.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+
+                {/* Name & Price */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-medium text-sm line-clamp-1">
+                    {addon.name}
+                  </h4>
+                </div>
+
+                {/* Selection Indicator */}
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                    isSelected
+                      ? "border-amber-500 bg-amber-500"
+                      : "border-zinc-600"
+                  }`}
+                >
+                  {isSelected && <Check size={12} className="text-black" />}
+                </div>
+              </div>
+
+              {/* Variants - Bottom Row (Only show when card is selected) */}
+              {isSelected && addon.variants && addon.variants.length > 0 && (
+                <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {addon.variants.map((variant, vIndex) => {
+                      const isVariantSelected =
+                        selectedVariant?.name === variant.name;
+                      return (
+                        <button
+                          key={vIndex}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVariantSelect(addonId, variant);
+                          }}
+                          className={`px-2.5 py-1 rounded text-xs transition-all ${
+                            isVariantSelected
+                              ? "bg-amber-500 text-black font-medium"
+                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                          }`}
+                        >
+                          {variant.name} - ${variant.price}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ==================== SPECIAL INSTRUCTIONS ====================
+const SpecialInstructions = ({
+  instructions,
+  selectedInstructions,
+  onSelect,
+}) => {
+  if (!instructions) return null;
+
+  const hasCut = instructions.cut && instructions.cut.length > 0;
+  const hasBake = instructions.bake && instructions.bake.length > 0;
+
+  if (!hasCut && !hasBake) return null;
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3">
+        Special Instructions
+      </h3>
+
+      {hasCut && (
+        <div className="mb-2">
+          <h4 className="text-xs text-gray-500 mb-1.5">Cut</h4>
+          <div className="flex flex-wrap gap-1.5">
+            {instructions.cut.map((item, index) => {
+              const isSelected = selectedInstructions.cut.some(
+                (s) => s.name === item.name,
+              );
+              return (
+                <button
+                  key={index}
+                  onClick={() => onSelect("cut", item)}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    isSelected
+                      ? "bg-amber-500 text-black font-medium"
+                      : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+                  }`}
+                >
+                  {item.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {hasBake && (
+        <div>
+          <h4 className="text-xs text-gray-500 mb-1.5">Bake</h4>
+          <div className="flex flex-wrap gap-1.5">
+            {instructions.bake.map((item, index) => {
+              const isSelected = selectedInstructions.bake.some(
+                (s) => s.name === item.name,
+              );
+              return (
+                <button
+                  key={index}
+                  onClick={() => onSelect("bake", item)}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    isSelected
+                      ? "bg-amber-500 text-black font-medium"
+                      : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+                  }`}
+                >
+                  {item.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ==================== RELATED ITEM CARD ====================
+const RelatedItemCard = ({ item }) => {
   const dispatch = useDispatch();
   const { cartsList } = useSelector((state) => state.cartDrawer);
   const [isAdding, setIsAdding] = useState(false);
 
-  // Get first variation
-  const variation =
-    item.variations && item.variations.length > 0 ? item.variations[0] : null;
-  const price =
-    variation?.variation_offer_price || variation?.variation_regular_price || 0;
-  const hasDiscount =
-    variation?.variation_offer_price &&
-    variation?.variation_offer_price < variation?.variation_regular_price;
-
-  // Check if in cart
+  const price = item.min_price || item.size?.[0]?.price || 0;
   const isInCart = cartsList.some((cartItem) => cartItem.productId === item.id);
 
   const handleAddToCart = () => {
-    if (!variation) return;
-
     setIsAdding(true);
     dispatch(
       singleAddToCartsList({
@@ -54,15 +435,12 @@ const AddonCard = ({ item }) => {
         name: item.name,
         image: item.image,
         price: price,
-        variationName: variation.variation_name || null,
-        variationPrice: variation.variation_regular_price || null,
-        variationOfferPrice: variation.variation_offer_price || null,
+        variationName: null,
+        variationPrice: null,
+        variationOfferPrice: null,
       }),
     );
-
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 500);
+    setTimeout(() => setIsAdding(false), 500);
   };
 
   return (
@@ -76,6 +454,7 @@ const AddonCard = ({ item }) => {
           alt={item.name}
           fill
           className="object-cover"
+          unoptimized
         />
         {item.is_addon && (
           <span className="absolute top-1 left-1 bg-purple-600 text-white text-[8px] px-1.5 py-0.5 rounded">
@@ -97,18 +476,7 @@ const AddonCard = ({ item }) => {
 
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
           <div className="text-right">
-            {hasDiscount ? (
-              <>
-                <span className="text-amber-400 font-semibold text-sm">
-                  ${variation.variation_offer_price}
-                </span>
-                <span className="text-gray-500 text-xs line-through ml-1.5">
-                  ${variation.variation_regular_price}
-                </span>
-              </>
-            ) : (
-              <span className="text-white font-semibold text-sm">${price}</span>
-            )}
+            <span className="text-white font-semibold text-sm">${price}</span>
           </div>
           <button
             onClick={handleAddToCart}
@@ -137,35 +505,63 @@ const AddonCard = ({ item }) => {
   );
 };
 
+// ==================== MAIN COMPONENT ====================
 export default function ItemDetailClient({ item, addonItems = [] }) {
   const dispatch = useDispatch();
   const { cartsList } = useSelector((state) => state.cartDrawer);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedVariation, setSelectedVariation] = useState(null);
+
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedCrust, setSelectedCrust] = useState(null);
+  const [selectedSeasonings, setSelectedSeasonings] = useState([]);
+  const [selectedAddons, setSelectedAddons] = useState([]);
+  const [selectedInstructions, setSelectedInstructions] = useState({
+    cut: [],
+    bake: [],
+  });
+
+  const [isCrustSelected, setIsCrustSelected] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  // Auto-select first variation if there's exactly 1 variation
+  const hasCrusts = item.crusts && item.crusts.length > 0;
+
+  // Auto-select first crust (index 0) if available
   useEffect(() => {
-    if (item.variations && item.variations.length === 1) {
-      setSelectedVariation(item.variations[0]);
-    } else {
-      setSelectedVariation(null);
+    if (hasCrusts && item.crusts.length > 0 && !selectedCrust) {
+      const firstCrust = item.crusts[0];
+      setSelectedCrust(firstCrust);
+      setIsCrustSelected(true);
     }
-  }, [item.variations]);
+  }, [hasCrusts, item.crusts, selectedCrust]);
+
+  // Auto-select first available size based on crust
+  useEffect(() => {
+    if (item.size && item.size.length > 0 && selectedCrust) {
+      const availableSizes = [];
+      if (selectedCrust.size?.small) availableSizes.push("Small");
+      if (selectedCrust.size?.medium) availableSizes.push("Medium");
+      if (selectedCrust.size?.large) availableSizes.push("Large");
+
+      if (availableSizes.length > 0) {
+        const firstAvailable = item.size.find(
+          (s) => s.name === availableSizes[0],
+        );
+        if (firstAvailable && !selectedSize) {
+          setSelectedSize(firstAvailable);
+        }
+      }
+    }
+  }, [selectedCrust, item.size]);
 
   // Check if product already in cart
   useEffect(() => {
-    const exists = cartsList.some(
-      (cartItem) =>
-        cartItem.productId === item.id &&
-        cartItem.variationName === (selectedVariation?.variation_name || null),
-    );
+    const exists = cartsList.some((cartItem) => cartItem.productId === item.id);
     setIsInCart(exists);
-  }, [cartsList, item.id, selectedVariation]);
+  }, [cartsList, item.id]);
 
-  // Create image array: main image + gallery
-  const images = [item.image, ...(item.gallery || [])].filter(Boolean);
+  // Create image array
+  const images = [item.image, ...(item.gallery_image || [])].filter(Boolean);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -179,90 +575,93 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     setCurrentImageIndex(index);
   };
 
-  // Handle variation selection
-  const handleVariationSelect = (variation) => {
-    // If only 1 variation, don't allow deselection
-    if (item.variations.length === 1) {
-      return;
-    }
+  // Handler functions
+  const handleCrustSelect = (crust) => {
+    const crustId = crust._id || crust.id;
+    const selectedId = selectedCrust?._id || selectedCrust?.id;
 
-    if (selectedVariation?.variation_name === variation.variation_name) {
-      // If clicking the same variation, deselect it (only if more than 1 variation)
-      if (item.variations.length > 1) {
-        setSelectedVariation(null);
-      }
+    if (crustId === selectedId) {
+      setSelectedCrust(null);
+      setIsCrustSelected(false);
+      setSelectedSize(null);
     } else {
-      setSelectedVariation(variation);
+      setSelectedCrust(crust);
+      setIsCrustSelected(true);
+      setSelectedSize(null);
     }
   };
 
-  // Get current price based on selected variation
-  const getCurrentPrice = () => {
-    if (selectedVariation) {
-      return (
-        selectedVariation.variation_offer_price ||
-        selectedVariation.variation_regular_price
+  const handleSizeSelect = (size) => {
+    if (selectedSize?.name === size.name) {
+      setSelectedSize(null);
+    } else {
+      setSelectedSize(size);
+    }
+  };
+
+  const handleSeasoningSelect = (seasoning) => {
+    const exists = selectedSeasonings.some((s) => s.name === seasoning.name);
+    if (exists) {
+      setSelectedSeasonings(
+        selectedSeasonings.filter((s) => s.name !== seasoning.name),
       );
+    } else {
+      setSelectedSeasonings([...selectedSeasonings, seasoning]);
     }
-    return 0;
   };
 
-  // Get original price (for strike-through)
-  const getOriginalPrice = () => {
-    if (selectedVariation && selectedVariation.variation_offer_price) {
-      return selectedVariation.variation_regular_price;
-    }
-    return null;
-  };
-
-  // Check if current variation has discount
-  const hasDiscount = () => {
-    if (selectedVariation && selectedVariation.variation_offer_price) {
-      return (
-        selectedVariation.variation_offer_price <
-        selectedVariation.variation_regular_price
+  const handleAddonSelect = (addon) => {
+    const addonId = addon._id || addon.id;
+    const exists = selectedAddons.some((a) => (a._id || a.id) === addonId);
+    if (exists) {
+      setSelectedAddons(
+        selectedAddons.filter((a) => (a._id || a.id) !== addonId),
       );
+    } else {
+      setSelectedAddons([...selectedAddons, addon]);
     }
-    return false;
   };
 
-  // Get discount percentage
-  const getDiscountPercent = () => {
-    if (hasDiscount()) {
-      return Math.round(
-        ((selectedVariation.variation_regular_price -
-          selectedVariation.variation_offer_price) /
-          selectedVariation.variation_regular_price) *
-          100,
-      );
-    }
-    return 0;
-  };
-
-  // Get price range display - only if multiple variations
-  const getPriceRange = () => {
-    if (!item.variations || item.variations.length <= 1) {
-      return null;
-    }
-
-    const prices = item.variations.map(
-      (v) => v.variation_offer_price || v.variation_regular_price,
+  const handleInstructionSelect = (type, instruction) => {
+    const exists = selectedInstructions[type].some(
+      (s) => s.name === instruction.name,
     );
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-
-    if (minPrice === maxPrice) {
-      return `$${minPrice}`;
+    if (exists) {
+      setSelectedInstructions({
+        ...selectedInstructions,
+        [type]: selectedInstructions[type].filter(
+          (s) => s.name !== instruction.name,
+        ),
+      });
+    } else {
+      setSelectedInstructions({
+        ...selectedInstructions,
+        [type]: [...selectedInstructions[type], instruction],
+      });
     }
-    return `$${minPrice} - $${maxPrice}`;
   };
 
-  // Handle Add to Cart - No redirect to checkout
-  const handleAddToCart = () => {
-    // Check if variation is selected (if more than 1 variation)
-    if (item.variations && item.variations.length > 1 && !selectedVariation) {
-      return;
+  const getCurrentPrice = () => {
+    if (selectedSize) {
+      return selectedSize.price;
     }
+    if (item.min_price) {
+      return item.min_price;
+    }
+    return 0;
+  };
+
+  const isSizeRequired = item.size && item.size.length > 0;
+  const isSizeSelected = selectedSize !== null;
+
+  const isAddToCartDisabled =
+    !item.is_available ||
+    isAddingToCart ||
+    (isSizeRequired && !isSizeSelected) ||
+    (hasCrusts && !isCrustSelected);
+
+  const handleAddToCart = () => {
+    if (isAddToCartDisabled) return;
 
     setIsAddingToCart(true);
     dispatch(
@@ -271,31 +670,30 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         name: item.name,
         image: item.image,
         price: getCurrentPrice(),
-        variationName: selectedVariation?.variation_name || null,
-        variationPrice: selectedVariation?.variation_regular_price || null,
-        variationOfferPrice: selectedVariation?.variation_offer_price || null,
+        size: selectedSize?.name || null,
+        crust: selectedCrust?.name || null,
+        seasonings: selectedSeasonings.map((s) => s.name),
+        addons: selectedAddons.map((a) => a.name),
+        instructions: {
+          cut: selectedInstructions.cut.map((s) => s.name),
+          bake: selectedInstructions.bake.map((s) => s.name),
+        },
       }),
     );
 
     setTimeout(() => {
       setIsAddingToCart(false);
-      // Stay on the same page, don't redirect
     }, 500);
   };
 
-  // Check if variation selection is required (more than 1 variation)
-  const isVariationRequired = item.variations && item.variations.length > 1;
-  const hasMultipleVariations = item.variations && item.variations.length > 1;
-  const isVariationSelected = selectedVariation !== null;
-  const hasSingleVariation = item.variations && item.variations.length === 1;
-
-  // Check if add to cart should be disabled
-  const isAddToCartDisabled =
-    !item.is_available ||
-    isAddingToCart ||
-    (isVariationRequired && !isVariationSelected);
-
-  const priceRange = getPriceRange();
+  const getButtonText = () => {
+    if (isInCart) return "In Cart";
+    if (isAddingToCart) return "Adding...";
+    if (!item.is_available) return "Unavailable";
+    if (hasCrusts && !isCrustSelected) return "Select Crust First";
+    if (isSizeRequired && !isSizeSelected) return "Select Size";
+    return `Add to Cart - $${getCurrentPrice()}`;
+  };
 
   return (
     <section className="bg-black min-h-screen py-10 lg:py-20">
@@ -311,11 +709,9 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
 
         {/* Item Details */}
         <div className="bg-[#111] border border-zinc-800 rounded-2xl overflow-hidden">
-          {/* Main Content - Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2">
-            {/* Image Section with Slider */}
+            {/* ===== IMAGE SECTION ===== */}
             <div className="relative bg-zinc-900">
-              {/* Main Image */}
               <div className="relative h-80 md:h-[500px]">
                 <Image
                   src={getImageUrl(images[currentImageIndex])}
@@ -323,16 +719,9 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                   fill
                   className="object-cover"
                   priority
+                  unoptimized
                 />
 
-                {/* Discount Badge */}
-                {hasDiscount() && (
-                  <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 text-sm font-bold rounded z-10">
-                    {getDiscountPercent()}% OFF
-                  </div>
-                )}
-
-                {/* Unavailable Overlay */}
                 {!item.is_available && (
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
                     <span className="text-white text-xl font-bold px-6 py-3 border-2 border-white rounded-lg">
@@ -341,7 +730,6 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                   </div>
                 )}
 
-                {/* Navigation Arrows */}
                 {images.length > 1 && (
                   <>
                     <button
@@ -378,6 +766,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                         alt={`${item.name} ${index + 1}`}
                         fill
                         className="object-cover"
+                        unoptimized
                       />
                     </button>
                   ))}
@@ -385,128 +774,45 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
               )}
             </div>
 
-            {/* Content Section */}
-            <div className="p-6 md:p-10">
+            {/* ===== CONTENT SECTION ===== */}
+            <div className="p-6 md:p-10 overflow-y-auto max-h-[800px] custom-scrollbar">
               {/* Category */}
-              {item.categories && item.categories.length > 0 ? (
-                <span className="inline-block text-sm text-amber-400 font-medium mb-2">
-                  {item.categories.map((c) => c?.name || c).join(", ")}
-                </span>
-              ) : (
-                item.category?.name && (
-                  <span className="inline-block text-sm text-amber-400 font-medium mb-2">
-                    {item.category.name}
-                  </span>
-                )
+              {item.categories && item.categories.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {item.categories.map((cat, index) => (
+                    <span
+                      key={index}
+                      className="inline-block text-xs text-amber-400 font-medium"
+                    >
+                      {cat?.name || cat}
+                      {index < item.categories.length - 1 && ", "}
+                    </span>
+                  ))}
+                </div>
               )}
 
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
                 {item.name}
               </h1>
 
-              {/* Addon Badge */}
-              {item.is_addon && (
-                <span className="inline-block bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full mb-3">
-                  Addon Item
-                </span>
-              )}
-
-              {/* Price Range - Only show if multiple variations */}
-              {priceRange && (
-                <div className="mb-4">
-                  <span className="text-sm text-gray-400">Price Range: </span>
-                  <span className="text-2xl font-bold text-amber-400">
-                    {priceRange}
+              {/* Flags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {item.is_veg && (
+                  <span className="inline-block bg-green-600/20 text-green-400 text-xs font-semibold px-3 py-1 rounded-full">
+                    🌿 Vegetarian
                   </span>
-                </div>
-              )}
-
-              {/* Variation Section */}
-              {item.variations && item.variations.length > 0 && (
-                <div className="mb-4">
-                  {hasMultipleVariations ? (
-                    <>
-                      <h3 className="text-sm font-semibold text-gray-400 mb-2">
-                        Select Variation <span className="text-red-500">*</span>
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {item.variations.map((variation, index) => {
-                          const isSelected =
-                            selectedVariation?.variation_name ===
-                            variation.variation_name;
-
-                          return (
-                            <button
-                              key={index}
-                              onClick={() => handleVariationSelect(variation)}
-                              className={`px-4 py-2 rounded-lg text-sm transition-all ${
-                                isSelected
-                                  ? "bg-amber-500 text-black font-semibold shadow-lg shadow-amber-500/25"
-                                  : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-                              }`}
-                            >
-                              {variation.variation_name}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Show price below selected variation name */}
-                      {selectedVariation && (
-                        <div className="mt-3 p-3 bg-zinc-800/50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm text-gray-400">
-                              Selected:
-                            </span>
-                            <span className="text-sm font-medium text-white">
-                              {selectedVariation.variation_name}
-                            </span>
-                            <span className="text-xl font-bold text-amber-400">
-                              ${getCurrentPrice()}
-                            </span>
-                            {hasDiscount() && (
-                              <>
-                                <span className="text-sm text-gray-400 line-through">
-                                  ${getOriginalPrice()}
-                                </span>
-                                <span className="text-xs text-green-400 font-semibold bg-green-400/10 px-2 py-0.5 rounded-full">
-                                  -{getDiscountPercent()}%
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {!isVariationSelected && (
-                        <p className="text-xs text-red-400 mt-2">
-                          Please select a variation
-                        </p>
-                      )}
-                    </>
-                  ) : hasSingleVariation ? (
-                    // Single variation - show only price, no variation name
-                    <div className="mt-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-400">Price:</span>
-                        <span className="text-3xl font-bold text-amber-400">
-                          ${getCurrentPrice()}
-                        </span>
-                        {hasDiscount() && (
-                          <>
-                            <span className="text-sm text-gray-400 line-through">
-                              ${getOriginalPrice()}
-                            </span>
-                            <span className="text-xs text-green-400 font-semibold bg-green-400/10 px-2 py-0.5 rounded-full">
-                              -{getDiscountPercent()}%
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              )}
+                )}
+                {item.is_spicy && (
+                  <span className="inline-block bg-red-600/20 text-red-400 text-xs font-semibold px-3 py-1 rounded-full">
+                    🌶️ Spicy
+                  </span>
+                )}
+                {item.is_gluten_free && (
+                  <span className="inline-block bg-blue-600/20 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full">
+                    Gluten Free
+                  </span>
+                )}
+              </div>
 
               {/* Short Description */}
               {item.short_description && (
@@ -515,10 +821,60 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                 </p>
               )}
 
-              {/* Features */}
+              {/* ===== CRUST ===== */}
+              <CrustSelector
+                crusts={item.crusts}
+                selectedCrust={selectedCrust}
+                onSelect={handleCrustSelect}
+              />
+
+              {/* ===== SIZE ===== */}
+              <SizeSelector
+                sizes={item.size}
+                selectedSize={selectedSize}
+                onSelect={handleSizeSelect}
+                hasCrusts={hasCrusts}
+                isCrustSelected={isCrustSelected}
+                selectedCrust={selectedCrust}
+              />
+
+              {/* ===== SEASONING ===== */}
+              <SeasoningSelector
+                seasonings={item.seasoning}
+                selectedSeasonings={selectedSeasonings}
+                onSelect={handleSeasoningSelect}
+              />
+
+              {/* ===== ADDONS ===== */}
+              {item.grouped_addons &&
+                Object.keys(item.grouped_addons).length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-sm font-semibold text-gray-400 mb-3">
+                      Add-ons
+                    </h3>
+                    {Object.keys(item.grouped_addons).map((category) => (
+                      <AddonSection
+                        key={category}
+                        category={category}
+                        addons={item.grouped_addons[category]}
+                        selectedAddons={selectedAddons}
+                        onSelect={handleAddonSelect}
+                      />
+                    ))}
+                  </div>
+                )}
+
+              {/* ===== SPECIAL INSTRUCTIONS ===== */}
+              <SpecialInstructions
+                instructions={item.special_instructions}
+                selectedInstructions={selectedInstructions}
+                onSelect={handleInstructionSelect}
+              />
+
+              {/* ===== FEATURES ===== */}
               {item.features && item.features.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-3">
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-2">
                     Features
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -534,21 +890,16 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                 </div>
               )}
 
-              {/* Meta Info */}
+              {/* ===== META INFO ===== */}
               <div className="border-t border-zinc-800 pt-4 flex flex-wrap gap-4 text-xs text-gray-500">
                 {item.sku && <span>SKU: {item.sku}</span>}
                 {item.preparation_time && (
                   <span>⏱️ {item.preparation_time} min</span>
                 )}
-                <span>
-                  {item.is_veg ? "🌿 Vegetarian" : "🍖 Non-Vegetarian"}
-                </span>
-                {item.is_spicy && <span>🌶️ Spicy</span>}
               </div>
 
-              {/* Action Buttons */}
+              {/* ===== ADD TO CART ===== */}
               <div className="flex gap-3 mt-6">
-                {/* Add to Cart Button - No redirect */}
                 <button
                   disabled={isAddToCartDisabled}
                   onClick={handleAddToCart}
@@ -558,30 +909,20 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                       : isAddingToCart
                         ? "bg-green-600 text-white"
                         : !isAddToCartDisabled
-                          ? "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
+                          ? "bg-amber-500 text-black hover:bg-amber-600"
                           : "bg-zinc-700 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  {isInCart ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Check size={18} /> In Cart
-                    </span>
-                  ) : isAddingToCart ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Adding...
-                    </span>
-                  ) : isVariationRequired && !isVariationSelected ? (
-                    "Select Variation"
-                  ) : (
-                    "Add to Cart"
-                  )}
+                  <span className="flex items-center justify-center gap-2">
+                    {isInCart && <Check size={18} />}
+                    {getButtonText()}
+                  </span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Description Section - Below the grid */}
+          {/* ===== FULL DESCRIPTION ===== */}
           {item.description && (
             <div className="border-t border-zinc-800 p-6 md:p-10">
               <h2 className="text-xl font-bold text-white mb-4">Description</h2>
@@ -592,22 +933,39 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
           )}
         </div>
 
-        {/* Addon Items Section */}
+        {/* ===== YOU MAY ALSO LIKE ===== */}
         {addonItems && addonItems.length > 0 && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-white mb-4">
-              Addon Items
+              You May Also Like
               <span className="text-sm font-normal text-gray-400 ml-2">
                 ({addonItems.length})
               </span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {addonItems.map((addon) => (
-                <AddonCard key={addon.id} item={addon} />
+                <RelatedItemCard key={addon.id} item={addon} />
               ))}
             </div>
           </div>
         )}
+
+        <style jsx>{`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #d97706;
+          }
+        `}</style>
       </div>
     </section>
   );

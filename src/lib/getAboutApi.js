@@ -4,7 +4,7 @@ import { API_BASE_URL } from "@/redux/url/url";
 
 export async function getAbout() {
   const res = await fetch(`${API_BASE_URL}get-about`, {
-   cache: "no-store", 
+    cache: "no-store",
   });
 
   if (!res.ok) {
