@@ -51,21 +51,22 @@ const SizeSelector = ({
 
   const availableSizes = getAvailableSizes();
 
+  // If only one size and no crusts, hide the size name
+  const showSizeName = sizes.length > 1;
+
   return (
     <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">
-        Select Size <span className="text-red-500">*</span>
-        {isDisabled && (
-          <span className="text-xs text-amber-400 ml-2">
-            (Select crust first)
-          </span>
-        )}
-        {!isDisabled && hasCrusts && availableSizes.length > 0 && (
-          <span className="text-xs text-gray-500 ml-2">
-            Available: {availableSizes.join(", ")}
-          </span>
-        )}
-      </h3>
+      {showSizeName && (
+        <h3 className="text-sm font-semibold text-gray-400 mb-3">
+          Select Size <span className="text-red-500">*</span>
+          {isDisabled && (
+            <span className="text-xs text-amber-400 ml-2">
+              (Select crust first)
+            </span>
+          )}
+        </h3>
+      )}
+
       <div className="flex flex-wrap gap-3">
         {sizes.map((size, index) => {
           // Check if this size is available for selected crust
@@ -77,6 +78,9 @@ const SizeSelector = ({
 
           const isSelected = selectedSize?.name === size.name;
 
+          // If only one size, make it visually different
+          const isSingleSize = sizes.length === 1 && !hasCrusts;
+
           return (
             <button
               key={index}
@@ -87,16 +91,19 @@ const SizeSelector = ({
                   ? "bg-zinc-800/30 text-gray-600 cursor-not-allowed border border-zinc-700/50"
                   : isSelected
                     ? "bg-amber-500 text-black shadow-lg shadow-amber-500/30 scale-105"
-                    : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700"
+                    : isSingleSize
+                      ? "bg-amber-500/10 text-white border border-amber-500/30"
+                      : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700"
               }`}
             >
-              <div className="font-bold">{size.name}</div>
-              <div className="text-xs opacity-70">${size.price}</div>
-              {!isSizeAvailable && hasCrusts && isCrustSelected && (
-                <div className="text-[8px] text-gray-500 mt-0.5">
-                  Unavailable
-                </div>
-              )}
+              {showSizeName && <div className="font-bold">{size.name}</div>}
+              <div
+                className={
+                  showSizeName ? "text-xs opacity-70" : "font-bold text-lg"
+                }
+              >
+                ${size.price}
+              </div>
             </button>
           );
         })}
@@ -178,6 +185,301 @@ const CrustSelector = ({ crusts, selectedCrust, onSelect }) => {
   );
 };
 
+// ==================== SAUCE SELECTOR (Single Select - Default First) ====================
+const SauceSelector = ({
+  sauces,
+  selectedSauce,
+  onSelect,
+  setSelectedSauceVariant,
+}) => {
+  if (!sauces || sauces.length === 0) return null;
+
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  // Auto-select first sauce and its first variant
+  useEffect(() => {
+    if (sauces.length > 0 && !selectedSauce) {
+      const firstSauce = sauces[0];
+      onSelect(firstSauce);
+
+      // Auto-select first variant for the sauce
+      if (firstSauce.variants) {
+        const variantKeys = Object.keys(firstSauce.variants).filter(
+          (key) => firstSauce.variants[key] === true,
+        );
+        if (variantKeys.length > 0) {
+          const firstVariant = variantKeys[0];
+          setSelectedVariant(firstVariant);
+          // Set the selected variant in parent
+          setSelectedSauceVariant(
+            firstSauce._id || firstSauce.id,
+            firstVariant,
+          );
+        }
+      }
+    }
+  }, [sauces]);
+
+  const handleVariantSelect = (variant) => {
+    setSelectedVariant(variant);
+    // Update parent with selected variant
+    if (selectedSauce) {
+      setSelectedSauceVariant(selectedSauce._id || selectedSauce.id, variant);
+    }
+  };
+
+  // Get variant price
+  const getVariantPrice = (sauce, variant) => {
+    if (sauce.variant_prices && sauce.variant_prices[variant] !== undefined) {
+      return sauce.variant_prices[variant];
+    }
+    return 0;
+  };
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3">Sauces</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {sauces.map((sauce) => {
+          const sauceId = sauce._id || sauce.id;
+          const isSelected =
+            (selectedSauce?._id || selectedSauce?.id) === sauceId;
+          const variantKeys = sauce.variants
+            ? Object.keys(sauce.variants).filter(
+                (key) => sauce.variants[key] === true,
+              )
+            : [];
+          const currentVariant = isSelected ? selectedVariant : null;
+          const selectedVariantPrice =
+            isSelected && currentVariant
+              ? getVariantPrice(sauce, currentVariant)
+              : 0;
+
+          return (
+            <div
+              key={sauceId}
+              onClick={() => onSelect(sauce)}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                isSelected
+                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                  : "border-zinc-700 hover:border-zinc-500"
+              }`}
+            >
+              <div className="flex items-center gap-3 p-3">
+                {/* Image */}
+                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
+                  <Image
+                    src={getImageUrl(sauce.image)}
+                    alt={sauce.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+
+                {/* Name & Price */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-medium text-sm line-clamp-1">
+                    {sauce.name}
+                  </h4>
+                </div>
+
+                {/* Selection Indicator */}
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                    isSelected
+                      ? "border-amber-500 bg-amber-500"
+                      : "border-zinc-600"
+                  }`}
+                >
+                  {isSelected && <Check size={12} className="text-black" />}
+                </div>
+              </div>
+
+              {/* Variants - Bottom Row */}
+              {isSelected && variantKeys.length > 0 && (
+                <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {variantKeys.map((variant) => {
+                      const isVariantSelected = selectedVariant === variant;
+                      const variantPrice = getVariantPrice(sauce, variant);
+                      return (
+                        <button
+                          key={variant}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVariantSelect(variant);
+                          }}
+                          className={`px-2.5 py-1 rounded text-xs transition-all ${
+                            isVariantSelected
+                              ? "bg-amber-500 text-black font-medium"
+                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                          }`}
+                        >
+                          {variant}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ==================== CHEESE SELECTOR (Single Select - Default First) ====================
+const CheeseSelector = ({
+  cheeses,
+  selectedCheese,
+  onSelect,
+  setSelectedCheeseVariant,
+}) => {
+  if (!cheeses || cheeses.length === 0) return null;
+
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  // Auto-select first cheese and its first variant
+  useEffect(() => {
+    if (cheeses.length > 0 && !selectedCheese) {
+      const firstCheese = cheeses[0];
+      onSelect(firstCheese);
+
+      // Auto-select first variant for the cheese
+      if (firstCheese.variants) {
+        const variantKeys = Object.keys(firstCheese.variants).filter(
+          (key) => firstCheese.variants[key] === true,
+        );
+        if (variantKeys.length > 0) {
+          const firstVariant = variantKeys[0];
+          setSelectedVariant(firstVariant);
+          // Set the selected variant in parent
+          setSelectedCheeseVariant(
+            firstCheese._id || firstCheese.id,
+            firstVariant,
+          );
+        }
+      }
+    }
+  }, [cheeses]);
+
+  const handleVariantSelect = (variant) => {
+    setSelectedVariant(variant);
+    // Update parent with selected variant
+    if (selectedCheese) {
+      setSelectedCheeseVariant(
+        selectedCheese._id || selectedCheese.id,
+        variant,
+      );
+    }
+  };
+
+  // Get variant price
+  const getVariantPrice = (cheese, variant) => {
+    if (cheese.variant_prices && cheese.variant_prices[variant] !== undefined) {
+      return cheese.variant_prices[variant];
+    }
+    return 0;
+  };
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3">Cheeses</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {cheeses.map((cheese) => {
+          const cheeseId = cheese._id || cheese.id;
+          const isSelected =
+            (selectedCheese?._id || selectedCheese?.id) === cheeseId;
+          const variantKeys = cheese.variants
+            ? Object.keys(cheese.variants).filter(
+                (key) => cheese.variants[key] === true,
+              )
+            : [];
+          const currentVariant = isSelected ? selectedVariant : null;
+          const selectedVariantPrice =
+            isSelected && currentVariant
+              ? getVariantPrice(cheese, currentVariant)
+              : 0;
+
+          return (
+            <div
+              key={cheeseId}
+              onClick={() => onSelect(cheese)}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                isSelected
+                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                  : "border-zinc-700 hover:border-zinc-500"
+              }`}
+            >
+              <div className="flex items-center gap-3 p-3">
+                {/* Image */}
+                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
+                  <Image
+                    src={getImageUrl(cheese.image)}
+                    alt={cheese.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+
+                {/* Name & Price */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-medium text-sm line-clamp-1">
+                    {cheese.name}
+                  </h4>
+                </div>
+
+                {/* Selection Indicator */}
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                    isSelected
+                      ? "border-amber-500 bg-amber-500"
+                      : "border-zinc-600"
+                  }`}
+                >
+                  {isSelected && <Check size={12} className="text-black" />}
+                </div>
+              </div>
+
+              {/* Variants - Bottom Row */}
+              {isSelected && variantKeys.length > 0 && (
+                <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {variantKeys.map((variant) => {
+                      const isVariantSelected = selectedVariant === variant;
+                      const variantPrice = getVariantPrice(cheese, variant);
+                      return (
+                        <button
+                          key={variant}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVariantSelect(variant);
+                          }}
+                          className={`px-2.5 py-1 rounded text-xs transition-all ${
+                            isVariantSelected
+                              ? "bg-amber-500 text-black font-medium"
+                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                          }`}
+                        >
+                          {variant}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 // ==================== SEASONING SELECTOR ====================
 const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
   if (!seasonings || seasonings.length === 0) return null;
@@ -214,7 +516,6 @@ const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
 const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
   if (!addons || addons.length === 0) return null;
 
-  // Track selected variant for each addon - default light
   const [selectedVariants, setSelectedVariants] = useState({});
 
   // Auto-select light variant for each addon when selected
@@ -245,7 +546,7 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
     }));
   };
 
-  // Format category name - capitalize and replace underscores with spaces
+  // Format category name
   const formatCategoryName = (cat) => {
     if (!cat) return "Other";
     return cat
@@ -290,7 +591,7 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
                   />
                 </div>
 
-                {/* Name & Price */}
+                {/* Name */}
                 <div className="flex-1 min-w-0">
                   <h4 className="text-white font-medium text-sm line-clamp-1">
                     {addon.name}
@@ -309,13 +610,14 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
                 </div>
               </div>
 
-              {/* Variants - Bottom Row (Only show when card is selected) */}
+              {/* Variants - Bottom Row */}
               {isSelected && addon.variants && addon.variants.length > 0 && (
                 <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {addon.variants.map((variant, vIndex) => {
                       const isVariantSelected =
                         selectedVariant?.name === variant.name;
+                      const variantPrice = variant.price || 0;
                       return (
                         <button
                           key={vIndex}
@@ -329,7 +631,8 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
                               : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
                           }`}
                         >
-                          {variant.name} - ${variant.price}
+                          {variant.name}{" "}
+                          {variantPrice > 0 ? `(+$${variantPrice})` : ""}
                         </button>
                       );
                     })}
@@ -368,9 +671,9 @@ const SpecialInstructions = ({
           <h4 className="text-xs text-gray-500 mb-1.5">Cut</h4>
           <div className="flex flex-wrap gap-1.5">
             {instructions.cut.map((item, index) => {
-              const isSelected = selectedInstructions.cut.some(
-                (s) => s.name === item.name,
-              );
+              const isSelected =
+                selectedInstructions.cut &&
+                selectedInstructions.cut.some((s) => s.name === item.name);
               return (
                 <button
                   key={index}
@@ -394,9 +697,9 @@ const SpecialInstructions = ({
           <h4 className="text-xs text-gray-500 mb-1.5">Bake</h4>
           <div className="flex flex-wrap gap-1.5">
             {instructions.bake.map((item, index) => {
-              const isSelected = selectedInstructions.bake.some(
-                (s) => s.name === item.name,
-              );
+              const isSelected =
+                selectedInstructions.bake &&
+                selectedInstructions.bake.some((s) => s.name === item.name);
               return (
                 <button
                   key={index}
@@ -513,6 +816,8 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedCrust, setSelectedCrust] = useState(null);
+  const [selectedSauce, setSelectedSauce] = useState(null);
+  const [selectedCheese, setSelectedCheese] = useState(null);
   const [selectedSeasonings, setSelectedSeasonings] = useState([]);
   const [selectedAddons, setSelectedAddons] = useState([]);
   const [selectedInstructions, setSelectedInstructions] = useState({
@@ -520,11 +825,22 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     bake: [],
   });
 
+  // Track selected variants for sauce and cheese
+  const [selectedSauceVariant, setSelectedSauceVariant] = useState(null);
+  const [selectedCheeseVariant, setSelectedCheeseVariant] = useState(null);
+
   const [isCrustSelected, setIsCrustSelected] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const hasCrusts = item.crusts && item.crusts.length > 0;
+  const hasSauces = item.sauces && item.sauces.length > 0;
+  const hasCheeses = item.cheeses && item.cheeses.length > 0;
+  const hasGroupedAddons =
+    item.grouped_addons && Object.keys(item.grouped_addons).length > 0;
+
+  // Check if single size (no size name needed)
+  const hasSingleSize = item.size && item.size.length === 1 && !hasCrusts;
 
   // Auto-select first crust (index 0) if available
   useEffect(() => {
@@ -553,6 +869,55 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       }
     }
   }, [selectedCrust, item.size]);
+
+  // Auto-select first size if only one and no crusts
+  useEffect(() => {
+    if (hasSingleSize && !selectedSize) {
+      setSelectedSize(item.size[0]);
+    }
+  }, [hasSingleSize, item.size, selectedSize]);
+
+  // Auto-select first sauce if available
+  useEffect(() => {
+    if (hasSauces && item.sauces.length > 0 && !selectedSauce) {
+      setSelectedSauce(item.sauces[0]);
+    }
+  }, [hasSauces, item.sauces, selectedSauce]);
+
+  // Auto-select first cheese if available
+  useEffect(() => {
+    if (hasCheeses && item.cheeses.length > 0 && !selectedCheese) {
+      setSelectedCheese(item.cheeses[0]);
+    }
+  }, [hasCheeses, item.cheeses, selectedCheese]);
+
+  // Auto-select first cut instruction if available
+  useEffect(() => {
+    if (
+      item.special_instructions?.cut &&
+      item.special_instructions.cut.length > 0 &&
+      selectedInstructions.cut.length === 0
+    ) {
+      setSelectedInstructions((prev) => ({
+        ...prev,
+        cut: [item.special_instructions.cut[0]],
+      }));
+    }
+  }, [item.special_instructions]);
+
+  // Auto-select first bake instruction if available
+  useEffect(() => {
+    if (
+      item.special_instructions?.bake &&
+      item.special_instructions.bake.length > 0 &&
+      selectedInstructions.bake.length === 0
+    ) {
+      setSelectedInstructions((prev) => ({
+        ...prev,
+        bake: [item.special_instructions.bake[0]],
+      }));
+    }
+  }, [item.special_instructions]);
 
   // Check if product already in cart
   useEffect(() => {
@@ -599,6 +964,40 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     }
   };
 
+  const handleSauceSelect = (sauce) => {
+    const sauceId = sauce._id || sauce.id;
+    const selectedId = selectedSauce?._id || selectedSauce?.id;
+
+    if (sauceId === selectedId) {
+      setSelectedSauce(null);
+      setSelectedSauceVariant(null);
+    } else {
+      setSelectedSauce(sauce);
+      setSelectedSauceVariant(null);
+    }
+  };
+
+  const handleCheeseSelect = (cheese) => {
+    const cheeseId = cheese._id || cheese.id;
+    const selectedId = selectedCheese?._id || selectedCheese?.id;
+
+    if (cheeseId === selectedId) {
+      setSelectedCheese(null);
+      setSelectedCheeseVariant(null);
+    } else {
+      setSelectedCheese(cheese);
+      setSelectedCheeseVariant(null);
+    }
+  };
+
+  const handleSetSauceVariant = (sauceId, variant) => {
+    setSelectedSauceVariant(variant);
+  };
+
+  const handleSetCheeseVariant = (cheeseId, variant) => {
+    setSelectedCheeseVariant(variant);
+  };
+
   const handleSeasoningSelect = (seasoning) => {
     const exists = selectedSeasonings.some((s) => s.name === seasoning.name);
     if (exists) {
@@ -623,22 +1022,21 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   };
 
   const handleInstructionSelect = (type, instruction) => {
-    const exists = selectedInstructions[type].some(
-      (s) => s.name === instruction.name,
-    );
-    if (exists) {
-      setSelectedInstructions({
-        ...selectedInstructions,
-        [type]: selectedInstructions[type].filter(
-          (s) => s.name !== instruction.name,
-        ),
-      });
-    } else {
-      setSelectedInstructions({
-        ...selectedInstructions,
-        [type]: [...selectedInstructions[type], instruction],
-      });
-    }
+    setSelectedInstructions((prev) => {
+      const current = prev[type] || [];
+      const exists = current.some((s) => s.name === instruction.name);
+      if (exists) {
+        return {
+          ...prev,
+          [type]: current.filter((s) => s.name !== instruction.name),
+        };
+      } else {
+        return {
+          ...prev,
+          [type]: [instruction],
+        };
+      }
+    });
   };
 
   const getCurrentPrice = () => {
@@ -647,6 +1045,25 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     }
     if (item.min_price) {
       return item.min_price;
+    }
+    return 0;
+  };
+
+  // Get variant price for sauce
+  const getSauceVariantPrice = (sauce, variant) => {
+    if (sauce?.variant_prices && sauce.variant_prices[variant] !== undefined) {
+      return sauce.variant_prices[variant];
+    }
+    return 0;
+  };
+
+  // Get variant price for cheese
+  const getCheeseVariantPrice = (cheese, variant) => {
+    if (
+      cheese?.variant_prices &&
+      cheese.variant_prices[variant] !== undefined
+    ) {
+      return cheese.variant_prices[variant];
     }
     return 0;
   };
@@ -672,11 +1089,19 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         price: getCurrentPrice(),
         size: selectedSize?.name || null,
         crust: selectedCrust?.name || null,
+        sauce: selectedSauce?.name || null,
+        cheese: selectedCheese?.name || null,
         seasonings: selectedSeasonings.map((s) => s.name),
         addons: selectedAddons.map((a) => a.name),
         instructions: {
-          cut: selectedInstructions.cut.map((s) => s.name),
-          bake: selectedInstructions.bake.map((s) => s.name),
+          cut:
+            selectedInstructions.cut.length > 0
+              ? selectedInstructions.cut.map((s) => s.name).join(", ")
+              : null,
+          bake:
+            selectedInstructions.bake.length > 0
+              ? selectedInstructions.bake.map((s) => s.name).join(", ")
+              : null,
         },
       }),
     );
@@ -691,9 +1116,74 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     if (isAddingToCart) return "Adding...";
     if (!item.is_available) return "Unavailable";
     if (hasCrusts && !isCrustSelected) return "Select Crust First";
-    if (isSizeRequired && !isSizeSelected) return "Select Size";
+    if (isSizeRequired && !isSizeSelected && !hasSingleSize)
+      return "Select Size";
     return `Add to Cart - $${getCurrentPrice()}`;
   };
+
+  // Get selected item names for bottom display - Column Wise
+  const getSelectedItems = () => {
+    const items = [];
+
+    if (selectedSize) {
+      // Only show size name if multiple sizes or has crusts
+      if ((item.size && item.size.length > 1) || hasCrusts) {
+        items.push(`Size - ${selectedSize.name}`);
+      } else {
+        // For single size, just show the price
+        items.push(`Size - $${selectedSize.price}`);
+      }
+    }
+
+    if (selectedCrust) {
+      items.push(`Crust - ${selectedCrust.name}`);
+    }
+
+    if (selectedSauce) {
+      const variant = selectedSauceVariant || "light";
+      const price = getSauceVariantPrice(selectedSauce, variant);
+      const priceText = price > 0 ? `+$${price}` : "Included";
+      items.push(`Sauce - ${selectedSauce.name} (${variant}) - ${priceText}`);
+    }
+
+    if (selectedCheese) {
+      const variant = selectedCheeseVariant || "light";
+      const price = getCheeseVariantPrice(selectedCheese, variant);
+      const priceText = price > 0 ? `+$${price}` : "Included";
+      items.push(`Cheese - ${selectedCheese.name} (${variant}) - ${priceText}`);
+    }
+
+    // Add selected seasonings
+    if (selectedSeasonings.length > 0) {
+      const seasoningNames = selectedSeasonings.map((s) => s.name).join(", ");
+      items.push(`Seasonings - ${seasoningNames}`);
+    }
+
+    // Add selected addons with variants
+    if (selectedAddons.length > 0) {
+      const addonNames = selectedAddons.map((a) => {
+        const variant = a._variant || "light";
+        const price = a.variants?.find((v) => v.name === variant)?.price || 0;
+        const priceText = price > 0 ? `+$${price}` : "Included";
+        return `${a.name} (${variant}) - ${priceText}`;
+      });
+      items.push(`Addons - ${addonNames.join(", ")}`);
+    }
+
+    // Add selected instructions
+    if (selectedInstructions.cut.length > 0) {
+      const cutNames = selectedInstructions.cut.map((s) => s.name).join(", ");
+      items.push(`Cut - ${cutNames}`);
+    }
+    if (selectedInstructions.bake.length > 0) {
+      const bakeNames = selectedInstructions.bake.map((s) => s.name).join(", ");
+      items.push(`Bake - ${bakeNames}`);
+    }
+
+    return items;
+  };
+
+  const selectedItems = getSelectedItems();
 
   return (
     <section className="bg-black min-h-screen py-10 lg:py-20">
@@ -772,6 +1262,17 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                   ))}
                 </div>
               )}
+
+              {/* Selected Items Display Below Images - Column Wise */}
+              {selectedItems.length > 0 && (
+                <div className="p-3 bg-zinc-900/90 border-t border-zinc-800">
+                  {selectedItems.map((item, index) => (
+                    <p key={index} className="text-xs text-gray-400">
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* ===== CONTENT SECTION ===== */}
@@ -822,11 +1323,13 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
               )}
 
               {/* ===== CRUST ===== */}
-              <CrustSelector
-                crusts={item.crusts}
-                selectedCrust={selectedCrust}
-                onSelect={handleCrustSelect}
-              />
+              {hasCrusts && (
+                <CrustSelector
+                  crusts={item.crusts}
+                  selectedCrust={selectedCrust}
+                  onSelect={handleCrustSelect}
+                />
+              )}
 
               {/* ===== SIZE ===== */}
               <SizeSelector
@@ -838,6 +1341,26 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                 selectedCrust={selectedCrust}
               />
 
+              {/* ===== SAUCES ===== */}
+              {hasSauces && (
+                <SauceSelector
+                  sauces={item.sauces}
+                  selectedSauce={selectedSauce}
+                  onSelect={handleSauceSelect}
+                  setSelectedSauceVariant={handleSetSauceVariant}
+                />
+              )}
+
+              {/* ===== CHEESES ===== */}
+              {hasCheeses && (
+                <CheeseSelector
+                  cheeses={item.cheeses}
+                  selectedCheese={selectedCheese}
+                  onSelect={handleCheeseSelect}
+                  setSelectedCheeseVariant={handleSetCheeseVariant}
+                />
+              )}
+
               {/* ===== SEASONING ===== */}
               <SeasoningSelector
                 seasonings={item.seasoning}
@@ -846,23 +1369,22 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
               />
 
               {/* ===== ADDONS ===== */}
-              {item.grouped_addons &&
-                Object.keys(item.grouped_addons).length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-semibold text-gray-400 mb-3">
-                      Add-ons
-                    </h3>
-                    {Object.keys(item.grouped_addons).map((category) => (
-                      <AddonSection
-                        key={category}
-                        category={category}
-                        addons={item.grouped_addons[category]}
-                        selectedAddons={selectedAddons}
-                        onSelect={handleAddonSelect}
-                      />
-                    ))}
-                  </div>
-                )}
+              {hasGroupedAddons && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-gray-400 mb-3">
+                    Add-ons
+                  </h3>
+                  {Object.keys(item.grouped_addons).map((category) => (
+                    <AddonSection
+                      key={category}
+                      category={category}
+                      addons={item.grouped_addons[category]}
+                      selectedAddons={selectedAddons}
+                      onSelect={handleAddonSelect}
+                    />
+                  ))}
+                </div>
+              )}
 
               {/* ===== SPECIAL INSTRUCTIONS ===== */}
               <SpecialInstructions
