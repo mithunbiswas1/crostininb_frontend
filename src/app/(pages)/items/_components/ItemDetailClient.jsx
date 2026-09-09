@@ -86,15 +86,14 @@ const SizeSelector = ({
               key={index}
               onClick={() => isSizeAvailable && onSelect(size)}
               disabled={!isSizeAvailable}
-              className={`px-6 py-3 rounded-xl text-sm font-medium transition-all min-w-[100px] text-center ${
-                !isSizeAvailable
-                  ? "bg-zinc-800/30 text-gray-600 cursor-not-allowed border border-zinc-700/50"
-                  : isSelected
-                    ? "bg-amber-500 text-black shadow-lg shadow-amber-500/30 scale-105"
-                    : isSingleSize
-                      ? "bg-amber-500/10 text-white border border-amber-500/30"
-                      : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700"
-              }`}
+              className={`px-6 py-3 rounded-xl text-sm font-medium transition-all min-w-[100px] text-center ${!isSizeAvailable
+                ? "bg-zinc-800/30 text-gray-600 cursor-not-allowed border border-zinc-700/50"
+                : isSelected
+                  ? "bg-amber-500 text-black shadow-lg shadow-amber-500/30 scale-105"
+                  : isSingleSize
+                    ? "bg-amber-500/10 text-white border border-amber-500/30"
+                    : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700"
+                }`}
             >
               {showSizeName && <div className="font-bold">{size.name}</div>}
               <div
@@ -141,15 +140,32 @@ const CrustSelector = ({ crusts, selectedCrust, onSelect }) => {
             <button
               key={crustId}
               onClick={() => onSelect(crust)}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all text-left ${
-                isSelected
-                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                  : "border-zinc-700 hover:border-zinc-500"
-              }`}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all text-left ${isSelected
+                ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                : "border-zinc-700 hover:border-zinc-500"
+                }`}
             >
-              <div className="flex items-center gap-3 p-3">
-                {/* Image */}
-                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
+              <div className="flex flex-col">
+                {/* Top section: Name (left) and Radio (right) */}
+                <div className="flex items-start justify-between p-3">
+                  {/* Name */}
+                  <h4 className="text-white font-medium text-sm line-clamp-1 flex-1 mr-2">
+                    {crust.name}
+                  </h4>
+
+                  {/* Selection Indicator - Radio Button */}
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected
+                      ? "border-amber-500 bg-amber-500"
+                      : "border-zinc-600"
+                      }`}
+                  >
+                    {isSelected && <Check size={12} className="text-black" />}
+                  </div>
+                </div>
+
+                {/* Bottom section: Image */}
+                <div className="relative w-full aspect-[4/3] bg-zinc-700">
                   <Image
                     src={getImageUrl(crust.image)}
                     alt={crust.name}
@@ -157,24 +173,6 @@ const CrustSelector = ({ crusts, selectedCrust, onSelect }) => {
                     className="object-cover"
                     unoptimized
                   />
-                </div>
-
-                {/* Name */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-medium text-sm line-clamp-1">
-                    {crust.name}
-                  </h4>
-                </div>
-
-                {/* Selection Indicator */}
-                <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected
-                      ? "border-amber-500 bg-amber-500"
-                      : "border-zinc-600"
-                  }`}
-                >
-                  {isSelected && <Check size={12} className="text-black" />}
                 </div>
               </div>
             </button>
@@ -246,8 +244,8 @@ const SauceSelector = ({
             (selectedSauce?._id || selectedSauce?.id) === sauceId;
           const variantKeys = sauce.variants
             ? Object.keys(sauce.variants).filter(
-                (key) => sauce.variants[key] === true,
-              )
+              (key) => sauce.variants[key] === true,
+            )
             : [];
           const currentVariant = isSelected ? selectedVariant : null;
           const selectedVariantPrice =
@@ -259,11 +257,10 @@ const SauceSelector = ({
             <div
               key={sauceId}
               onClick={() => onSelect(sauce)}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
-                isSelected
-                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                  : "border-zinc-700 hover:border-zinc-500"
-              }`}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${isSelected
+                ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                : "border-zinc-700 hover:border-zinc-500"
+                }`}
             >
               <div className="flex items-center gap-3 p-3">
                 {/* Image */}
@@ -286,11 +283,10 @@ const SauceSelector = ({
 
                 {/* Selection Indicator */}
                 <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected
-                      ? "border-amber-500 bg-amber-500"
-                      : "border-zinc-600"
-                  }`}
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
+                    ? "border-amber-500 bg-amber-500"
+                    : "border-zinc-600"
+                    }`}
                 >
                   {isSelected && <Check size={12} className="text-black" />}
                 </div>
@@ -310,11 +306,10 @@ const SauceSelector = ({
                             e.stopPropagation();
                             handleVariantSelect(variant);
                           }}
-                          className={`px-2.5 py-1 rounded text-xs transition-all ${
-                            isVariantSelected
-                              ? "bg-amber-500 text-black font-medium"
-                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
-                          }`}
+                          className={`px-2.5 py-1 rounded text-xs transition-all ${isVariantSelected
+                            ? "bg-amber-500 text-black font-medium"
+                            : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                            }`}
                         >
                           {variant}
                         </button>
@@ -385,68 +380,109 @@ const CheeseSelector = ({
     return 0;
   };
 
+  // No Cheese option
+  const noCheeseOption = {
+    id: 'no-cheese',
+    name: 'No Cheese',
+    image: null,
+    isNoCheese: true
+  };
+
+  // Combine options
+  const allOptions = [...cheeses, noCheeseOption];
+
   return (
     <div className="mb-6">
       <h3 className="text-sm font-semibold text-gray-400 mb-3">Cheeses</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {cheeses.map((cheese) => {
-          const cheeseId = cheese._id || cheese.id;
-          const isSelected =
-            (selectedCheese?._id || selectedCheese?.id) === cheeseId;
-          const variantKeys = cheese.variants
+        {allOptions.map((cheese) => {
+          const isNoCheese = cheese.isNoCheese;
+          const cheeseId = isNoCheese ? 'no-cheese' : (cheese._id || cheese.id);
+          const isSelected = isNoCheese
+            ? selectedCheese === 'no-cheese'
+            : (selectedCheese?._id || selectedCheese?.id) === cheeseId;
+
+          const variantKeys = !isNoCheese && cheese.variants
             ? Object.keys(cheese.variants).filter(
-                (key) => cheese.variants[key] === true,
-              )
+              (key) => cheese.variants[key] === true,
+            )
             : [];
-          const currentVariant = isSelected ? selectedVariant : null;
+          const currentVariant = isSelected && !isNoCheese ? selectedVariant : null;
           const selectedVariantPrice =
-            isSelected && currentVariant
+            isSelected && !isNoCheese && currentVariant
               ? getVariantPrice(cheese, currentVariant)
               : 0;
 
           return (
             <div
               key={cheeseId}
-              onClick={() => onSelect(cheese)}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
-                isSelected
-                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                  : "border-zinc-700 hover:border-zinc-500"
-              }`}
+              onClick={() => {
+                if (isNoCheese) {
+                  onSelect('no-cheese');
+                  setSelectedCheeseVariant('no-cheese', null);
+                  setSelectedVariant(null);
+                } else {
+                  onSelect(cheese);
+                  // Auto-select first variant if available
+                  if (cheese.variants) {
+                    const variantKeys = Object.keys(cheese.variants).filter(
+                      (key) => cheese.variants[key] === true,
+                    );
+                    if (variantKeys.length > 0) {
+                      const firstVariant = variantKeys[0];
+                      setSelectedVariant(firstVariant);
+                      setSelectedCheeseVariant(
+                        cheese._id || cheese.id,
+                        firstVariant,
+                      );
+                    }
+                  }
+                }
+              }}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${isSelected
+                ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                : "border-zinc-700 hover:border-zinc-500"
+                } ${isNoCheese ? 'bg-zinc-800/30' : ''}`}
             >
-              <div className="flex items-center gap-3 p-3">
-                {/* Image */}
-                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
-                  <Image
-                    src={getImageUrl(cheese.image)}
-                    alt={cheese.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-
-                {/* Name & Price */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-medium text-sm line-clamp-1">
+              <div className="flex flex-col">
+                {/* Top section: Name (left) and Radio (right) */}
+                <div className="flex items-start justify-between p-3">
+                  <h4 className={`text-white font-medium text-sm line-clamp-1 flex-1 mr-2 ${isNoCheese ? 'text-gray-400' : ''}`}>
                     {cheese.name}
                   </h4>
-                </div>
-
-                {/* Selection Indicator */}
-                <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected
                       ? "border-amber-500 bg-amber-500"
                       : "border-zinc-600"
-                  }`}
-                >
-                  {isSelected && <Check size={12} className="text-black" />}
+                      }`}
+                  >
+                    {isSelected && <Check size={12} className="text-black" />}
+                  </div>
                 </div>
+
+                {/* Bottom section: Image (only if not "No Cheese") */}
+                {!isNoCheese && cheese.image && (
+                  <div className="relative w-full aspect-[4/3] bg-zinc-700">
+                    <Image
+                      src={getImageUrl(cheese.image)}
+                      alt={cheese.name}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                )}
+
+                {/* Show empty placeholder for "No Cheese" option */}
+                {isNoCheese && (
+                  <div className="w-full aspect-[4/3] bg-zinc-800/30 flex items-center justify-center border-t border-zinc-700/30">
+                    <span className="text-zinc-600 text-xs">No cheese selected</span>
+                  </div>
+                )}
               </div>
 
-              {/* Variants - Bottom Row */}
-              {isSelected && variantKeys.length > 0 && (
+              {/* Variants - Bottom Row (only for cheese with variants) */}
+              {!isNoCheese && isSelected && variantKeys.length > 0 && (
                 <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {variantKeys.map((variant) => {
@@ -459,11 +495,10 @@ const CheeseSelector = ({
                             e.stopPropagation();
                             handleVariantSelect(variant);
                           }}
-                          className={`px-2.5 py-1 rounded text-xs transition-all ${
-                            isVariantSelected
-                              ? "bg-amber-500 text-black font-medium"
-                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
-                          }`}
+                          className={`px-2.5 py-1 rounded text-xs transition-all ${isVariantSelected
+                            ? "bg-amber-500 text-black font-medium"
+                            : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                            }`}
                         >
                           {variant}
                         </button>
@@ -480,30 +515,61 @@ const CheeseSelector = ({
   );
 };
 
-// ==================== SEASONING SELECTOR ====================
+// ==================== SEASONING SELECTOR (Single Select) ====================
 const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
   if (!seasonings || seasonings.length === 0) return null;
 
+  // Auto-select first seasoning
+  useEffect(() => {
+    if (seasonings.length > 0 && selectedSeasonings.length === 0) {
+      onSelect(seasonings[0]);
+    }
+  }, [seasonings]);
+
   return (
     <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">Seasonings</h3>
-      <div className="flex flex-wrap gap-2">
+      <h3 className="text-sm font-semibold text-gray-400 mb-3">
+        Choose Seasonings
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {seasonings.map((seasoning, index) => {
           const isSelected = selectedSeasonings.some(
             (s) => s.name === seasoning.name,
           );
+
           return (
             <button
               key={index}
-              onClick={() => onSelect(seasoning)}
-              className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                isSelected
-                  ? "bg-amber-500 text-black font-semibold"
-                  : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-              }`}
+              onClick={() => {
+                // Single select - if already selected, deselect it
+                if (isSelected) {
+                  onSelect(seasoning); // This will deselect via the handler
+                } else {
+                  // Deselect all others and select this one
+                  onSelect(seasoning);
+                }
+              }}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all text-left ${isSelected
+                ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                : "border-zinc-700 hover:border-zinc-500"
+                }`}
             >
-              {seasoning.name}
-              {isSelected && <Check size={12} className="inline ml-1" />}
+              <div className="flex items-center justify-between p-4">
+                {/* Name */}
+                <h4 className="text-white font-medium text-sm flex-1 mr-2">
+                  {seasoning.name}
+                </h4>
+
+                {/* Selection Indicator - Radio Button */}
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
+                    ? "border-amber-500 bg-amber-500"
+                    : "border-zinc-600"
+                    }`}
+                >
+                  {isSelected && <Check size={12} className="text-black" />}
+                </div>
+              </div>
             </button>
           );
         })}
@@ -513,14 +579,23 @@ const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
 };
 
 // ==================== ADDON CARD (Section Wise - Dynamic Categories) ====================
-const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
+const AddonSection = ({ category, addons, selectedAddons, onSelect, onVariantChange }) => {
   if (!addons || addons.length === 0) return null;
 
   const [selectedVariants, setSelectedVariants] = useState({});
+  const [selectedPlacements, setSelectedPlacements] = useState({});
 
-  // Auto-select light variant for each addon when selected
+  // Static pizza placement options
+  const pizzaPlacementOptions = [
+    { name: 'left', label: 'Left' },
+    { name: 'center', label: 'Center' },
+    { name: 'right', label: 'Right' },
+  ];
+
+  // Auto-select default variant for each addon when selected
   useEffect(() => {
     const defaultVariants = {};
+    const defaultPlacements = {};
     addons.forEach((addon) => {
       const addonId = addon._id || addon.id;
       if (addon.variants && addon.variants.length > 0) {
@@ -528,6 +603,7 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
           addon.variants.find((v) => v.name === "light") || addon.variants[0];
         if (!selectedVariants[addonId]) {
           defaultVariants[addonId] = lightVariant;
+          defaultPlacements[addonId] = 'center';
         }
       }
     });
@@ -536,14 +612,35 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
         ...prev,
         ...defaultVariants,
       }));
+      setSelectedPlacements((prev) => ({
+        ...prev,
+        ...defaultPlacements,
+      }));
     }
   }, [addons]);
 
-  const handleVariantSelect = (addonId, variant) => {
+  const handleVariantSelect = (addonId, variant, e) => {
+    e.stopPropagation();
     setSelectedVariants((prev) => ({
       ...prev,
       [addonId]: variant,
     }));
+    // Notify parent about variant change
+    if (onVariantChange) {
+      onVariantChange(addonId, 'variant', variant);
+    }
+  };
+
+  const handlePlacementSelect = (addonId, placement, e) => {
+    e.stopPropagation();
+    setSelectedPlacements((prev) => ({
+      ...prev,
+      [addonId]: placement,
+    }));
+    // Notify parent about placement change
+    if (onVariantChange) {
+      onVariantChange(addonId, 'placement', placement);
+    }
   };
 
   // Format category name
@@ -567,16 +664,16 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
             (a) => (a._id || a.id) === addonId,
           );
           const selectedVariant = selectedVariants[addonId];
+          const selectedPlacement = selectedPlacements[addonId] || 'center';
 
           return (
             <div
               key={addonId}
               onClick={() => onSelect(addon)}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
-                isSelected
-                  ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                  : "border-zinc-700 hover:border-zinc-500"
-              }`}
+              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${isSelected
+                ? "border-amber-500 shadow-lg shadow-amber-500/20"
+                : "border-zinc-700 hover:border-zinc-500"
+                }`}
             >
               {/* Card Content - Top Row */}
               <div className="flex items-center gap-3 p-3">
@@ -600,42 +697,64 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect }) => {
 
                 {/* Selection Indicator */}
                 <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected
-                      ? "border-amber-500 bg-amber-500"
-                      : "border-zinc-600"
-                  }`}
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
+                    ? "border-amber-500 bg-amber-500"
+                    : "border-zinc-600"
+                    }`}
                 >
                   {isSelected && <Check size={12} className="text-black" />}
                 </div>
               </div>
 
-              {/* Variants - Bottom Row */}
+              {/* Variants - Bottom Row with Left, Center, Right */}
               {isSelected && addon.variants && addon.variants.length > 0 && (
                 <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {addon.variants.map((variant, vIndex) => {
-                      const isVariantSelected =
-                        selectedVariant?.name === variant.name;
-                      const variantPrice = variant.price || 0;
-                      return (
-                        <button
-                          key={vIndex}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleVariantSelect(addonId, variant);
-                          }}
-                          className={`px-2.5 py-1 rounded text-xs transition-all ${
-                            isVariantSelected
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {/* Variant buttons (Light, Normal, Extra) */}
+                    <div className="flex flex-wrap gap-1.5 flex-1">
+                      {addon.variants.map((variant, vIndex) => {
+                        const isVariantSelected = selectedVariant?.name === variant.name;
+                        const variantPrice = variant.price || 0;
+                        return (
+                          <button
+                            key={vIndex}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleVariantSelect(addonId, variant, e);
+                            }}
+                            className={`px-2.5 py-1 rounded text-xs transition-all ${isVariantSelected
                               ? "bg-amber-500 text-black font-medium"
                               : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
-                          }`}
-                        >
-                          {variant.name}{" "}
-                          {variantPrice > 0 ? `(+$${variantPrice})` : ""}
-                        </button>
-                      );
-                    })}
+                              }`}
+                          >
+                            {variant.name}
+
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Placement buttons (Left, Center, Right)  Right side */}
+                    <div className="flex gap-1.5 flex-shrink-0">
+                      {pizzaPlacementOptions.map((option) => {
+                        const isPlacementSelected = selectedPlacement === option.name;
+                        return (
+                          <button
+                            key={option.name}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePlacementSelect(addonId, option.name, e);
+                            }}
+                            className={`px-2.5 py-1 rounded text-xs transition-all ${isPlacementSelected
+                              ? "bg-amber-500 text-black font-medium"
+                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                              }`}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
@@ -678,11 +797,10 @@ const SpecialInstructions = ({
                 <button
                   key={index}
                   onClick={() => onSelect("cut", item)}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                    isSelected
-                      ? "bg-amber-500 text-black font-medium"
-                      : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${isSelected
+                    ? "bg-amber-500 text-black font-medium"
+                    : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+                    }`}
                 >
                   {item.name}
                 </button>
@@ -704,11 +822,10 @@ const SpecialInstructions = ({
                 <button
                   key={index}
                   onClick={() => onSelect("bake", item)}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                    isSelected
-                      ? "bg-amber-500 text-black font-medium"
-                      : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all ${isSelected
+                    ? "bg-amber-500 text-black font-medium"
+                    : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+                    }`}
                 >
                   {item.name}
                 </button>
@@ -784,15 +901,14 @@ const RelatedItemCard = ({ item }) => {
           <button
             onClick={handleAddToCart}
             disabled={isAdding || isInCart || !item.is_available}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-              isInCart
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isInCart
+              ? "bg-green-600 text-white"
+              : isAdding
                 ? "bg-green-600 text-white"
-                : isAdding
-                  ? "bg-green-600 text-white"
-                  : item.is_available
-                    ? "bg-amber-500 text-black hover:bg-amber-600"
-                    : "bg-zinc-700 text-gray-400 cursor-not-allowed"
-            }`}
+                : item.is_available
+                  ? "bg-amber-500 text-black hover:bg-amber-600"
+                  : "bg-zinc-700 text-gray-400 cursor-not-allowed"
+              }`}
           >
             {isInCart ? (
               <Check size={16} />
@@ -984,6 +1100,9 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     if (cheeseId === selectedId) {
       setSelectedCheese(null);
       setSelectedCheeseVariant(null);
+    } else if (cheese === 'no-cheese') {
+      setSelectedCheese('no-cheese');
+      setSelectedCheeseVariant(null);
     } else {
       setSelectedCheese(cheese);
       setSelectedCheeseVariant(null);
@@ -999,13 +1118,12 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   };
 
   const handleSeasoningSelect = (seasoning) => {
-    const exists = selectedSeasonings.some((s) => s.name === seasoning.name);
-    if (exists) {
-      setSelectedSeasonings(
-        selectedSeasonings.filter((s) => s.name !== seasoning.name),
-      );
+    const isSelected = selectedSeasonings.some((s) => s.name === seasoning.name);
+
+    if (isSelected) {
+      setSelectedSeasonings([]);
     } else {
-      setSelectedSeasonings([...selectedSeasonings, seasoning]);
+      setSelectedSeasonings([seasoning]);
     }
   };
 
@@ -1017,8 +1135,32 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         selectedAddons.filter((a) => (a._id || a.id) !== addonId),
       );
     } else {
-      setSelectedAddons([...selectedAddons, addon]);
+      // Add with default variant and placement
+      const defaultVariant = addon.variants?.[0]?.name || 'normal';
+      const addonWithDetails = {
+        ...addon,
+        _selectedVariant: defaultVariant,
+        _selectedPlacement: 'center'
+      };
+      setSelectedAddons([...selectedAddons, addonWithDetails]);
     }
+  };
+
+  // Handle variant/placement change from AddonSection
+  const handleAddonVariantChange = (addonId, type, value) => {
+    setSelectedAddons((prev) =>
+      prev.map((a) => {
+        const id = a._id || a.id;
+        if (id === addonId) {
+          if (type === 'variant') {
+            return { ...a, _selectedVariant: value.name };
+          } else if (type === 'placement') {
+            return { ...a, _selectedPlacement: value };
+          }
+        }
+        return a;
+      })
+    );
   };
 
   const handleInstructionSelect = (type, instruction) => {
@@ -1040,13 +1182,40 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   };
 
   const getCurrentPrice = () => {
+    // Base price from size
+    let total = 0;
     if (selectedSize) {
-      return selectedSize.price;
+      total += Number(selectedSize.price) || 0;
+    } else if (item.min_price) {
+      total += Number(item.min_price) || 0;
     }
-    if (item.min_price) {
-      return item.min_price;
+
+    // Sauce variant price
+    if (selectedSauce) {
+      const variant = selectedSauceVariant || "light";
+      total += Number(getSauceVariantPrice(selectedSauce, variant)) || 0;
     }
-    return 0;
+
+    // Cheese variant price
+    if (selectedCheese && selectedCheese !== "no-cheese") {
+      const variant = selectedCheeseVariant || "light";
+      total += Number(getCheeseVariantPrice(selectedCheese, variant)) || 0;
+    }
+
+    // Addon variant prices
+    selectedAddons.forEach((a) => {
+      const variant = a._selectedVariant || a.variants?.[0]?.name || "normal";
+      const addonPrice = a.variants?.find((v) => v.name === variant)?.price || 0;
+      total += Number(addonPrice) || 0;
+    });
+
+    return total;
+  };
+
+  // Format price display (remove trailing .00 if integer)
+  const formatPrice = (price) => {
+    const num = Number(price);
+    return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
   };
 
   // Get variant price for sauce
@@ -1090,7 +1259,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         size: selectedSize?.name || null,
         crust: selectedCrust?.name || null,
         sauce: selectedSauce?.name || null,
-        cheese: selectedCheese?.name || null,
+        cheese: selectedCheese === 'no-cheese' ? 'No Cheese' : selectedCheese?.name || null,
         seasonings: selectedSeasonings.map((s) => s.name),
         addons: selectedAddons.map((a) => a.name),
         instructions: {
@@ -1118,7 +1287,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     if (hasCrusts && !isCrustSelected) return "Select Crust First";
     if (isSizeRequired && !isSizeSelected && !hasSingleSize)
       return "Select Size";
-    return `Add to Cart - $${getCurrentPrice()}`;
+    return `Add to Cart - $${formatPrice(getCurrentPrice())}`;
   };
 
   // Get selected item names for bottom display - Column Wise
@@ -1126,11 +1295,9 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     const items = [];
 
     if (selectedSize) {
-      // Only show size name if multiple sizes or has crusts
       if ((item.size && item.size.length > 1) || hasCrusts) {
         items.push(`Size - ${selectedSize.name}`);
       } else {
-        // For single size, just show the price
         items.push(`Size - $${selectedSize.price}`);
       }
     }
@@ -1143,34 +1310,25 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       const variant = selectedSauceVariant || "light";
       const price = getSauceVariantPrice(selectedSauce, variant);
       const priceText = price > 0 ? `+$${price}` : "Included";
-      items.push(`Sauce - ${selectedSauce.name} (${variant}) - ${priceText}`);
+      items.push(`Sauce - ${selectedSauce.name} (${variant})  ${priceText}`);
     }
 
     if (selectedCheese) {
-      const variant = selectedCheeseVariant || "light";
-      const price = getCheeseVariantPrice(selectedCheese, variant);
-      const priceText = price > 0 ? `+$${price}` : "Included";
-      items.push(`Cheese - ${selectedCheese.name} (${variant}) - ${priceText}`);
+      if (selectedCheese === 'no-cheese') {
+        items.push(`Cheese - No Cheese`);
+      } else {
+        const variant = selectedCheeseVariant || "light";
+        const price = getCheeseVariantPrice(selectedCheese, variant);
+        const priceText = price > 0 ? `+$${price}` : "Included";
+        items.push(`Cheese - ${selectedCheese.name} (${variant})  ${priceText}`);
+      }
     }
 
-    // Add selected seasonings
     if (selectedSeasonings.length > 0) {
       const seasoningNames = selectedSeasonings.map((s) => s.name).join(", ");
       items.push(`Seasonings - ${seasoningNames}`);
     }
 
-    // Add selected addons with variants
-    if (selectedAddons.length > 0) {
-      const addonNames = selectedAddons.map((a) => {
-        const variant = a._variant || "light";
-        const price = a.variants?.find((v) => v.name === variant)?.price || 0;
-        const priceText = price > 0 ? `+$${price}` : "Included";
-        return `${a.name} (${variant}) - ${priceText}`;
-      });
-      items.push(`Addons - ${addonNames.join(", ")}`);
-    }
-
-    // Add selected instructions
     if (selectedInstructions.cut.length > 0) {
       const cutNames = selectedInstructions.cut.map((s) => s.name).join(", ");
       items.push(`Cut - ${cutNames}`);
@@ -1180,10 +1338,74 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       items.push(`Bake - ${bakeNames}`);
     }
 
+    // Add selected addons with variants and placement
+    if (selectedAddons.length > 0) {
+      const addonDetails = selectedAddons.map((a) => {
+        const variant = a._selectedVariant || a.variants?.[0]?.name || 'normal';
+        const placement = a._selectedPlacement || 'center';
+        const price = a.variants?.find((v) => v.name === variant)?.price || 0;
+        const priceText = price > 0 ? `+$${price}` : "Included";
+        const displayVariant = variant.charAt(0).toUpperCase() + variant.slice(1);
+        const displayPlacement = placement.charAt(0).toUpperCase() + placement.slice(1);
+        return `${a.name} (${displayVariant} - ${displayPlacement})  ${priceText}`;
+      });
+      items.push(`Addons - ${addonDetails.join(", ")}`);
+    }
+
     return items;
   };
 
   const selectedItems = getSelectedItems();
+
+  // Get structured display data for Your Selection section
+  const getSelectionDisplay = () => {
+    const basics = [];
+
+    if (selectedSize) {
+      if ((item.size && item.size.length > 1) || hasCrusts) {
+        basics.push(selectedSize.name);
+      } else {
+        basics.push(`$${selectedSize.price}`);
+      }
+    }
+    if (selectedCrust) basics.push(selectedCrust.name);
+    if (selectedSeasonings.length > 0) basics.push(selectedSeasonings.map((s) => s.name).join(", "));
+    if (selectedInstructions.cut.length > 0) basics.push(selectedInstructions.cut.map((s) => s.name).join(", "));
+    if (selectedInstructions.bake.length > 0) basics.push(selectedInstructions.bake.map((s) => s.name).join(", "));
+
+    let sauce = null;
+    if (selectedSauce) {
+      const variant = selectedSauceVariant || "light";
+      const price = getSauceVariantPrice(selectedSauce, variant);
+      sauce = `${selectedSauce.name} (${variant})  ${price > 0 ? `+$${price}` : "Included"}`;
+    }
+
+    let cheese = null;
+    if (selectedCheese) {
+      if (selectedCheese === "no-cheese") {
+        cheese = "No Cheese";
+      } else {
+        const variant = selectedCheeseVariant || "light";
+        const price = getCheeseVariantPrice(selectedCheese, variant);
+        cheese = `${selectedCheese.name} (${variant})  ${price > 0 ? `+$${price}` : "Included"}`;
+      }
+    }
+
+    const addonsList = selectedAddons.map((a) => {
+      const variant = a._selectedVariant || a.variants?.[0]?.name || "normal";
+      const placement = a._selectedPlacement || "center";
+      const price = a.variants?.find((v) => v.name === variant)?.price || 0;
+      const priceText = price > 0 ? `+$${price}` : "Included";
+      const displayVariant = variant.charAt(0).toUpperCase() + variant.slice(1);
+      const displayPlacement = placement.charAt(0).toUpperCase() + placement.slice(1);
+      return `${a.name} (${displayVariant} - ${displayPlacement})  ${priceText}`;
+    });
+
+    return { basics, sauce, cheese, addonsList };
+  };
+
+  const { basics, sauce, cheese, addonsList } = getSelectionDisplay();
+  const hasSelection = basics.length > 0 || sauce || cheese || addonsList.length > 0;
 
   return (
     <section className="bg-black min-h-screen py-10 lg:py-20">
@@ -1198,11 +1420,12 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         </Link>
 
         {/* Item Details */}
-        <div className="bg-[#111] border border-zinc-800 rounded-2xl overflow-hidden">
+        <div className="bg-[#111] border border-zinc-800 rounded-2xl">
+          {/* grid: both cols equal height by default (items-stretch). Left col has no overflow so sticky works */}
           <div className="grid grid-cols-1 md:grid-cols-2">
-            {/* ===== IMAGE SECTION ===== */}
-            <div className="relative bg-zinc-900">
-              <div className="relative h-80 md:h-[500px]">
+            {/* ===== IMAGE SECTION (left col, sticky container) ===== */}
+            <div className="bg-zinc-900 rounded-tl-2xl rounded-bl-2xl">
+              <div className="relative h-80 md:h-[500px] overflow-hidden rounded-tl-2xl">
                 <Image
                   src={getImageUrl(images[currentImageIndex])}
                   alt={item.name}
@@ -1245,11 +1468,10 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                     <button
                       key={index}
                       onClick={() => goToImage(index)}
-                      className={`relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
-                        currentImageIndex === index
-                          ? "border-amber-400"
-                          : "border-transparent hover:border-zinc-600"
-                      }`}
+                      className={`relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${currentImageIndex === index
+                        ? "border-amber-400"
+                        : "border-transparent hover:border-zinc-600"
+                        }`}
                     >
                       <Image
                         src={getImageUrl(img)}
@@ -1263,32 +1485,70 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                 </div>
               )}
 
-              {/* Selected Items Display Below Images - Column Wise */}
-              {selectedItems.length > 0 && (
-                <div className="p-3 bg-zinc-900/90 border-t border-zinc-800">
-                  {selectedItems.map((item, index) => (
-                    <p key={index} className="text-xs text-gray-400">
-                      {item}
-                    </p>
-                  ))}
+              {/* Selected Items Display Below Images - Desktop Only */}
+              {hasSelection && (
+                <div className="hidden md:block sticky top-15 z-10 p-4 bg-gradient-to-b from-zinc-900/95 to-zinc-900/80 border-t border-zinc-800/60 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                    <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                      Your Selection
+                    </h4>
+                  </div>
+                  <div className="space-y-1.5">
+                    {basics.length > 0 && (
+                      <p className="text-xs text-gray-300 leading-relaxed">{basics.join(", ")}</p>
+                    )}
+                    {sauce && <p className="text-xs text-gray-400">{sauce}</p>}
+                    {cheese && <p className="text-xs text-gray-400">{cheese}</p>}
+                    {addonsList.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mt-6 mb-2">
+                          <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                          <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                            Addons
+                          </h4>
+                        </div>
+                        {addonsList.map((addon, i) => (
+                          <p key={i} className="text-xs text-gray-400">{addon}</p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
             {/* ===== CONTENT SECTION ===== */}
-            <div className="p-6 md:p-10 overflow-y-auto max-h-[800px] custom-scrollbar">
-              {/* Category */}
-              {item.categories && item.categories.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {item.categories.map((cat, index) => (
-                    <span
-                      key={index}
-                      className="inline-block text-xs text-amber-400 font-medium"
-                    >
-                      {cat?.name || cat}
-                      {index < item.categories.length - 1 && ", "}
-                    </span>
-                  ))}
+            <div className="p-6 md:p-10">
+              {/* Your Selection - Mobile Only */}
+              {hasSelection && (
+                <div className="block md:hidden sticky top-13 z-10 -mx-6 px-4 py-3 mb-4 bg-gradient-to-b from-zinc-900/95 to-zinc-900/80 border-b border-zinc-800/60 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                    <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                      Your Selection
+                    </h4>
+                  </div>
+                  <div className="space-y-1">
+                    {basics.length > 0 && (
+                      <p className="text-xs text-gray-300 leading-relaxed">{basics.join(", ")}</p>
+                    )}
+                    {sauce && <p className="text-xs text-gray-400">{sauce}</p>}
+                    {cheese && <p className="text-xs text-gray-400">{cheese}</p>}
+                    {addonsList.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mt-6 mb-2">
+                          <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                          <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                            Addons
+                          </h4>
+                        </div>
+                        {addonsList.map((addon, i) => (
+                          <p key={i} className="text-xs text-gray-400 pl-2">{addon}</p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -1371,7 +1631,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
               {/* ===== ADDONS ===== */}
               {hasGroupedAddons && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-400 mb-3">
+                  <h3 className="text-sm font-semibold text-gray-100 mb-3 bg-gray-800 p-4 rounded-lg">
                     Add-ons
                   </h3>
                   {Object.keys(item.grouped_addons).map((category) => (
@@ -1381,6 +1641,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                       addons={item.grouped_addons[category]}
                       selectedAddons={selectedAddons}
                       onSelect={handleAddonSelect}
+                      onVariantChange={handleAddonVariantChange}
                     />
                   ))}
                 </div>
@@ -1425,15 +1686,14 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                 <button
                   disabled={isAddToCartDisabled}
                   onClick={handleAddToCart}
-                  className={`flex-1 font-bold py-3 px-6 rounded-lg transition-all duration-300 ${
-                    isInCart
-                      ? "bg-green-600 text-white cursor-pointer hover:bg-green-700"
-                      : isAddingToCart
-                        ? "bg-green-600 text-white"
-                        : !isAddToCartDisabled
-                          ? "bg-amber-500 text-black hover:bg-amber-600"
-                          : "bg-zinc-700 text-gray-400 cursor-not-allowed"
-                  }`}
+                  className={`flex-1 font-bold py-3 px-6 rounded-lg transition-all duration-300 ${isInCart
+                    ? "bg-green-600 text-white cursor-pointer hover:bg-green-700"
+                    : isAddingToCart
+                      ? "bg-green-600 text-white"
+                      : !isAddToCartDisabled
+                        ? "bg-amber-500 text-black hover:bg-amber-600"
+                        : "bg-zinc-700 text-gray-400 cursor-not-allowed"
+                    }`}
                 >
                   <span className="flex items-center justify-center gap-2">
                     {isInCart && <Check size={18} />}

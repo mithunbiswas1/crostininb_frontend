@@ -92,7 +92,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
       <div className="relative mb-6">
         <div className="flex gap-6 w-max animate-marquee">
           {duplicatedTestimonials.map((t, i) => (
-            <TestimonialCard key={`top-${t.id || i}`} testimonial={t} />
+            <TestimonialCard key={`top-${i}`} testimonial={t} />
           ))}
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
       <div className="relative">
         <div className="flex gap-6 w-max animate-marquee-reverse">
           {duplicatedTestimonials.map((t, i) => (
-            <TestimonialCard key={`bottom-${t.id || i}`} testimonial={t} />
+            <TestimonialCard key={`bottom-${i}`} testimonial={t} />
           ))}
         </div>
       </div>
