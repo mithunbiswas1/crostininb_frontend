@@ -12,9 +12,12 @@ import {
   ChevronRight,
   Check,
   Plus,
+  Minus,
 } from "lucide-react";
 import { baseUriBackend } from "@/redux/url/url";
-import { singleAddToCartsList } from "@/redux/features/Slice/CartDrawerSlice";
+import {
+  singleAddToCartsList,
+} from "@/redux/features/Slice/CartDrawerSlice";
 
 // Helper function to get image URL
 const getImageUrl = (path) => {
@@ -838,86 +841,118 @@ const SpecialInstructions = ({
   );
 };
 
-// ==================== RELATED ITEM CARD ====================
-const RelatedItemCard = ({ item }) => {
-  const dispatch = useDispatch();
-  const { cartsList } = useSelector((state) => state.cartDrawer);
-  const [isAdding, setIsAdding] = useState(false);
+// ==================== RELATED ITEM CARD (Crusts Card Style) ====================
+const RelatedItemCard = ({
+  item,
+  quantity = 0,
+  onAdd,
+  onIncrement,
+  onDecrement,
+}) => {
+  const itemId = item.id || item._id;
+  const price =
+    item.size?.price ||
+    (Array.isArray(item.size) ? item.size[0]?.price : null) ||
+    item.price ||
+    item.min_price ||
+    item.variation?.offer_price ||
+    item.variation?.regular_price ||
+    0;
 
-  const price = item.min_price || item.size?.[0]?.price || 0;
-  const isInCart = cartsList.some((cartItem) => cartItem.productId === item.id);
-
-  const handleAddToCart = () => {
-    setIsAdding(true);
-    dispatch(
-      singleAddToCartsList({
-        productId: item.id,
-        name: item.name,
-        image: item.image,
-        price: price,
-        variationName: null,
-        variationPrice: null,
-        variationOfferPrice: null,
-      }),
-    );
-    setTimeout(() => setIsAdding(false), 500);
-  };
+  // Available unless explicitly false (getCardItems already filters is_available: true)
+  const isAvailable = item.is_available !== false && item.is_active !== false;
+  const isSelected = quantity > 0;
 
   return (
-    <div className="bg-[#111] border border-zinc-800 rounded-lg overflow-hidden hover:border-amber-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5 flex group">
-      <Link
-        href={`/items/${item.slug}`}
-        className="relative w-24 md:w-28 aspect-square flex-shrink-0"
-      >
-        <Image
-          src={getImageUrl(item.image)}
-          alt={item.name}
-          fill
-          className="object-cover"
-          unoptimized
-        />
-        {item.is_addon && (
-          <span className="absolute top-1 left-1 bg-purple-600 text-white text-[8px] px-1.5 py-0.5 rounded">
-            Addon
-          </span>
-        )}
-      </Link>
-      <div className="flex-1 p-3 flex items-center justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <Link href={`/items/${item.slug}`}>
-            <h4 className="text-white font-semibold text-sm line-clamp-1 group-hover:text-amber-400 transition-colors">
-              {item.name}
-            </h4>
-          </Link>
-          <p className="text-gray-400 text-xs line-clamp-2 mt-0.5">
-            {item.short_description || item.description?.substring(0, 60) || ""}
-          </p>
+    <div
+      onClick={!isSelected && isAvailable ? () => onAdd(item) : undefined}
+      className={`group relative bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all text-left flex flex-col ${isSelected
+        ? "border-amber-500 shadow-lg shadow-amber-500/20"
+        : "border-zinc-700 hover:border-zinc-500 cursor-pointer"
+        } ${!isAvailable ? "opacity-60 cursor-not-allowed" : ""}`}
+    >
+      <div className="flex flex-col">
+        {/* Top section: Name & Price (left) and Action / - 1 + (right) */}
+        <div className="flex items-center justify-between p-3 gap-2 bg-zinc-900/40">
+          <div className="flex-1 min-w-0">
+            <Link
+              href={`/items/${item.slug}`}
+              onClick={(e) => e.stopPropagation()}
+              className="block"
+            >
+              <h4 className="text-white font-medium text-xs sm:text-sm line-clamp-1 hover:text-amber-400 transition-colors">
+                {item.name}
+              </h4>
+            </Link>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-amber-400 font-bold text-xs sm:text-sm">
+                ${price}
+              </span>
+              {item.is_addon && (
+                <span className="bg-purple-600/80 text-white text-[8px] px-1.5 py-0.2 rounded font-medium">
+                  Addon
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Right Action: When selected, show "- count +", else show circle Add */}
+          <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            {isSelected ? (
+              <div className="flex items-center gap-1 bg-amber-500 text-black rounded-md px-1.5 py-1 font-bold text-xs shadow-md">
+                <button
+                  type="button"
+                  onClick={() => onDecrement(item)}
+                  aria-label="Decrease quantity"
+                  className="w-5 h-5 flex items-center justify-center hover:bg-black/15 rounded active:scale-90 transition-all cursor-pointer"
+                >
+                  <Minus size={12} strokeWidth={2.5} />
+                </button>
+                <span className="w-4 text-center font-bold select-none text-xs">
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onIncrement(item)}
+                  aria-label="Increase quantity"
+                  className="w-5 h-5 flex items-center justify-center hover:bg-black/15 rounded active:scale-90 transition-all cursor-pointer"
+                >
+                  <Plus size={12} strokeWidth={2.5} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onAdd(item)}
+                disabled={!isAvailable}
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isAvailable
+                  ? "border-zinc-600 hover:border-amber-500 hover:bg-amber-500 hover:text-black text-gray-300 cursor-pointer"
+                  : "border-zinc-700 text-zinc-600 cursor-not-allowed"
+                  }`}
+              >
+                <Plus size={12} />
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-          <div className="text-right">
-            <span className="text-white font-semibold text-sm">${price}</span>
-          </div>
-          <button
-            onClick={handleAddToCart}
-            disabled={isAdding || isInCart || !item.is_available}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isInCart
-              ? "bg-green-600 text-white"
-              : isAdding
-                ? "bg-green-600 text-white"
-                : item.is_available
-                  ? "bg-amber-500 text-black hover:bg-amber-600"
-                  : "bg-zinc-700 text-gray-400 cursor-not-allowed"
-              }`}
-          >
-            {isInCart ? (
-              <Check size={16} />
-            ) : isAdding ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Plus size={16} />
-            )}
-          </button>
+        {/* Bottom section: Image (exact Crusts card style) */}
+        <div className="relative w-full aspect-[4/3] bg-zinc-700 overflow-hidden">
+          <Image
+            src={getImageUrl(item.image)}
+            alt={item.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            unoptimized
+          />
+
+          {!isAvailable && (
+            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+              <span className="text-[10px] font-semibold text-white px-2 py-0.5 bg-red-600/80 rounded">
+                Unavailable
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -936,6 +971,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   const [selectedCheese, setSelectedCheese] = useState(null);
   const [selectedSeasonings, setSelectedSeasonings] = useState([]);
   const [selectedAddons, setSelectedAddons] = useState([]);
+  const [selectedRelatedItems, setSelectedRelatedItems] = useState({});
   const [selectedInstructions, setSelectedInstructions] = useState({
     cut: [],
     bake: [],
@@ -948,6 +984,22 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   const [isCrustSelected, setIsCrustSelected] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  // Reset isInCart whenever any ingredient or option is changed
+  useEffect(() => {
+    setIsInCart(false);
+  }, [
+    selectedSize,
+    selectedCrust,
+    selectedSauce,
+    selectedSauceVariant,
+    selectedCheese,
+    selectedCheeseVariant,
+    selectedSeasonings,
+    selectedAddons,
+    selectedRelatedItems,
+    selectedInstructions,
+  ]);
 
   const hasCrusts = item.crusts && item.crusts.length > 0;
   const hasSauces = item.sauces && item.sauces.length > 0;
@@ -1035,11 +1087,6 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     }
   }, [item.special_instructions]);
 
-  // Check if product already in cart
-  useEffect(() => {
-    const exists = cartsList.some((cartItem) => cartItem.productId === item.id);
-    setIsInCart(exists);
-  }, [cartsList, item.id]);
 
   // Create image array
   const images = [item.image, ...(item.gallery_image || [])].filter(Boolean);
@@ -1181,7 +1228,69 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     });
   };
 
-  const getCurrentPrice = () => {
+  // Related items (You May Also Like) handlers
+  const handleRelatedItemAdd = (relItem) => {
+    const relId = relItem._id || relItem.id;
+    const p =
+      relItem.size?.price ||
+      (Array.isArray(relItem.size) ? relItem.size[0]?.price : null) ||
+      relItem.price ||
+      relItem.min_price ||
+      relItem.variation?.offer_price ||
+      relItem.variation?.regular_price ||
+      0;
+
+    setSelectedRelatedItems((prev) => ({
+      ...prev,
+      [relId]: {
+        item: relItem,
+        quantity: (prev[relId]?.quantity || 0) + 1,
+        price: p,
+      },
+    }));
+  };
+
+  const handleRelatedItemIncrement = (relItem) => {
+    const relId = relItem._id || relItem.id;
+    const p =
+      relItem.size?.price ||
+      (Array.isArray(relItem.size) ? relItem.size[0]?.price : null) ||
+      relItem.price ||
+      relItem.min_price ||
+      relItem.variation?.offer_price ||
+      relItem.variation?.regular_price ||
+      0;
+
+    setSelectedRelatedItems((prev) => ({
+      ...prev,
+      [relId]: {
+        item: relItem,
+        quantity: (prev[relId]?.quantity || 0) + 1,
+        price: p,
+      },
+    }));
+  };
+
+  const handleRelatedItemDecrement = (relItem) => {
+    const relId = relItem._id || relItem.id;
+    setSelectedRelatedItems((prev) => {
+      const currentQty = prev[relId]?.quantity || 0;
+      if (currentQty <= 1) {
+        const updated = { ...prev };
+        delete updated[relId];
+        return updated;
+      }
+      return {
+        ...prev,
+        [relId]: {
+          ...prev[relId],
+          quantity: currentQty - 1,
+        },
+      };
+    });
+  };
+
+  const getMainProductPrice = () => {
     // Base price from size
     let total = 0;
     if (selectedSize) {
@@ -1210,6 +1319,20 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     });
 
     return total;
+  };
+
+  const getRelatedItemsTotalPrice = () => {
+    let total = 0;
+    Object.values(selectedRelatedItems).forEach((entry) => {
+      if (entry.quantity > 0) {
+        total += (Number(entry.price) || 0) * entry.quantity;
+      }
+    });
+    return total;
+  };
+
+  const getCurrentPrice = () => {
+    return getMainProductPrice() + getRelatedItemsTotalPrice();
   };
 
   // Format price display (remove trailing .00 if integer)
@@ -1250,18 +1373,47 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     if (isAddToCartDisabled) return;
 
     setIsAddingToCart(true);
+
+    const { basics, sauce, cheese, addonsList } = getSelectionDisplay();
+    const mainProductPrice = getMainProductPrice();
+
+    const yourSelectionParts = [];
+    if (basics.length > 0) yourSelectionParts.push(basics.join(", "));
+    if (sauce) yourSelectionParts.push(sauce);
+    if (cheese) yourSelectionParts.push(cheese);
+    const yourSelectionText =
+      yourSelectionParts.length > 0 ? yourSelectionParts.join(" | ") : null;
+
+    const allAddonsData = addonsList.length > 0 ? addonsList : null;
+
+    const sauceText = selectedSauce
+      ? `${selectedSauce.name}${selectedSauceVariant ? ` (${selectedSauceVariant})` : ""}`
+      : null;
+    const cheeseText =
+      selectedCheese === "no-cheese"
+        ? "No Cheese"
+        : selectedCheese
+          ? `${selectedCheese.name}${selectedCheeseVariant ? ` (${selectedCheeseVariant})` : ""}`
+          : null;
+
+    // 1. Add main customized product to cart (NO extra field)
     dispatch(
       singleAddToCartsList({
-        productId: item.id,
+        productId: item.id || item._id,
         name: item.name,
         image: item.image,
-        price: getCurrentPrice(),
+        price: mainProductPrice,
+        quantity: 1,
+        // Match user's exact requirements for local storage:
+        "Your Selection": yourSelectionText,
+        yourSelection: yourSelectionText,
+        "Addons": allAddonsData,
+        addons: allAddonsData,
         size: selectedSize?.name || null,
         crust: selectedCrust?.name || null,
-        sauce: selectedSauce?.name || null,
-        cheese: selectedCheese === 'no-cheese' ? 'No Cheese' : selectedCheese?.name || null,
-        seasonings: selectedSeasonings.map((s) => s.name),
-        addons: selectedAddons.map((a) => a.name),
+        sauce: sauceText,
+        cheese: cheeseText,
+        seasonings: selectedSeasonings.map((s) => s.name).sort(),
         instructions: {
           cut:
             selectedInstructions.cut.length > 0
@@ -1275,14 +1427,33 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       }),
     );
 
+    // 2. Add each selected "You May Also Like" item separately into cart
+    Object.values(selectedRelatedItems).forEach((entry) => {
+      if (entry.quantity > 0) {
+        dispatch(
+          singleAddToCartsList({
+            productId: entry.item._id || entry.item.id,
+            name: entry.item.name,
+            image: entry.item.image,
+            price: Number(entry.price) || 0,
+            quantity: entry.quantity,
+          }),
+        );
+      }
+    });
+
     setTimeout(() => {
       setIsAddingToCart(false);
-    }, 500);
+      setIsInCart(true);
+      setTimeout(() => {
+        setIsInCart(false);
+      }, 2500);
+    }, 400);
   };
 
   const getButtonText = () => {
-    if (isInCart) return "In Cart";
     if (isAddingToCart) return "Adding...";
+    if (isInCart) return `Added to Cart! ($${formatPrice(getCurrentPrice())})`;
     if (!item.is_available) return "Unavailable";
     if (hasCrusts && !isCrustSelected) return "Select Crust First";
     if (isSizeRequired && !isSizeSelected && !hasSingleSize)
@@ -1401,14 +1572,26 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       return `${a.name} (${displayVariant} - ${displayPlacement})  ${priceText}`;
     });
 
-    return { basics, sauce, cheese, addonsList };
+    const extraList = Object.values(selectedRelatedItems)
+      .filter((entry) => entry.quantity > 0)
+      .map((entry) => {
+        const p = (Number(entry.price) || 0) * entry.quantity;
+        return `${entry.item.name} x${entry.quantity}  ${p > 0 ? `+$${p % 1 === 0 ? p : p.toFixed(2)}` : "Included"}`;
+      });
+
+    return { basics, sauce, cheese, addonsList, extraList };
   };
 
-  const { basics, sauce, cheese, addonsList } = getSelectionDisplay();
-  const hasSelection = basics.length > 0 || sauce || cheese || addonsList.length > 0;
+  const { basics, sauce, cheese, addonsList, extraList } = getSelectionDisplay();
+  const hasSelection =
+    basics.length > 0 ||
+    sauce ||
+    cheese ||
+    addonsList.length > 0 ||
+    extraList.length > 0;
 
   return (
-    <section className="bg-black min-h-screen py-10 lg:py-20">
+    <section className="bg-black min-h-screen pt-30 pb-20">
       <div className="max-w-6xl mx-auto px-4 lg:px-20">
         {/* Back Button */}
         <Link
@@ -1487,7 +1670,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
 
               {/* Selected Items Display Below Images - Desktop Only */}
               {hasSelection && (
-                <div className="hidden md:block sticky top-15 z-10 p-4 bg-gradient-to-b from-zinc-900/95 to-zinc-900/80 border-t border-zinc-800/60 backdrop-blur-sm">
+                <div className="hidden md:block sticky top-20 z-10 p-4 bg-gradient-to-b from-zinc-900/95 to-zinc-900/80 border-t border-zinc-800/60 backdrop-blur-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
                     <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
@@ -1513,6 +1696,19 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                         ))}
                       </div>
                     )}
+                    {extraList.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mt-6 mb-2">
+                          <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                          <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                            You May Also Like
+                          </h4>
+                        </div>
+                        {extraList.map((extra, i) => (
+                          <p key={i} className="text-xs text-gray-400">{extra}</p>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1522,7 +1718,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
             <div className="p-6 md:p-10">
               {/* Your Selection - Mobile Only */}
               {hasSelection && (
-                <div className="block md:hidden sticky top-13 z-10 -mx-6 px-4 py-3 mb-4 bg-gradient-to-b from-zinc-900/95 to-zinc-900/80 border-b border-zinc-800/60 backdrop-blur-sm">
+                <div className="block md:hidden sticky top-16 z-10 -mx-6 px-4 py-3 mb-4 bg-gradient-to-b from-zinc-900/95 to-zinc-900/80 border-b border-zinc-800/60 backdrop-blur-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
                     <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
@@ -1545,6 +1741,19 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                         </div>
                         {addonsList.map((addon, i) => (
                           <p key={i} className="text-xs text-gray-400 pl-2">{addon}</p>
+                        ))}
+                      </div>
+                    )}
+                    {extraList.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mt-6 mb-2">
+                          <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                          <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                            You May Also Like
+                          </h4>
+                        </div>
+                        {extraList.map((extra, i) => (
+                          <p key={i} className="text-xs text-gray-400 pl-2">{extra}</p>
                         ))}
                       </div>
                     )}
@@ -1681,25 +1890,57 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                 )}
               </div>
 
-              {/* ===== ADD TO CART ===== */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  disabled={isAddToCartDisabled}
-                  onClick={handleAddToCart}
-                  className={`flex-1 font-bold py-3 px-6 rounded-lg transition-all duration-300 ${isInCart
-                    ? "bg-green-600 text-white cursor-pointer hover:bg-green-700"
-                    : isAddingToCart
-                      ? "bg-green-600 text-white"
-                      : !isAddToCartDisabled
-                        ? "bg-amber-500 text-black hover:bg-amber-600"
-                        : "bg-zinc-700 text-gray-400 cursor-not-allowed"
-                    }`}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    {isInCart && <Check size={18} />}
-                    {getButtonText()}
-                  </span>
-                </button>
+              {/* ===== YOU MAY ALSO LIKE (After SKU row) ===== */}
+              {addonItems && addonItems.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-zinc-800">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                      You May Also Like
+                      <span className="text-xs font-normal text-gray-500 ml-2">
+                        ({addonItems.length})
+                      </span>
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {addonItems.map((addon, idx) => {
+                      const addonId = addon._id || addon.id;
+                      return (
+                        <RelatedItemCard
+                          key={addonId || idx}
+                          item={addon}
+                          quantity={selectedRelatedItems[addonId]?.quantity || 0}
+                          onAdd={handleRelatedItemAdd}
+                          onIncrement={handleRelatedItemIncrement}
+                          onDecrement={handleRelatedItemDecrement}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ===== ADD TO CART (Sticky Bottom) ===== */}
+              <div className="sticky bottom-0 z-20 -mx-6 md:-mx-10 -mb-6 md:-mb-10 p-2 bg-white/20 backdrop-blur-xs border-zinc-800/80 backdrop-blur-md mt-6 rounded-t-xl">
+                <div className="flex gap-3">
+                  <button
+                    disabled={isAddToCartDisabled}
+                    onClick={handleAddToCart}
+                    className={`flex-1 font-bold py-3.5 px-6 rounded-lg transition-all duration-300 shadow-lg ${isInCart
+                      ? "bg-green-600 text-white cursor-pointer hover:bg-green-700"
+                      : isAddingToCart
+                        ? "bg-green-600 text-white"
+                        : !isAddToCartDisabled
+                          ? "bg-amber-500 text-black hover:bg-amber-600 active:scale-[0.99] cursor-pointer"
+                          : "bg-zinc-700 text-gray-400 cursor-not-allowed"
+                      }`}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      {isInCart && <Check size={18} />}
+                      {getButtonText()}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1714,23 +1955,6 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
             </div>
           )}
         </div>
-
-        {/* ===== YOU MAY ALSO LIKE ===== */}
-        {addonItems && addonItems.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-white mb-4">
-              You May Also Like
-              <span className="text-sm font-normal text-gray-400 ml-2">
-                ({addonItems.length})
-              </span>
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {addonItems.map((addon) => (
-                <RelatedItemCard key={addon.id} item={addon} />
-              ))}
-            </div>
-          </div>
-        )}
 
         <style jsx>{`
           .custom-scrollbar::-webkit-scrollbar {

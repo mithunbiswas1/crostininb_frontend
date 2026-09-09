@@ -2,13 +2,21 @@
 
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ShoppingCart } from "lucide-react";
 import { toggleCart } from "@/redux/features/Slice/CartDrawerSlice";
 
 export default function FixedCartButton() {
+  const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
   const { cartsList } = useSelector((state) => state.cartDrawer);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   // Calculate total items in cart
   const totalItems = cartsList.reduce((sum, item) => sum + item.quantity, 0);

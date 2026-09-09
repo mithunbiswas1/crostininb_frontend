@@ -13,7 +13,7 @@ import {
   removeFromCartsList,
   clearCartsList,
 } from "@/redux/features/Slice/CartDrawerSlice";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.png";
@@ -25,11 +25,17 @@ const getImageUrl = (path) => {
 };
 
 export default function CartDrawer() {
+  const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
   const { open, cartsList } = useSelector((state) => state.cartDrawer);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Lock body scroll when drawer is open
   useEffect(() => {
+    if (!mounted) return;
     if (open) {
       document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
@@ -52,12 +58,25 @@ export default function CartDrawer() {
     dispatch(closeCart());
   };
 
-  const handleRemove = (productId, variationName) => {
-    dispatch(removeFromCartsList({ productId, variationName }));
+  const handleRemove = (item) => {
+    dispatch(
+      removeFromCartsList({
+        cartItemId: item.cartItemId,
+        productId: item.productId,
+        variationName: item.variationName,
+      }),
+    );
   };
 
-  const handleUpdateQuantity = (productId, variationName, quantity) => {
-    dispatch(updateQuantity({ productId, variationName, quantity }));
+  const handleUpdateQuantity = (item, quantity) => {
+    dispatch(
+      updateQuantity({
+        cartItemId: item.cartItemId,
+        productId: item.productId,
+        variationName: item.variationName,
+        quantity,
+      }),
+    );
   };
 
   const handleClearCart = () => {
@@ -86,6 +105,8 @@ export default function CartDrawer() {
     (sum, item) => sum + (item.discountedPrice || item.price) * item.quantity,
     0,
   );
+
+  if (!mounted) return null;
 
   return (
     <>
@@ -157,7 +178,7 @@ export default function CartDrawer() {
 
               return (
                 <div
-                  key={index}
+                  key={item.cartItemId || index}
                   className="flex gap-3 bg-zinc-900/50 rounded-lg p-3 border border-zinc-800"
                 >
                   {/* Image */}
@@ -182,6 +203,27 @@ export default function CartDrawer() {
                             {item.variationName}
                           </span>
                         )}
+                        {(item["Your Selection"] || item.yourSelection) && (
+                          <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed break-words">
+                            {item["Your Selection"] || item.yourSelection}
+                          </p>
+                        )}
+                        {(item["Addons"] || item.addons) && (
+                          <p className="text-[10px] text-amber-400/90 mt-0.5 leading-relaxed break-words">
+                            Addons:{" "}
+                            {Array.isArray(item["Addons"] || item.addons)
+                              ? (item["Addons"] || item.addons).join(", ")
+                              : item["Addons"] || item.addons}
+                          </p>
+                        )}
+                        {(item["Extra:"] || item["Extra"] || item.extra) && (
+                          <p className="text-[10px] text-amber-400/90 mt-0.5 leading-relaxed break-words">
+                            Extra:{" "}
+                            {Array.isArray(item["Extra:"] || item["Extra"] || item.extra)
+                              ? (item["Extra:"] || item["Extra"] || item.extra).join(", ")
+                              : item["Extra:"] || item["Extra"] || item.extra}
+                          </p>
+                        )}
                         {hasDiscount && (
                           <span className="text-xs text-green-400 ml-1">
                             -
@@ -193,9 +235,7 @@ export default function CartDrawer() {
                         )}
                       </div>
                       <button
-                        onClick={() =>
-                          handleRemove(item.productId, item.variationName)
-                        }
+                        onClick={() => handleRemove(item)}
                         className="text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"
                       >
                         <Trash2 size={16} />
@@ -206,11 +246,7 @@ export default function CartDrawer() {
                       <div className="flex items-center gap-1 bg-zinc-800 rounded-lg">
                         <button
                           onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.variationName,
-                              item.quantity - 1,
-                            )
+                            handleUpdateQuantity(item, item.quantity - 1)
                           }
                           className="p-1.5 hover:bg-zinc-700 rounded-l-lg transition-colors text-gray-400 hover:text-white"
                         >
@@ -221,11 +257,7 @@ export default function CartDrawer() {
                         </span>
                         <button
                           onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.variationName,
-                              item.quantity + 1,
-                            )
+                            handleUpdateQuantity(item, item.quantity + 1)
                           }
                           className="p-1.5 hover:bg-zinc-700 rounded-r-lg transition-colors text-gray-400 hover:text-white"
                         >

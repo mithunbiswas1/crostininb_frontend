@@ -32,10 +32,6 @@ const navigation1 = [
     href: "/menu",
   },
   {
-    name: "Specials",
-    href: "/specials",
-  },
-  {
     name: "Items",
     href: "#",
     subMenu: [],
@@ -45,8 +41,8 @@ const navigation1 = [
 
 const navigation2 = [
   {
-    name: "Order Online",
-    href: "/order-online",
+    name: "Specials",
+    href: "/specials",
   },
   {
     name: "About",
@@ -227,17 +223,16 @@ export default function Navbar() {
                 <div className="flex items-center">
                   <Link
                     href={item.href}
-                    className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 flex items-center gap-1 ${
-                      pathname === item.href ||
+                    className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 flex items-center gap-1 ${pathname === item.href ||
                       (item.subMenu &&
                         item.subMenu.some((sub) => sub.href === pathname))
-                        ? isScrolled
-                          ? "text-secondary"
-                          : "text-primary"
-                        : isScrolled
-                          ? "text-black hover:text-secondary"
-                          : "text-gray-50 hover:text-primary"
-                    }`}
+                      ? isScrolled
+                        ? "text-secondary"
+                        : "text-primary"
+                      : isScrolled
+                        ? "text-black hover:text-secondary"
+                        : "text-gray-50 hover:text-primary"
+                      }`}
                   >
                     {item.name}
                     {item.subMenu && item.subMenu.length > 0 && (
@@ -270,11 +265,10 @@ export default function Navbar() {
                             <Link
                               key={subItem.name}
                               href={subItem.href}
-                              className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${
-                                pathname === subItem.href
-                                  ? "text-primary bg-primary/5"
-                                  : "text-gray-700 dark:text-gray-200"
-                              }`}
+                              className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${pathname === subItem.href
+                                ? "text-primary bg-primary/5"
+                                : "text-gray-700 dark:text-gray-200"
+                                }`}
                             >
                               <div className="flex items-center gap-3">
                                 <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
@@ -330,15 +324,14 @@ export default function Navbar() {
                 <div className="flex items-center">
                   <Link
                     href={item.href}
-                    className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 ${
-                      pathname === item.href
-                        ? isScrolled
-                          ? "text-secondary"
-                          : "text-primary"
-                        : isScrolled
-                          ? "text-black hover:text-secondary"
-                          : "text-gray-50 hover:text-primary"
-                    }`}
+                    className={`text-base font-bold py-4 px-3 hover:text-secondary transition-colors duration-300 ${pathname === item.href
+                      ? isScrolled
+                        ? "text-secondary"
+                        : "text-primary"
+                      : isScrolled
+                        ? "text-black hover:text-secondary"
+                        : "text-gray-50 hover:text-primary"
+                      }`}
                   >
                     {item.name}
                   </Link>
@@ -354,11 +347,10 @@ export default function Navbar() {
             >
               <div className="flex items-center">
                 <button
-                  className={`text-base font-bold py-4 px-3 transition-colors duration-300 flex items-center gap-1 ${
-                    isScrolled
-                      ? "text-black hover:text-secondary"
-                      : "text-gray-50 hover:text-primary"
-                  }`}
+                  className={`text-base font-bold py-4 px-3 transition-colors duration-300 flex items-center gap-1 ${isScrolled
+                    ? "text-black hover:text-secondary"
+                    : "text-gray-50 hover:text-primary"
+                    }`}
                 >
                   <span>Account</span>
                   <span className="ml-1">
@@ -468,12 +460,11 @@ export default function Navbar() {
               {navigation.map((item) => (
                 <div key={item.name} className="relative">
                   <div
-                    className={`flex items-center justify-between overflow-y-auto ${
-                      pathname === item.href ||
+                    className={`flex items-center justify-between overflow-y-auto ${pathname === item.href ||
                       item.subMenu?.some((sub) => sub.href === pathname)
-                        ? "border-b-2 border-primary text-primary"
-                        : "text-gray-50"
-                    }`}
+                      ? "border-b-2 border-primary text-primary"
+                      : "text-gray-50"
+                      }`}
                   >
                     <Link
                       href={item.href}
@@ -490,21 +481,19 @@ export default function Navbar() {
                       >
                         {openSubMenu === item.name ? (
                           <FaChevronUp
-                            className={`h-4 w-4 ${
-                              pathname === item.href ||
+                            className={`h-4 w-4 ${pathname === item.href ||
                               item.subMenu?.some((sub) => sub.href === pathname)
-                                ? "text-primary"
-                                : "text-gray-50"
-                            }`}
+                              ? "text-primary"
+                              : "text-gray-50"
+                              }`}
                           />
                         ) : (
                           <FaChevronDown
-                            className={`h-4 w-4 ${
-                              pathname === item.href ||
+                            className={`h-4 w-4 ${pathname === item.href ||
                               item.subMenu?.some((sub) => sub.href === pathname)
-                                ? "text-primary"
-                                : "text-gray-50"
-                            }`}
+                              ? "text-primary"
+                              : "text-gray-50"
+                              }`}
                           />
                         )}
                       </button>

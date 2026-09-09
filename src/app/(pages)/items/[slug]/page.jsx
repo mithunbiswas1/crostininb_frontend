@@ -1,7 +1,7 @@
 // src/app/items/[slug]/page.jsx
 
 import { notFound } from "next/navigation";
-import { getItemBySlug, getItemsByCategorySlug } from "@/lib/getItems";
+import { getItemBySlug, getCardItems } from "@/lib/getItems";
 import ItemDetailClient from "../_components/ItemDetailClient";
 
 export default async function ItemDetailPage({ params }) {
@@ -10,44 +10,52 @@ export default async function ItemDetailPage({ params }) {
   let item;
   let addonItems = [];
 
+  console.log(addonItems, "addonItems")
+
   try {
     const data = await getItemBySlug(slug);
     item = data?.data;
 
     console.log(data, "getItemBySlug");
 
-    // Get category slug from item (support both old and new format)
-    let categorySlug = null;
+    // Extract category ID from item (support array, object, and string formats)
+    let categoryId = null;
 
-    if (item?.category?.slug) {
-      // Old format: single category
-      categorySlug = item.category.slug;
+    if (item?.category?._id || item?.category?.id) {
+      categoryId = item.category._id || item.category.id;
     } else if (item?.categories && item.categories.length > 0) {
-      // New format: categories array - get first category slug
-      categorySlug = item.categories[0]?.slug;
+      const firstCat = item.categories[0];
+      categoryId =
+        firstCat?._id ||
+        firstCat?.id ||
+        (typeof firstCat === "string" ? firstCat : null);
+    } else if (typeof item?.category === "string") {
+      categoryId = item.category;
     }
 
-    console.log(categorySlug, "categorySlug");
+    console.log(categoryId, "categoryId");
 
-    // Fetch addon items if category slug exists
-    if (categorySlug) {
+    // Fetch addon items using category ID
+    if (categoryId) {
       try {
-        const addonResponse = await getItemsByCategorySlug(categorySlug, {
-          limit: 20,
-          is_available: true,
-          is_active: true,
+        const addonResponse = await getCardItems({
+          category: categoryId,
           is_addon: true,
-          sortBy: "name",
-          order: "asc",
+          limit: 30,
+          is_available: true,
         });
 
-        console.log(addonResponse, "addonResponsedd");
+        console.log(addonResponse, "addonResponse");
 
-        // ✅ FIX: Assign the items to addonItems
-        addonItems = addonResponse?.data?.items || [];
+        // Assign the items to addonItems
+        const rawItems =
+          addonResponse?.data?.items || addonResponse?.data || [];
 
-        // Filter out the current item from addons
-        addonItems = addonItems.filter((addon) => addon.id !== item.id);
+        // Filter out current item from addons
+        const currentItemId = item._id || item.id;
+        addonItems = rawItems.filter(
+          (addon) => (addon._id || addon.id) !== currentItemId
+        );
 
         console.log(addonItems, "addonItems after filter");
       } catch (error) {
@@ -66,3 +74,4 @@ export default async function ItemDetailPage({ params }) {
   // ✅ Pass addonItems to the client component
   return <ItemDetailClient item={item} addonItems={addonItems} />;
 }
+

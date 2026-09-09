@@ -12,7 +12,7 @@ export async function getListItems({
   sortBy = "createdAt",
   is_active = true,
   is_available = true,
-  is_addon = false,
+  is_addon = "",
 } = {}) {
   const validPage = Math.max(1, parseInt(page) || 1);
 
@@ -52,7 +52,7 @@ export async function getCardItems({
   sections = "",
   sortBy = "createdAt",
   is_available = true,
-  is_addon = false,
+  is_addon = "",
 } = {}) {
   const validPage = Math.max(1, parseInt(page) || 1);
 
@@ -138,7 +138,7 @@ export async function getItemsByCategorySlug(
     sortBy = "createdAt",
     minPrice = "",
     maxPrice = "",
-    is_addon = false,
+    is_addon = "",
   } = {},
 ) {
   const validPage = Math.max(1, parseInt(page) || 1);

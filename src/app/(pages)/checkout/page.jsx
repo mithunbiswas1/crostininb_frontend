@@ -137,18 +137,31 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleUpdateQuantity = (productId, variationName, quantity) => {
+  const handleUpdateQuantity = (item, quantity) => {
     if (isBuyNowMode) return;
-    dispatch(updateQuantity({ productId, variationName, quantity }));
+    dispatch(
+      updateQuantity({
+        cartItemId: item.cartItemId,
+        productId: item.productId,
+        variationName: item.variationName,
+        quantity,
+      }),
+    );
   };
 
-  const handleRemove = (productId, variationName) => {
+  const handleRemove = (item) => {
     if (isBuyNowMode) {
       dispatch(clearBuyNowItem());
       router.push("/");
       return;
     }
-    dispatch(removeFromCartsList({ productId, variationName }));
+    dispatch(
+      removeFromCartsList({
+        cartItemId: item.cartItemId,
+        productId: item.productId,
+        variationName: item.variationName,
+      }),
+    );
   };
 
   const handlePlaceOrder = async () => {
@@ -172,15 +185,30 @@ export default function CheckoutPage() {
           zipCode: formData.zipCode.trim(),
           deliveryInstructions: formData.deliveryInstructions.trim(),
         },
-        items: displayItems.map((item) => ({
-          productId: item.productId,
-          name: item.name,
-          image: item.image,
-          price: item.price,
-          discountedPrice: item.discountedPrice || null,
-          variationName: item.variationName || null,
-          quantity: item.quantity,
-        })),
+        items: displayItems.map((item) => {
+          const unitPrice = Number(item.discountedPrice || item.price) || 0;
+          const qty = Number(item.quantity) || 1;
+          const itemTotalPrice = unitPrice * qty;
+
+          const allSelection = item["Your Selection"] || item.yourSelection || "";
+
+          let allAddons = "";
+          const addonsData = item["Addons"] || item.addons;
+          if (Array.isArray(addonsData)) {
+            allAddons = addonsData.join(", ");
+          } else if (addonsData) {
+            allAddons = String(addonsData);
+          }
+
+          return {
+            productId: item.productId || null,
+            product_name: item.name || item.product_name || "",
+            total_price: itemTotalPrice,
+            quantity: qty,
+            all_selection: allSelection,
+            all_addons: allAddons,
+          };
+        }),
         subtotal: subtotal,
         discountAmount: totalSavings,
         deliveryFee: deliveryFee,
@@ -370,8 +398,8 @@ export default function CheckoutPage() {
                 )}
               </h2>
 
-              {/* Items List - Small */}
-              <div className="max-h-[200px] overflow-y-auto space-y-2 mb-4 pr-2">
+              {/* Items List - Detailed like Your Cart */}
+              <div className="space-y-3 mb-4">
                 {displayItems.map((item, index) => {
                   const hasDiscount =
                     item.discountedPrice && item.discountedPrice < item.price;
@@ -379,12 +407,19 @@ export default function CheckoutPage() {
                     ? item.discountedPrice
                     : item.price;
 
+                  const yourSelection =
+                    item["Your Selection"] || item.yourSelection;
+                  const addons = item["Addons"] || item.addons;
+                  const extra =
+                    item["Extra:"] || item["Extra"] || item.extra;
+
                   return (
                     <div
-                      key={index}
-                      className="flex items-center gap-3 bg-zinc-900/30 rounded-lg p-2"
+                      key={item.cartItemId || index}
+                      className="flex gap-3 bg-zinc-900/50 rounded-xl p-3 border border-zinc-800/80"
                     >
-                      <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-800">
+                      {/* Image */}
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-800">
                         <Image
                           src={getImageUrl(item.image)}
                           alt={item.name}
@@ -392,18 +427,105 @@ export default function CheckoutPage() {
                           className="object-cover"
                         />
                       </div>
+
+                      {/* Details */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-white text-sm font-medium truncate">
-                          {item.name}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {item.quantity} × ${displayPrice}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-amber-400 font-semibold text-sm">
-                          ${(displayPrice * item.quantity).toFixed(2)}
-                        </p>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h4 className="text-white text-sm font-semibold truncate">
+                              {item.name}
+                            </h4>
+                            {item.variationName && (
+                              <span className="text-xs text-gray-400 block">
+                                {item.variationName}
+                              </span>
+                            )}
+                            {yourSelection && (
+                              <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed break-words">
+                                {yourSelection}
+                              </p>
+                            )}
+                            {addons && (
+                              <p className="text-[10px] text-amber-400/90 mt-0.5 leading-relaxed break-words">
+                                Addons:{" "}
+                                {Array.isArray(addons)
+                                  ? addons.join(", ")
+                                  : addons}
+                              </p>
+                            )}
+                            {extra && (
+                              <p className="text-[10px] text-amber-400/90 mt-0.5 leading-relaxed break-words">
+                                Extra:{" "}
+                                {Array.isArray(extra)
+                                  ? extra.join(", ")
+                                  : extra}
+                              </p>
+                            )}
+                            {hasDiscount && (
+                              <span className="text-xs text-green-400 font-medium inline-block mt-0.5">
+                                -
+                                {Math.round(
+                                  (1 - item.discountedPrice / item.price) * 100,
+                                )}
+                                %
+                              </span>
+                            )}
+                          </div>
+                          {!isBuyNowMode && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemove(item)}
+                              className="text-gray-500 hover:text-red-400 transition-colors flex-shrink-0 p-1"
+                              title="Remove item"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Quantity and Price row */}
+                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-800/50">
+                          {!isBuyNowMode ? (
+                            <div className="flex items-center gap-1 bg-zinc-800 rounded-lg">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateQuantity(item, item.quantity - 1)
+                                }
+                                className="p-1.5 hover:bg-zinc-700 rounded-l-lg transition-colors text-gray-400 hover:text-white cursor-pointer"
+                              >
+                                <Minus size={13} />
+                              </button>
+                              <span className="text-white text-xs font-semibold w-7 text-center select-none">
+                                {item.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateQuantity(item, item.quantity + 1)
+                                }
+                                className="p-1.5 hover:bg-zinc-700 rounded-r-lg transition-colors text-gray-400 hover:text-white cursor-pointer"
+                              >
+                                <Plus size={13} />
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400 font-medium">
+                              Qty: {item.quantity}
+                            </span>
+                          )}
+
+                          <div className="text-right">
+                            <span className="text-amber-400 font-bold text-sm">
+                              ${(displayPrice * item.quantity).toFixed(2)}
+                            </span>
+                            {hasDiscount && (
+                              <span className="text-[11px] text-gray-500 line-through block">
+                                ${(item.price * item.quantity).toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
@@ -441,11 +563,10 @@ export default function CheckoutPage() {
               <button
                 onClick={handlePlaceOrder}
                 disabled={isProcessing || isOrderCreating}
-                className={`w-full font-bold py-3 px-6 rounded-lg transition-colors duration-200 mt-6 ${
-                  isProcessing || isOrderCreating
-                    ? "bg-zinc-700 text-gray-400 cursor-not-allowed"
-                    : "bg-amber-500 hover:bg-amber-600 text-black"
-                }`}
+                className={`w-full font-bold py-3 px-6 rounded-lg transition-colors duration-200 mt-6 ${isProcessing || isOrderCreating
+                  ? "bg-zinc-700 text-gray-400 cursor-not-allowed"
+                  : "bg-amber-500 hover:bg-amber-600 text-black"
+                  }`}
               >
                 {isProcessing || isOrderCreating ? (
                   <span className="flex items-center justify-center gap-2">
@@ -457,9 +578,6 @@ export default function CheckoutPage() {
                 )}
               </button>
 
-              <p className="text-xs text-gray-500 text-center mt-3">
-                By placing your order, you agree to our Terms and Conditions
-              </p>
             </div>
           </div>
         </div>
