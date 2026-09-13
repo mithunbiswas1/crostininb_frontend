@@ -29,6 +29,8 @@ import {
   clearBuyNowItem,
 } from "@/redux/features/Slice/CartDrawerSlice";
 import { useCreateOrderMutation } from "@/redux/features/orderApi";
+import { useLoginMutation } from "@/redux/features/authApi";
+import { setLogin } from "@/redux/features/Slice/authSlice";
 import { toast } from "sonner";
 
 const getImageUrl = (path) => {
@@ -51,9 +53,10 @@ export default function CheckoutPage() {
   // Delivery type state
   const [deliveryType, setDeliveryType] = useState("pickup");
 
-  // Redux mutation hook
+  // Redux mutation hooks
   const [createOrder, { isLoading: isOrderCreating }] =
     useCreateOrderMutation();
+  const [login] = useLoginMutation();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -175,6 +178,30 @@ export default function CheckoutPage() {
     );
   };
 
+  // Auto-login function for newly created accounts
+  const autoLoginUser = async (email, password) => {
+    try {
+      const loginResult = await login({
+        email: email,
+        password: password,
+      }).unwrap();
+
+      if (loginResult?.data) {
+        dispatch(
+          setLogin({
+            user: loginResult.data.user,
+            token: loginResult.data.accessToken,
+          }),
+        );
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Auto-login failed:", error);
+      return false;
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!validateForm()) {
       return;
@@ -244,25 +271,37 @@ export default function CheckoutPage() {
         dispatch(clearCartsList());
       }
 
-      setIsProcessing(false);
-
       // Check if new user was created
       const isNewUser = response.data.account?.isNewUser || false;
       const accountInfo = response.data.account;
 
-      // Show success message with account info if new user
+      // If new user was created, auto-login and redirect to /orders
       if (isNewUser && accountInfo) {
-        toast.success(
-          `Order placed successfully! A new account has been created. 
-        Login with: ${accountInfo.email || accountInfo.phone} 
-        Password: ${accountInfo.password}`,
+        const loginSuccess = await autoLoginUser(
+          accountInfo.email || formData.email.trim(),
+          accountInfo.password,
         );
 
-        // Redirect to order success with account info
-        router.push(
-          `/order-success?orderNumber=${response.data.order.orderNumber}&isNewUser=true&email=${accountInfo.email}&phone=${accountInfo.phone}`,
-        );
+        setIsProcessing(false);
+
+        if (loginSuccess) {
+          toast.success(
+            "Order placed successfully! You have been logged in automatically.",
+          );
+          router.push("/orders");
+        } else {
+          toast.success(
+            `Order placed successfully! A new account has been created. 
+            Login with: ${accountInfo.email || accountInfo.phone} 
+            Password: ${accountInfo.password}`,
+          );
+          router.push(
+            `/order-success?orderNumber=${response.data.order.orderNumber}&isNewUser=true&email=${accountInfo.email}&phone=${accountInfo.phone}`,
+          );
+        }
       } else {
+        // Existing user or logged-in user
+        setIsProcessing(false);
         toast.success("Order placed successfully!");
         router.push(
           `/order-success?orderNumber=${response.data.order.orderNumber}`,

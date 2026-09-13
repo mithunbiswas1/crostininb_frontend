@@ -505,7 +505,7 @@ export default function ProfilePage() {
                   Change Password
                 </h3>
                 <p className="text-gray-400 text-sm mt-1">
-                  Enter your current password and choose a new one
+                  Default Password: <span className="font-bold">12345678</span>
                 </p>
               </div>
               <button
