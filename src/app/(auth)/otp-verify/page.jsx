@@ -71,7 +71,7 @@ const OtpPage = () => {
             </button>
           </span>
           <Link
-            href="/sign-in"
+            href="/login"
             className="text-primary underline cursor-pointer"
           >
             Change Number

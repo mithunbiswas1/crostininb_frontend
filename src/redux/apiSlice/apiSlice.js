@@ -32,7 +32,7 @@ const baseQueryWithAuth = async (args, api, extraOptions) => {
       }
 
       // redirect
-      window.location.href = "/sign-in";
+      window.location.href = "/login";
     }
   }
 

@@ -47,7 +47,7 @@ const FoodCard = ({ item }) => {
         <h3 className="text-gray-50 text-sm font-medium group-hover:text-amber-400 transition-colors line-clamp-1">
           {item.name}
         </h3>
-
+        {/* 
         <div className="mt-2 flex items-center justify-center gap-2">
           <span className="text-amber-400 font-semibold">${displayPrice}</span>
           {hasDiscount && (
@@ -55,7 +55,7 @@ const FoodCard = ({ item }) => {
               ${originalPrice}
             </span>
           )}
-        </div>
+        </div> */}
       </div>
     </Link>
   );

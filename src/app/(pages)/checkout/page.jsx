@@ -5,7 +5,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
@@ -18,6 +17,8 @@ import {
   Mail,
   Home,
   AlertCircle,
+  Store,
+  Truck,
 } from "lucide-react";
 import { baseUriBackend } from "@/redux/url/url";
 import Input from "@/components/ui/Input";
@@ -46,6 +47,9 @@ export default function CheckoutPage() {
   const { cartsList, buyNowItem } = useSelector((state) => state.cartDrawer);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isBuyNowMode, setIsBuyNowMode] = useState(false);
+
+  // Delivery type state
+  const [deliveryType, setDeliveryType] = useState("pickup");
 
   // Redux mutation hook
   const [createOrder, { isLoading: isOrderCreating }] =
@@ -114,23 +118,30 @@ export default function CheckoutPage() {
     if (!formData.firstName.trim()) {
       errors.firstName = "First name is required";
     }
-    if (!formData.email.trim()) {
-      errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "Please enter a valid email";
-    }
+
     if (!formData.phone.trim()) {
       errors.phone = "Phone number is required";
     } else if (!/^[\d\s\-+()]{10,}$/.test(formData.phone.replace(/\s/g, ""))) {
       errors.phone = "Please enter a valid phone number";
     }
-    if (!formData.addressLine1.trim()) {
-      errors.addressLine1 = "Address is required";
+
+    // Email is required for both pickup and delivery
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Please enter a valid email";
     }
-    if (!formData.zipCode.trim()) {
-      errors.zipCode = "ZIP code is required";
-    } else if (!/^\d{5}(-\d{4})?$/.test(formData.zipCode)) {
-      errors.zipCode = "Please enter a valid ZIP code";
+
+    // Only validate delivery fields if delivery type is "delivery"
+    if (deliveryType === "delivery") {
+      if (!formData.addressLine1.trim()) {
+        errors.addressLine1 = "Address is required";
+      }
+      if (!formData.zipCode.trim()) {
+        errors.zipCode = "ZIP code is required";
+      } else if (!/^\d{5}(-\d{4})?$/.test(formData.zipCode)) {
+        errors.zipCode = "Please enter a valid ZIP code";
+      }
     }
 
     setFormErrors(errors);
@@ -180,11 +191,17 @@ export default function CheckoutPage() {
           phone: formData.phone.trim(),
         },
         deliveryAddress: {
-          addressLine1: formData.addressLine1.trim(),
-          addressLine2: formData.addressLine2.trim(),
-          zipCode: formData.zipCode.trim(),
-          deliveryInstructions: formData.deliveryInstructions.trim(),
+          addressLine1:
+            deliveryType === "delivery" ? formData.addressLine1.trim() : "",
+          addressLine2:
+            deliveryType === "delivery" ? formData.addressLine2.trim() : "",
+          zipCode: deliveryType === "delivery" ? formData.zipCode.trim() : "",
+          deliveryInstructions:
+            deliveryType === "delivery"
+              ? formData.deliveryInstructions.trim()
+              : "",
         },
+        deliveryType: deliveryType,
         items: displayItems.map((item) => {
           const unitPrice = Number(item.discountedPrice || item.price) || 0;
           const qty = Number(item.quantity) || 1;
@@ -283,13 +300,43 @@ export default function CheckoutPage() {
           <span>Back to Menu</span>
         </button>
 
+        {/* Delivery Type Toggle Buttons */}
+        <div className="mb-6">
+          <div className="inline-flex bg-[#111] border border-zinc-800 rounded-xl p-1.5 gap-1.5">
+            <button
+              type="button"
+              onClick={() => setDeliveryType("pickup")}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${deliveryType === "pickup"
+                ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
+                : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                }`}
+            >
+              <Store size={16} />
+              Store Pickup
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeliveryType("delivery")}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${deliveryType === "delivery"
+                ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
+                : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                }`}
+            >
+              <Truck size={16} />
+              Delivery
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Side - Delivery Information */}
           <div className="flex-1">
             <div className="bg-[#111] border border-zinc-800 rounded-2xl p-6">
               <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
                 <MapPin size={20} className="text-amber-400" />
-                Delivery Information
+                {deliveryType === "pickup"
+                  ? "Pickup Information"
+                  : "Delivery Information"}
               </h2>
 
               <div className="space-y-4">
@@ -331,57 +378,62 @@ export default function CheckoutPage() {
                   prefix={<Phone size={16} className="text-gray-400" />}
                 />
 
-                {/* Address Line 1 */}
-                <Input
-                  id="addressLine1"
-                  name="addressLine1"
-                  label="Address Line 1 *"
-                  placeholder="123 Main Street"
-                  value={formData.addressLine1}
-                  onChange={handleInputChange}
-                  error={formErrors.addressLine1}
-                  prefix={<Home size={16} className="text-gray-400" />}
-                />
+                {/* Delivery-only fields */}
+                {deliveryType === "delivery" && (
+                  <>
+                    {/* Address Line 1 */}
+                    <Input
+                      id="addressLine1"
+                      name="addressLine1"
+                      label="Address Line 1 *"
+                      placeholder="123 Main Street"
+                      value={formData.addressLine1}
+                      onChange={handleInputChange}
+                      error={formErrors.addressLine1}
+                      prefix={<Home size={16} className="text-gray-400" />}
+                    />
 
-                {/* Address Line 2 (Optional) */}
-                <Input
-                  id="addressLine2"
-                  name="addressLine2"
-                  label="Address Line 2 (Optional)"
-                  placeholder="Apartment, Suite, Building, Floor"
-                  value={formData.addressLine2}
-                  onChange={handleInputChange}
-                  prefix={<Home size={16} className="text-gray-400" />}
-                />
+                    {/* Address Line 2 (Optional) */}
+                    <Input
+                      id="addressLine2"
+                      name="addressLine2"
+                      label="Address Line 2 (Optional)"
+                      placeholder="Apartment, Suite, Building, Floor"
+                      value={formData.addressLine2}
+                      onChange={handleInputChange}
+                      prefix={<Home size={16} className="text-gray-400" />}
+                    />
 
-                {/* ZIP Code */}
-                <Input
-                  id="zipCode"
-                  name="zipCode"
-                  label="ZIP Code *"
-                  placeholder="10001"
-                  value={formData.zipCode}
-                  onChange={handleInputChange}
-                  error={formErrors.zipCode}
-                />
+                    {/* ZIP Code */}
+                    <Input
+                      id="zipCode"
+                      name="zipCode"
+                      label="ZIP Code *"
+                      placeholder="10001"
+                      value={formData.zipCode}
+                      onChange={handleInputChange}
+                      error={formErrors.zipCode}
+                    />
 
-                {/* Delivery Instructions (Optional) */}
-                <div>
-                  <label
-                    htmlFor="deliveryInstructions"
-                    className="block text-sm font-medium mb-3 text-gray_deep"
-                  >
-                    Delivery Instructions (Optional)
-                  </label>
-                  <textarea
-                    id="deliveryInstructions"
-                    name="deliveryInstructions"
-                    placeholder="Gate code, building entrance, special instructions..."
-                    value={formData.deliveryInstructions}
-                    onChange={handleInputChange}
-                    className="w-full rounded-md border border-border_gray bg-gray-50 text-base focus:outline-none focus:ring-1 focus:ring-primary py-3 px-4 min-h-[80px] resize-y"
-                  />
-                </div>
+                    {/* Delivery Instructions (Optional) */}
+                    <div>
+                      <label
+                        htmlFor="deliveryInstructions"
+                        className="block text-sm font-medium mb-3 text-gray_deep"
+                      >
+                        Delivery Instructions (Optional)
+                      </label>
+                      <textarea
+                        id="deliveryInstructions"
+                        name="deliveryInstructions"
+                        placeholder="Gate code, building entrance, special instructions..."
+                        value={formData.deliveryInstructions}
+                        onChange={handleInputChange}
+                        className="w-full rounded-md border border-border_gray bg-gray-50 text-base focus:outline-none focus:ring-1 focus:ring-primary py-3 px-4 min-h-[80px] resize-y"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

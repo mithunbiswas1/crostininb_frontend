@@ -8,7 +8,6 @@ import SpecialMenu from "./_components/SpecialMenu";
 import TestimonialsSection from "./_components/TestimonialsSection";
 import WhyChooseUs from "./_components/WhyChooseUs";
 import AboutSection from "./_components/AboutSection";
-import OurFeatures from "./_components/OurFeatures";
 import ChefSpecial from "./_components/ChefSpecial";
 
 import { getCardItems } from "@/lib/getItems";

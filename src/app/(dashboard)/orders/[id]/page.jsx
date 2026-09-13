@@ -21,6 +21,7 @@ import {
   XCircle,
   ShoppingBag,
   Home,
+  Store,
 } from "lucide-react";
 
 import {
@@ -76,8 +77,7 @@ const StatusBadge = ({ status, size = "md" }) => {
       className={`inline-flex items-center gap-1.5 rounded-full border font-semibold ${sizeClass} ${config.className}`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
-          status === "pending"
+        className={`h-1.5 w-1.5 rounded-full ${status === "pending"
             ? "bg-yellow-500"
             : status === "confirmed"
               ? "bg-blue-500"
@@ -88,9 +88,27 @@ const StatusBadge = ({ status, size = "md" }) => {
                   : status === "delivered"
                     ? "bg-green-500"
                     : "bg-red-500"
-        }`}
+          }`}
       />
       {config.label}
+    </span>
+  );
+};
+
+// Delivery Type Badge Component
+const DeliveryTypeBadge = ({ deliveryType, size = "md" }) => {
+  const isDelivery = deliveryType === "delivery";
+  const sizeClass = size === "lg" ? "px-4 py-2 text-sm" : "px-3 py-1 text-xs";
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border font-semibold ${sizeClass} ${isDelivery
+          ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
+          : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+        }`}
+    >
+      {isDelivery ? <Truck size={14} /> : <Store size={14} />}
+      {isDelivery ? "Delivery" : "Store Pickup"}
     </span>
   );
 };
@@ -132,19 +150,17 @@ const OrderTimeline = ({ status }) => {
             className="relative flex items-start gap-4 pb-6 last:pb-0"
           >
             <div
-              className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full ${
-                isActive
+              className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full ${isActive
                   ? "bg-amber-500 text-black"
                   : "bg-zinc-700 text-gray-500"
-              }`}
+                }`}
             >
               <Icon size={16} />
             </div>
             <div>
               <p
-                className={`font-medium ${
-                  isActive ? "text-white" : "text-gray-500"
-                }`}
+                className={`font-medium ${isActive ? "text-white" : "text-gray-500"
+                  }`}
               >
                 {step.label}
               </p>
@@ -217,7 +233,7 @@ export default function OrderDetailPage({ params }) {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/dashboard/orders"
             className="inline-flex items-center gap-2 text-gray-400 hover:text-amber-500 transition-colors"
@@ -229,6 +245,7 @@ export default function OrderDetailPage({ params }) {
             Order #{order.orderNumber}
           </h1>
           <StatusBadge status={order.status} size="lg" />
+          <DeliveryTypeBadge deliveryType={order.deliveryType} size="lg" />
         </div>
         {isCancellable && (
           <button
@@ -336,29 +353,50 @@ export default function OrderDetailPage({ params }) {
             </div>
           </div>
 
-          {/* Delivery Address */}
+          {/* Delivery Address / Pickup Info */}
           <div className="bg-[#1a1a1a] rounded-xl border border-zinc-800 p-6">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-              <Home size={20} className="text-amber-500" />
-              Delivery Address
-            </h2>
-            <div className="space-y-2 text-sm">
-              <p className="text-gray-300">
-                {order.deliveryAddress?.addressLine1}
-                {order.deliveryAddress?.addressLine2 && (
-                  <>, {order.deliveryAddress.addressLine2}</>
-                )}
-              </p>
-              <p className="text-gray-400">
-                ZIP: {order.deliveryAddress?.zipCode}
-              </p>
-              {order.deliveryAddress?.deliveryInstructions && (
-                <p className="text-gray-400">
-                  <span className="text-gray-500">Instructions:</span>{" "}
-                  {order.deliveryAddress.deliveryInstructions}
-                </p>
+              {order.deliveryType === "delivery" ? (
+                <>
+                  <Home size={20} className="text-amber-500" />
+                  Delivery Address
+                </>
+              ) : (
+                <>
+                  <Store size={20} className="text-amber-500" />
+                  Store Pickup
+                </>
               )}
-            </div>
+            </h2>
+
+            {order.deliveryType === "delivery" ? (
+              <div className="space-y-2 text-sm">
+                <p className="text-gray-300">
+                  {order.deliveryAddress?.addressLine1}
+                  {order.deliveryAddress?.addressLine2 && (
+                    <>, {order.deliveryAddress.addressLine2}</>
+                  )}
+                </p>
+                <p className="text-gray-400">
+                  ZIP: {order.deliveryAddress?.zipCode}
+                </p>
+                {order.deliveryAddress?.deliveryInstructions && (
+                  <p className="text-gray-400">
+                    <span className="text-gray-500">Instructions:</span>{" "}
+                    {order.deliveryAddress.deliveryInstructions}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2 text-sm">
+                <p className="text-gray-300">
+                  Customer will pick up from store
+                </p>
+                <p className="text-gray-500 text-xs">
+                  No delivery address required for store pickup
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -380,11 +418,15 @@ export default function OrderDetailPage({ params }) {
               Order Details
             </h2>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-gray-400">Order Type</span>
                 <span className="text-white capitalize">
                   {order.orderType?.replace("_", " ")}
                 </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Delivery Type</span>
+                <DeliveryTypeBadge deliveryType={order.deliveryType} />
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Payment Method</span>
@@ -395,13 +437,12 @@ export default function OrderDetailPage({ params }) {
               <div className="flex justify-between">
                 <span className="text-gray-400">Payment Status</span>
                 <span
-                  className={`capitalize ${
-                    order.paymentStatus === "paid"
+                  className={`capitalize ${order.paymentStatus === "paid"
                       ? "text-green-500"
                       : order.paymentStatus === "pending"
                         ? "text-yellow-500"
                         : "text-red-500"
-                  }`}
+                    }`}
                 >
                   {order.paymentStatus}
                 </span>

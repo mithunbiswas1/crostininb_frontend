@@ -35,7 +35,7 @@ const navigation1 = [
     name: "Items",
     href: "#",
     subMenu: [],
-    subColumn: 1,
+    subColumn: 2,
   },
 ];
 
@@ -258,16 +258,28 @@ export default function Navbar() {
                       transition={{ duration: 0.2 }}
                       className="absolute left-1/2 transform -translate-x-1/2 pt-2"
                     >
-                      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl min-w-[220px] overflow-hidden border border-gray-200 dark:border-gray-700">
+                      <div
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700"
+                        style={{
+                          minWidth: item.subColumn > 1 ? `${item.subColumn * 180}px` : "220px",
+                        }}
+                      >
                         <div className="h-1 bg-primary"></div>
-                        <div className="py-2">
+                        <div
+                          className={`py-2 ${item.subColumn > 1 ? "grid" : "flex flex-col"}`}
+                          style={
+                            item.subColumn > 1
+                              ? { gridTemplateColumns: `repeat(${item.subColumn}, minmax(0, 1fr))` }
+                              : undefined
+                          }
+                        >
                           {item.subMenu.map((subItem) => (
                             <Link
                               key={subItem.name}
                               href={subItem.href}
                               className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${pathname === subItem.href
-                                ? "text-primary bg-primary/5"
-                                : "text-gray-700 dark:text-gray-200"
+                                  ? "text-primary bg-primary/5"
+                                  : "text-gray-700 dark:text-gray-200"
                                 }`}
                             >
                               <div className="flex items-center gap-3">
@@ -509,23 +521,32 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.2 }}
-                        className="mt-2 space-y-3 max-h-[300px]"
+                        className="mt-2 space-y-2 max-h-[300px] overflow-y-auto"
                       >
-                        {item.subMenu.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            href={subItem.href}
-                            onClick={() => {
-                              setMobileMenuOpen(false);
-                              if (subItem.isLogout) {
+                        {item.subMenu.map((subItem) =>
+                          subItem.isLogout ? (
+                            <button
+                              key="logout"
+                              onClick={() => {
+                                setMobileMenuOpen(false);
                                 handleLogout();
-                              }
-                            }}
-                            className="block text-md font-light text-gray-50 text-left pl-12"
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
+                              }}
+                              disabled={isLoggingOut}
+                              className="block w-full text-left text-md font-light text-red-400 pl-12 py-1 disabled:opacity-50"
+                            >
+                              {isLoggingOut ? "Logging out..." : subItem.name}
+                            </button>
+                          ) : (
+                            <Link
+                              key={subItem.name}
+                              href={subItem.href}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="block text-md font-light text-gray-50 text-left pl-12 py-1"
+                            >
+                              {subItem.name}
+                            </Link>
+                          )
+                        )}
                       </motion.div>
                     )}
                 </div>

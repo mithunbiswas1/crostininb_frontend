@@ -29,7 +29,7 @@ const Card = ({ item }) => (
         </P>
       </div>
 
-      <div className="flex flex-col justify-center items-center gap-2">
+      {/* <div className="flex flex-col justify-center items-center gap-2">
         {item.variation?.offer_price ? (
           <>
             <span className="text-amber-400 font-semibold text-sm">
@@ -44,7 +44,7 @@ const Card = ({ item }) => (
             ${item.variation?.regular_price || 0}
           </span>
         )}
-      </div>
+      </div> */}
     </div>
   </Link>
 );

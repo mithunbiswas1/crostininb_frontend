@@ -581,93 +581,120 @@ const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
   );
 };
 
-// ==================== ADDON CARD (Section Wise - Dynamic Categories) ====================
-const AddonSection = ({ category, addons, selectedAddons, onSelect, onVariantChange }) => {
+// ==================== ADDON SECTION (Same design as BuildYourPizzaClient) ====================
+const AddonSection = ({
+  category,
+  addons,
+  selectedAddons,
+  onSelect,
+  onVariantChange,
+}) => {
   if (!addons || addons.length === 0) return null;
 
   const [selectedVariants, setSelectedVariants] = useState({});
   const [selectedPlacements, setSelectedPlacements] = useState({});
 
-  // Static pizza placement options
-  const pizzaPlacementOptions = [
-    { name: 'left', label: 'Left' },
-    { name: 'center', label: 'Center' },
-    { name: 'right', label: 'Right' },
-  ];
-
-  // Auto-select default variant for each addon when selected
   useEffect(() => {
     const defaultVariants = {};
     const defaultPlacements = {};
     addons.forEach((addon) => {
       const addonId = addon._id || addon.id;
-      if (addon.variants && addon.variants.length > 0) {
-        const lightVariant =
-          addon.variants.find((v) => v.name === "light") || addon.variants[0];
+      if (addon.variants && Array.isArray(addon.variants) && addon.variants.length > 0) {
+        const normalVariant =
+          addon.variants.find((v) => v.name?.toLowerCase() === "normal") ||
+          addon.variants[0];
         if (!selectedVariants[addonId]) {
-          defaultVariants[addonId] = lightVariant;
-          defaultPlacements[addonId] = 'center';
+          defaultVariants[addonId] = normalVariant;
+          defaultPlacements[addonId] = "whole";
         }
       }
     });
     if (Object.keys(defaultVariants).length > 0) {
-      setSelectedVariants((prev) => ({
-        ...prev,
-        ...defaultVariants,
-      }));
-      setSelectedPlacements((prev) => ({
-        ...prev,
-        ...defaultPlacements,
-      }));
+      setSelectedVariants((prev) => ({ ...prev, ...defaultVariants }));
+      setSelectedPlacements((prev) => ({ ...prev, ...defaultPlacements }));
     }
   }, [addons]);
 
   const handleVariantSelect = (addonId, variant, e) => {
     e.stopPropagation();
-    setSelectedVariants((prev) => ({
-      ...prev,
-      [addonId]: variant,
-    }));
-    // Notify parent about variant change
+    setSelectedVariants((prev) => ({ ...prev, [addonId]: variant }));
     if (onVariantChange) {
-      onVariantChange(addonId, 'variant', variant);
+      onVariantChange(addonId, "variant", variant);
     }
   };
 
   const handlePlacementSelect = (addonId, placement, e) => {
     e.stopPropagation();
-    setSelectedPlacements((prev) => ({
-      ...prev,
-      [addonId]: placement,
-    }));
-    // Notify parent about placement change
+    setSelectedPlacements((prev) => ({ ...prev, [addonId]: placement }));
     if (onVariantChange) {
-      onVariantChange(addonId, 'placement', placement);
+      onVariantChange(addonId, "placement", placement);
     }
   };
 
-  // Format category name
   const formatCategoryName = (cat) => {
-    if (!cat) return "Other";
+    if (!cat) return "Other Toppings";
     return cat
       .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
+  };
+
+  // Placement Circle Component
+  const PlacementCircle = ({ placement, isSelected }) => {
+    const fillColor = isSelected ? "#f59e0b" : "#9ca3af";
+    const bgColor = isSelected ? "#f59e0b" : "transparent";
+    const strokeColor = isSelected ? "#f59e0b" : "#6b7280";
+
+    if (placement === "left") {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
+          <path
+            d="M10 1.5 A 8.5 8.5 0 0 0 10 18.5 Z"
+            fill={fillColor}
+          />
+        </svg>
+      );
+    }
+
+    if (placement === "whole") {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="8.5" fill={fillColor} stroke={strokeColor} strokeWidth="2" />
+        </svg>
+      );
+    }
+
+    if (placement === "right") {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
+          <path
+            d="M10 1.5 A 8.5 8.5 0 0 1 10 18.5 Z"
+            fill={fillColor}
+          />
+        </svg>
+      );
+    }
+
+    return null;
   };
 
   return (
     <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3 capitalize">
+      <h4 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">
         {formatCategoryName(category)}
-      </h3>
+      </h4>
       <div className="grid grid-cols-1 gap-3">
         {addons.map((addon) => {
           const addonId = addon._id || addon.id;
           const isSelected = selectedAddons.some(
             (a) => (a._id || a.id) === addonId,
           );
-          const selectedVariant = selectedVariants[addonId];
-          const selectedPlacement = selectedPlacements[addonId] || 'center';
+          const currentVariant = selectedVariants[addonId];
+          const currentPlacement = selectedPlacements[addonId] || "whole";
+          const hasVariants =
+            addon.variants && Array.isArray(addon.variants) && addon.variants.length > 0;
 
           return (
             <div
@@ -678,9 +705,7 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect, onVariantCha
                 : "border-zinc-700 hover:border-zinc-500"
                 }`}
             >
-              {/* Card Content - Top Row */}
               <div className="flex items-center gap-3 p-3">
-                {/* Image */}
                 <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
                   <Image
                     src={getImageUrl(addon.image)}
@@ -690,15 +715,16 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect, onVariantCha
                     unoptimized
                   />
                 </div>
-
-                {/* Name */}
                 <div className="flex-1 min-w-0">
                   <h4 className="text-white font-medium text-sm line-clamp-1">
                     {addon.name}
                   </h4>
+                  {isSelected && (
+                    <p className="text-[11px] text-amber-400/90 mt-0.5 capitalize">
+                      {currentVariant?.name || "normal"} · {currentPlacement}
+                    </p>
+                  )}
                 </div>
-
-                {/* Selection Indicator */}
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
                     ? "border-amber-500 bg-amber-500"
@@ -709,51 +735,53 @@ const AddonSection = ({ category, addons, selectedAddons, onSelect, onVariantCha
                 </div>
               </div>
 
-              {/* Variants - Bottom Row with Left, Center, Right */}
-              {isSelected && addon.variants && addon.variants.length > 0 && (
+              {isSelected && hasVariants && (
                 <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
-                    {/* Variant buttons (Light, Normal, Extra) */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
                     <div className="flex flex-wrap gap-1.5 flex-1">
-                      {addon.variants.map((variant, vIndex) => {
-                        const isVariantSelected = selectedVariant?.name === variant.name;
-                        const variantPrice = variant.price || 0;
+                      {addon.variants.map((v, vIdx) => {
+                        const isVSelected = currentVariant?.name === v.name;
+                        const vPrice = Number(v.price) || 0;
                         return (
                           <button
-                            key={vIndex}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleVariantSelect(addonId, variant, e);
-                            }}
-                            className={`px-2.5 py-1 rounded text-xs transition-all ${isVariantSelected
+                            key={vIdx}
+                            type="button"
+                            onClick={(e) => handleVariantSelect(addonId, v, e)}
+                            className={`px-2.5 py-1 rounded text-xs transition-all cursor-pointer ${isVSelected
                               ? "bg-amber-500 text-black font-medium"
                               : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
                               }`}
                           >
-                            {variant.name}
+                            <span className="capitalize">{v.name}</span>
 
                           </button>
                         );
                       })}
                     </div>
-
-                    {/* Placement buttons (Left, Center, Right)  Right side */}
                     <div className="flex gap-1.5 flex-shrink-0">
-                      {pizzaPlacementOptions.map((option) => {
-                        const isPlacementSelected = selectedPlacement === option.name;
+                      {[
+                        { name: "left", label: "Left" },
+                        { name: "whole", label: "Whole" },
+                        { name: "right", label: "Right" },
+                      ].map((opt) => {
+                        const isPSelected = currentPlacement === opt.name;
                         return (
                           <button
-                            key={option.name}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePlacementSelect(addonId, option.name, e);
-                            }}
-                            className={`px-2.5 py-1 rounded text-xs transition-all ${isPlacementSelected
-                              ? "bg-amber-500 text-black font-medium"
-                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                            key={opt.name}
+                            type="button"
+                            onClick={(e) =>
+                              handlePlacementSelect(addonId, opt.name, e)
+                            }
+                            className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center ${isPSelected
+                              ? "bg-amber-500/20 border border-amber-500/50"
+                              : "bg-zinc-700/50 border border-transparent hover:bg-zinc-700"
                               }`}
+                            title={opt.label}
                           >
-                            {option.label}
+                            <PlacementCircle
+                              placement={opt.name}
+                              isSelected={isPSelected}
+                            />
                           </button>
                         );
                       })}
@@ -1187,7 +1215,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       const addonWithDetails = {
         ...addon,
         _selectedVariant: defaultVariant,
-        _selectedPlacement: 'center'
+        _selectedPlacement: 'whole'
       };
       setSelectedAddons([...selectedAddons, addonWithDetails]);
     }
@@ -1513,7 +1541,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     if (selectedAddons.length > 0) {
       const addonDetails = selectedAddons.map((a) => {
         const variant = a._selectedVariant || a.variants?.[0]?.name || 'normal';
-        const placement = a._selectedPlacement || 'center';
+        const placement = a._selectedPlacement || 'whole';
         const price = a.variants?.find((v) => v.name === variant)?.price || 0;
         const priceText = price > 0 ? `+$${price}` : "Included";
         const displayVariant = variant.charAt(0).toUpperCase() + variant.slice(1);
@@ -1564,7 +1592,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
 
     const addonsList = selectedAddons.map((a) => {
       const variant = a._selectedVariant || a.variants?.[0]?.name || "normal";
-      const placement = a._selectedPlacement || "center";
+      const placement = a._selectedPlacement || "whole";
       const price = a.variants?.find((v) => v.name === variant)?.price || 0;
       const priceText = price > 0 ? `+$${price}` : "Included";
       const displayVariant = variant.charAt(0).toUpperCase() + variant.slice(1);

@@ -53,7 +53,7 @@ const STATIC_INSTRUCTIONS = {
 
 const PIZZA_PLACEMENT_OPTIONS = [
   { name: "left", label: "Left" },
-  { name: "center", label: "Center" },
+  { name: "whole", label: "Whole" },
   { name: "right", label: "Right" },
 ];
 
@@ -475,7 +475,7 @@ const AddonSection = ({
           addon.variants[0];
         if (!selectedVariants[addonId]) {
           defaultVariants[addonId] = normalVariant;
-          defaultPlacements[addonId] = "center";
+          defaultPlacements[addonId] = "whole";
         }
       }
     });
@@ -509,6 +509,47 @@ const AddonSection = ({
       .join(" ");
   };
 
+  // Placement Circle Component
+  const PlacementCircle = ({ placement, isSelected }) => {
+    const fillColor = isSelected ? "#f59e0b" : "#9ca3af";
+    const bgColor = isSelected ? "#f59e0b" : "transparent";
+    const strokeColor = isSelected ? "#f59e0b" : "#6b7280";
+
+    if (placement === "left") {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
+          <path
+            d="M10 1.5 A 8.5 8.5 0 0 0 10 18.5 Z"
+            fill={fillColor}
+          />
+        </svg>
+      );
+    }
+
+    if (placement === "whole") {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="8.5" fill={fillColor} stroke={strokeColor} strokeWidth="2" />
+        </svg>
+      );
+    }
+
+    if (placement === "right") {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
+          <path
+            d="M10 1.5 A 8.5 8.5 0 0 1 10 18.5 Z"
+            fill={fillColor}
+          />
+        </svg>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="mb-6">
       <h4 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">
@@ -521,7 +562,7 @@ const AddonSection = ({
             (a) => (a._id || a.id) === addonId,
           );
           const currentVariant = selectedVariants[addonId];
-          const currentPlacement = selectedPlacements[addonId] || "center";
+          const currentPlacement = selectedPlacements[addonId] || "whole";
           const hasVariants =
             addon.variants && Array.isArray(addon.variants) && addon.variants.length > 0;
 
@@ -548,6 +589,11 @@ const AddonSection = ({
                   <h4 className="text-white font-medium text-sm line-clamp-1">
                     {addon.name}
                   </h4>
+                  {isSelected && (
+                    <p className="text-[11px] text-amber-400/90 mt-0.5 capitalize">
+                      {currentVariant?.name || "normal"} · {currentPlacement}
+                    </p>
+                  )}
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
@@ -592,12 +638,16 @@ const AddonSection = ({
                             onClick={(e) =>
                               handlePlacementSelect(addonId, opt.name, e)
                             }
-                            className={`px-2.5 py-1 rounded text-xs transition-all cursor-pointer ${isPSelected
-                              ? "bg-amber-500 text-black font-medium"
-                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
+                            className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center ${isPSelected
+                              ? "bg-amber-500/20 border border-amber-500/50"
+                              : "bg-zinc-700/50 border border-transparent hover:bg-zinc-700"
                               }`}
+                            title={opt.label}
                           >
-                            {opt.label}
+                            <PlacementCircle
+                              placement={opt.name}
+                              isSelected={isPSelected}
+                            />
                           </button>
                         );
                       })}
@@ -976,7 +1026,7 @@ export default function BuildYourPizzaClient({
         {
           ...addon,
           _selectedVariant: defaultVariant,
-          _selectedPlacement: "center",
+          _selectedPlacement: "whole",
         },
       ];
     });
@@ -1086,7 +1136,7 @@ export default function BuildYourPizzaClient({
 
     const addonsList = selectedAddons.map((a) => {
       const variant = a._selectedVariant?.name || "normal";
-      const placement = a._selectedPlacement || "center";
+      const placement = a._selectedPlacement || "whole";
       const price = Number(a._selectedVariant?.price) || 0;
       const priceText = price > 0 ? `+$${price}` : "Included";
       const displayVariant =
@@ -1152,7 +1202,7 @@ export default function BuildYourPizzaClient({
 
     const allAddonsData = selectedAddons.map((a) => {
       const v = a._selectedVariant?.name || "normal";
-      const p = a._selectedPlacement || "center";
+      const p = a._selectedPlacement || "whole";
       return `${a.name} (${v} - ${p})`;
     });
 
