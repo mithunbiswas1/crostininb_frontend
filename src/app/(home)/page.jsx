@@ -51,7 +51,7 @@ export default async function Home() {
 
   return (
     <main className="">
-      <section className="relative w-full min-h-[70vh] lg:min-h-screen overflow-hidden">
+      <section className="relative w-full min-h-[70vh] lg:min-h-screen overflow-hidden pt-20 lg:pt-0">
         <BannerVideoBack banners={banners} />
         <Banner banners={banners} />
       </section>
