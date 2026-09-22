@@ -14,6 +14,7 @@ import {
   clearCartsList,
 } from "@/redux/features/Slice/CartDrawerSlice";
 import { useState, useEffect } from "react";
+import InstantOrderModal from "@/components/checkout/InstantOrderModal";
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.png";
@@ -26,6 +27,7 @@ const getImageUrl = (path) => {
 
 export default function CartDrawer() {
   const [mounted, setMounted] = useState(false);
+  const [isInstantOrderOpen, setIsInstantOrderOpen] = useState(false);
   const dispatch = useDispatch();
   const { open, cartsList } = useSelector((state) => state.cartDrawer);
 
@@ -316,16 +318,26 @@ export default function CartDrawer() {
               <span className="text-amber-400">${netTotal.toFixed(2)}</span>
             </div>
 
-            <Link
-              href="/checkout"
-              onClick={handleClose}
-              className="block w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 px-6 rounded-lg text-center transition-colors"
+            <button
+              type="button"
+              onClick={() => {
+                handleClose();
+                setIsInstantOrderOpen(true);
+              }}
+              className="block w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 px-6 rounded-lg text-center transition-colors cursor-pointer"
             >
               Proceed to Checkout
-            </Link>
+            </button>
           </div>
         )}
       </div>
+
+      <InstantOrderModal
+        isOpen={isInstantOrderOpen}
+        onClose={() => setIsInstantOrderOpen(false)}
+        items={cartsList}
+        isCartCheckout={true}
+      />
     </>
   );
 }

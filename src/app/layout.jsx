@@ -51,7 +51,7 @@ export default async function RootLayout({ children }) {
           {children}
           <FixedCartButton />
           <CartDrawer />
-          <Toaster />
+          <Toaster position="top-right" richColors />
         </ReduxProvider>
       </body>
     </html>

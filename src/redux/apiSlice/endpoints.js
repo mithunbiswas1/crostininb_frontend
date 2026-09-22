@@ -17,6 +17,11 @@ export const endpoints = {
     cancelOrder: "cancel-order",
   },
 
+  // Coupon API
+  coupon: {
+    validateCoupon: "validate-coupon",
+  },
+
   //Product API
   product: {
     product: "product",

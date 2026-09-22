@@ -27,7 +27,7 @@ export async function getTestimonialList({
   const res = await fetch(
     `${API_BASE_URL}get-testimonial-list?${params.toString()}`,
     {
-      cache: "no-store",
+      next: { revalidate: 60 },
     },
   );
 

@@ -1,5 +1,3 @@
-// src/app/(pages)/build-your-pizza/page.jsx
-
 import { getAllCrusts } from "@/lib/getCrust";
 import { getAllCheeses } from "@/lib/getCheese";
 import { getAllSauces } from "@/lib/getSauce";

@@ -35,10 +35,10 @@ export async function getAllCategories({
 
 // Get active categories only
 export async function getActiveCategories() {
-  const url = `${API_BASE_URL}get-active-categories?_t=${Date.now()}`;
+  const url = `${API_BASE_URL}get-active-categories`;
 
   const res = await fetch(url, {
-    cache: "no-store",
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {

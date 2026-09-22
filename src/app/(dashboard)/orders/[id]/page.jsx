@@ -78,16 +78,16 @@ const StatusBadge = ({ status, size = "md" }) => {
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${status === "pending"
-            ? "bg-yellow-500"
-            : status === "confirmed"
-              ? "bg-blue-500"
-              : status === "preparing"
-                ? "bg-purple-500"
-                : status === "out_for_delivery"
-                  ? "bg-indigo-500"
-                  : status === "delivered"
-                    ? "bg-green-500"
-                    : "bg-red-500"
+          ? "bg-yellow-500"
+          : status === "confirmed"
+            ? "bg-blue-500"
+            : status === "preparing"
+              ? "bg-purple-500"
+              : status === "out_for_delivery"
+                ? "bg-indigo-500"
+                : status === "delivered"
+                  ? "bg-green-500"
+                  : "bg-red-500"
           }`}
       />
       {config.label}
@@ -103,8 +103,8 @@ const DeliveryTypeBadge = ({ deliveryType, size = "md" }) => {
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border font-semibold ${sizeClass} ${isDelivery
-          ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
-          : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+        ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
+        : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
         }`}
     >
       {isDelivery ? <Truck size={14} /> : <Store size={14} />}
@@ -151,8 +151,8 @@ const OrderTimeline = ({ status }) => {
           >
             <div
               className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full ${isActive
-                  ? "bg-amber-500 text-black"
-                  : "bg-zinc-700 text-gray-500"
+                ? "bg-amber-500 text-black"
+                : "bg-zinc-700 text-gray-500"
                 }`}
             >
               <Icon size={16} />
@@ -331,9 +331,22 @@ export default function OrderDetailPage({ params }) {
                 </div>
                 {order.discountAmount > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Discount</span>
+                    <span className="text-gray-400">Item Discount</span>
                     <span className="text-green-500">
                       -${order.discountAmount?.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                {order.coupon?.discount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">
+                      Coupon{" "}
+                      <span className="text-amber-400 font-mono font-medium">
+                        ({order.coupon.code})
+                      </span>
+                    </span>
+                    <span className="text-green-400 font-medium">
+                      -${order.coupon.discount?.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -438,10 +451,10 @@ export default function OrderDetailPage({ params }) {
                 <span className="text-gray-400">Payment Status</span>
                 <span
                   className={`capitalize ${order.paymentStatus === "paid"
-                      ? "text-green-500"
-                      : order.paymentStatus === "pending"
-                        ? "text-yellow-500"
-                        : "text-red-500"
+                    ? "text-green-500"
+                    : order.paymentStatus === "pending"
+                      ? "text-yellow-500"
+                      : "text-red-500"
                     }`}
                 >
                   {order.paymentStatus}

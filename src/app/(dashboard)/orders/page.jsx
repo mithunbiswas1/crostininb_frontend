@@ -20,6 +20,7 @@ import {
   User,
   ArrowRight,
   ShoppingBag,
+  RotateCcw,
 } from "lucide-react";
 
 import {
@@ -27,6 +28,7 @@ import {
   useCancelOrderMutation,
 } from "@/redux/features/orderApi";
 import { baseUriBackend } from "@/redux/url/url";
+import InstantOrderModal from "@/components/checkout/InstantOrderModal";
 
 // Helper function to get image URL
 const getImageUrl = (path) => {
@@ -87,9 +89,10 @@ const StatusBadge = ({ status }) => {
 };
 
 // Order Card Component
-const OrderCard = ({ order, onCancel }) => {
+const OrderCard = ({ order, onCancel, onReorder }) => {
   const isCancellable =
     order.status !== "cancelled" && order.status !== "delivered";
+  const isDelivered = order.status === "delivered";
   const totalItems = order.items?.length || 0;
 
   return (
@@ -191,15 +194,26 @@ const OrderCard = ({ order, onCancel }) => {
             View Details
             <ArrowRight size={14} />
           </Link>
-          {isCancellable && (
-            <button
-              onClick={() => onCancel(order.id)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors"
-            >
-              <XCircle size={14} />
-              Cancel Order
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            {isDelivered && (
+              <button
+                onClick={() => onReorder(order)}
+                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-amber-500 border border-amber-500/30 rounded-lg hover:bg-amber-500/10 transition-colors"
+              >
+                <RotateCcw size={14} />
+                Order Same Item Again
+              </button>
+            )}
+            {isCancellable && (
+              <button
+                onClick={() => onCancel(order.id)}
+                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors"
+              >
+                <XCircle size={14} />
+                Cancel Order
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -209,6 +223,8 @@ const OrderCard = ({ order, onCancel }) => {
 export default function CustomerOrdersPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
+  const [isInstantOrderOpen, setIsInstantOrderOpen] = useState(false);
+  const [instantOrderItems, setInstantOrderItems] = useState([]);
 
   // RTK Queries & Mutations
   const { data, isLoading, refetch } = useGetOrdersByUserQuery({ page, limit });
@@ -230,6 +246,39 @@ export default function CustomerOrdersPage() {
       console.error("Error cancelling order:", error);
       toast.error(error?.data?.message || "Failed to cancel order.");
     }
+  };
+
+  // Open the same instant-order checkout modal used from item pages,
+  // pre-filled with this order's items - it places a fresh order directly,
+  // without touching the cart. Order line items store price already
+  // multiplied by their quantity, so it's divided back down to a per-unit
+  // price for the modal.
+  const handleReorder = (order) => {
+    const items = order.items || [];
+    if (items.length === 0) return;
+
+    const mappedItems = items.map((item, index) => {
+      const quantity = Number(item.quantity) || 1;
+      const lineTotal = Number(item.price) || 0;
+      const unitPrice = quantity > 0 ? lineTotal / quantity : lineTotal;
+
+      return {
+        cartItemId: `reorder-${order.id}-${item.productId || index}`,
+        productId: item.productId,
+        variationName: item.variationName || null,
+        name: item.name || item.product_name,
+        image: item.image,
+        price: unitPrice,
+        quantity,
+        "Your Selection": item.all_selection || null,
+        yourSelection: item.all_selection || null,
+        Addons: item.all_addons || null,
+        addons: item.all_addons || null,
+      };
+    });
+
+    setInstantOrderItems(mappedItems);
+    setIsInstantOrderOpen(true);
   };
 
   // Handle page change
@@ -292,6 +341,7 @@ export default function CustomerOrdersPage() {
             key={order.id}
             order={order}
             onCancel={handleCancelOrder}
+            onReorder={handleReorder}
           />
         ))}
       </div>
@@ -318,6 +368,12 @@ export default function CustomerOrdersPage() {
           </button>
         </div>
       )}
+
+      <InstantOrderModal
+        isOpen={isInstantOrderOpen}
+        onClose={() => setIsInstantOrderOpen(false)}
+        items={instantOrderItems}
+      />
     </div>
   );
 }

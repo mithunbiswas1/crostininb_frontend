@@ -11,6 +11,7 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import { Search } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -21,6 +22,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { setLogout } from "@/redux/features/Slice/authSlice";
 import { toast } from "sonner";
 import { useLogoutMutation } from "@/redux/features/profileApi";
+import { baseUriBackend } from "@/redux/url/url";
+import SearchModal from "@/components/shared/SearchModal";
+
+const getCategoryImageUrl = (image) => {
+  if (!image || image === "default-category.png") {
+    return "/home/special_menu/pizzas.png";
+  }
+  return `${baseUriBackend}${image.replace(/^\/+/, "")}`;
+};
 
 const navigation1 = [
   {
@@ -29,13 +39,9 @@ const navigation1 = [
   },
   {
     name: "Menu",
-    href: "/menu",
-  },
-  {
-    name: "Items",
-    href: "#",
+    href: "menu",
     subMenu: [],
-    subColumn: 2,
+    subColumn: 4,
   },
 ];
 
@@ -87,6 +93,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Logout mutation
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
@@ -103,6 +110,7 @@ export default function Navbar() {
         const subMenuItems = categoryData.map((category) => ({
           name: category.name,
           href: `/menu/${category.slug}`,
+          image: category.image,
         }));
 
         setCategories(subMenuItems);
@@ -117,7 +125,7 @@ export default function Navbar() {
 
   // Update navigation1 with dynamic submenu
   const updatedNavigation1 = navigation1.map((item) => {
-    if (item.name === "Items") {
+    if (item.name === "Menu") {
       return {
         ...item,
         subMenu: categories,
@@ -256,12 +264,12 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute left-1/2 transform -translate-x-1/2 pt-2"
+                      className="absolute transform -translate-x-1/15 pt-2"
                     >
                       <div
                         className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700"
                         style={{
-                          minWidth: item.subColumn > 1 ? `${item.subColumn * 180}px` : "220px",
+                          minWidth: item.subColumn > 1 ? `${item.subColumn * 280}px` : "220px",
                         }}
                       >
                         <div className="h-1 bg-primary"></div>
@@ -278,8 +286,8 @@ export default function Navbar() {
                               key={subItem.name}
                               href={subItem.href}
                               className={`block px-6 py-3 text-sm hover:bg-primary/10 transition-colors duration-200 ${pathname === subItem.href
-                                  ? "text-primary bg-primary/5"
-                                  : "text-gray-700 dark:text-gray-200"
+                                ? "text-primary bg-primary/5"
+                                : "text-gray-700 dark:text-gray-200"
                                 }`}
                             >
                               <div className="flex items-center gap-3">
@@ -294,6 +302,20 @@ export default function Navbar() {
                   )}
               </div>
             ))}
+
+
+            {/* Search */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className={`font-bold flex justify-center items-center gap-2 p-2 rounded-full transition-colors duration-300 ${isScrolled
+                ? "text-black hover:text-secondary"
+                : "text-gray-50 hover:text-primary"
+                }`}
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" /> Search
+            </button>
           </div>
 
           {/* Logo - Center */}
@@ -310,8 +332,19 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex lg:hidden">
+          {/* Mobile Search + Menu Buttons */}
+          <div className="flex lg:hidden items-center">
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="inline-flex items-center justify-center rounded-md p-3"
+              aria-label="Search"
+            >
+              <Search
+                aria-hidden="true"
+                className={`${isScrolled ? "text-black" : "text-gray-50"} h-5 w-5`}
+              />
+            </button>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
@@ -599,6 +632,8 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }

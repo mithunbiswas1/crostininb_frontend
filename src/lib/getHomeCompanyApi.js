@@ -39,7 +39,7 @@ export async function getHomeCompanyList({
   const res = await fetch(
     `${API_BASE_URL}get-home-company-list?${params.toString()}`,
     {
-      cache: "no-store", // Revalidate every hour
+      next: { revalidate: 60 },
     },
   );
 

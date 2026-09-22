@@ -16,6 +16,10 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+// Endpoints where a 401 means "wrong credentials", not "session expired" -
+// they must not trigger the global logout/redirect below.
+const AUTH_ENDPOINTS_SKIP_REDIRECT = ["login", "register", "new-otp", "otp-verify"];
+
 // CUSTOM BASE QUERY WITH AUTH HANDLING
 const baseQueryWithAuth = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
@@ -24,8 +28,12 @@ const baseQueryWithAuth = async (args, api, extraOptions) => {
   if (result?.error) {
     const status = result.error.status;
     const data = result.error.data;
+    const url = typeof args === "string" ? args : args?.url;
+    const isAuthEndpoint = AUTH_ENDPOINTS_SKIP_REDIRECT.some((path) =>
+      url?.includes(path),
+    );
 
-    if (status === 401 || data?.error === "Unauthenticated.") {
+    if (!isAuthEndpoint && (status === 401 || data?.error === "Unauthenticated.")) {
       // remove token
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
@@ -53,6 +61,7 @@ export const apiSlice = createApi({
     "ProductReviews",
     "Tracking",
     "Order",
+    "Coupon",
   ],
   endpoints: () => ({}),
 });

@@ -1,10 +1,10 @@
-// src/components/auth/LoginModal.jsx
+// src/components/auth/RegistrationModal.jsx
 
 "use client";
 
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Eye, EyeOff, Lock, Phone as PhoneIcon, X } from "lucide-react";
+import { Eye, EyeOff, Lock, Phone as PhoneIcon, User, X } from "lucide-react";
 import { toast } from "sonner";
 import Input from "@/components/ui/Input";
 import {
@@ -14,20 +14,24 @@ import {
 import { setLogin } from "@/redux/features/Slice/authSlice";
 import { generateUsernameFromPhone } from "@/lib/authHelpers";
 
-const LoginModal = ({ isOpen, onClose, onSuccess, onSwitchToRegister }) => {
+const RegistrationModal = ({ isOpen, onClose, onSuccess, onSwitchToLogin }) => {
   const dispatch = useDispatch();
 
-  const [formData, setFormData] = useState({ phone: "", password: "" });
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phone: "",
+    password: "",
+  });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const [login] = useLoginMutation();
   const [registration] = useRegistrationMutation();
+  const [login] = useLoginMutation();
 
   useEffect(() => {
     if (isOpen) {
-      setFormData({ phone: "", password: "" });
+      setFormData({ fullName: "", phone: "", password: "" });
       setErrors({});
     }
   }, [isOpen]);
@@ -42,20 +46,10 @@ const LoginModal = ({ isOpen, onClose, onSuccess, onSwitchToRegister }) => {
     const newErrors = {};
     if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
     if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const loginAndFinish = async (phone, password, successMessage) => {
-    const result = await login({ phone, password }).unwrap();
-    dispatch(
-      setLogin({
-        user: result.data.user,
-        token: result.data.accessToken,
-      }),
-    );
-    toast.success(successMessage);
-    onSuccess?.(result.data.user);
   };
 
   const handleSubmit = async (e) => {
@@ -64,37 +58,33 @@ const LoginModal = ({ isOpen, onClose, onSuccess, onSwitchToRegister }) => {
 
     const phone = formData.phone.trim();
     const { password } = formData;
+    const fullName = formData.fullName.trim() || "No Name";
 
     setSubmitting(true);
     try {
-      await loginAndFinish(phone, password, "Welcome back!");
-    } catch (err) {
-      if (err?.status === 404) {
-        // No account exists for this phone yet - register one automatically.
-        try {
-          await registration({
-            userName: generateUsernameFromPhone(phone),
-            fullName: "No Name",
-            phone,
-            password,
-            role: "customer",
-          }).unwrap();
+      await registration({
+        userName: generateUsernameFromPhone(phone),
+        fullName,
+        phone,
+        password,
+        role: "customer",
+      }).unwrap();
 
-          await loginAndFinish(phone, password, "Account created and logged in!");
-        } catch (regErr) {
-          toast.error(
-            regErr?.data?.message ||
-              regErr?.data?.errors?.[0] ||
-              "Could not create an account. Please try again.",
-          );
-        }
-      } else {
-        toast.error(
-          err?.data?.message ||
-            err?.data?.errors?.[0] ||
-            "Login failed. Please try again.",
-        );
-      }
+      const result = await login({ phone, password }).unwrap();
+      dispatch(
+        setLogin({
+          user: result.data.user,
+          token: result.data.accessToken,
+        }),
+      );
+      toast.success(`Welcome, ${fullName}!`);
+      onSuccess?.(result.data.user);
+    } catch (err) {
+      toast.error(
+        err?.data?.message ||
+          err?.data?.errors?.[0] ||
+          "Registration failed. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -118,15 +108,25 @@ const LoginModal = ({ isOpen, onClose, onSuccess, onSwitchToRegister }) => {
         )}
 
         <h2 className="text-white text-xl font-semibold mb-1">
-          Login to continue
+          Create an account
         </h2>
         <p className="text-gray-400 text-sm mb-6">
-          Please login so we can confirm your order.
+          Just your phone and a password - name is optional.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            id="login-phone"
+            id="register-fullName"
+            name="fullName"
+            label="Full Name (optional)"
+            placeholder="No Name"
+            value={formData.fullName}
+            onChange={handleChange}
+            prefix={<User size={16} className="text-gray-400" />}
+          />
+
+          <Input
+            id="register-phone"
             name="phone"
             label="Phone Number *"
             type="tel"
@@ -138,11 +138,11 @@ const LoginModal = ({ isOpen, onClose, onSuccess, onSwitchToRegister }) => {
           />
 
           <Input
-            id="login-password"
+            id="register-password"
             name="password"
             label="Password *"
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
+            placeholder="Min. 6 characters"
             value={formData.password}
             onChange={handleChange}
             error={errors.password}
@@ -167,18 +167,18 @@ const LoginModal = ({ isOpen, onClose, onSuccess, onSwitchToRegister }) => {
                 : "bg-amber-500 hover:bg-amber-600 text-black"
             }`}
           >
-            {submitting ? "Please wait..." : "Login"}
+            {submitting ? "Please wait..." : "Create Account"}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-400">
-          Don&apos;t have an account?{" "}
+          Already have an account?{" "}
           <button
             type="button"
-            onClick={onSwitchToRegister}
+            onClick={onSwitchToLogin}
             className="text-amber-400 hover:underline font-medium"
           >
-            Register
+            Login
           </button>
         </p>
       </div>
@@ -186,4 +186,4 @@ const LoginModal = ({ isOpen, onClose, onSuccess, onSwitchToRegister }) => {
   );
 };
 
-export default LoginModal;
+export default RegistrationModal;

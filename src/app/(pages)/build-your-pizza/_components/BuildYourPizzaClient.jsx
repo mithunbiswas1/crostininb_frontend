@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -12,10 +12,14 @@ import {
   Plus,
   Minus,
   SlidersHorizontal,
+  X,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { baseUriBackend } from "@/redux/url/url";
 import { singleAddToCartsList } from "@/redux/features/Slice/CartDrawerSlice";
+import InstantOrderModal from "@/components/checkout/InstantOrderModal";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 // Helper function to get image URL
 const getImageUrl = (path) => {
@@ -57,58 +61,253 @@ const PIZZA_PLACEMENT_OPTIONS = [
   { name: "right", label: "Right" },
 ];
 
-// ==================== CRUST SELECTOR ====================
-const CrustSelector = ({ crusts, selectedCrust, onSelect }) => {
-  if (!crusts || crusts.length === 0) return null;
+// ==================== OPTION PICKER MODAL (Crust / Sauce / Cheese) ====================
+// Compact trigger button + full-screen picker: click the button, pick one
+// option (and a light/normal/extra variant if it has any) at the bottom,
+// tap Select to confirm.
+const OptionTrigger = ({ label, required, image, name, variant, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="w-full flex items-center gap-3 bg-zinc-800/50 border border-zinc-700 hover:border-amber-500/50 rounded-lg p-2.5 transition-all text-left mb-4 cursor-pointer"
+  >
+    <div className="relative w-11 h-11 rounded-md overflow-hidden bg-zinc-700 flex-shrink-0">
+      {image ? (
+        <Image
+          src={getImageUrl(image)}
+          alt={name || label}
+          fill
+          className="object-cover"
+          unoptimized
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-[8px] text-zinc-500">
+          N/A
+        </div>
+      )}
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+        {label} {required && <span className="text-red-500">*</span>}
+      </p>
+      <p className="text-white font-medium text-sm truncate">
+        {name || "Select"}
+        {variant ? ` (${variant})` : ""}
+      </p>
+    </div>
+    <span className="flex items-center gap-0.5 text-amber-400 text-xs font-semibold flex-shrink-0">
+      Change
+      <ChevronRight size={14} />
+    </span>
+  </button>
+);
+
+const PizzaOptionModal = ({
+  isOpen,
+  onClose,
+  title,
+  options,
+  selectedId,
+  selectedVariant,
+  onConfirm,
+}) => {
+  const [draftId, setDraftId] = useState(selectedId);
+  const [draftVariant, setDraftVariant] = useState(selectedVariant);
+
+  useBodyScrollLock(isOpen);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDraftId(selectedId);
+      setDraftVariant(selectedVariant);
+    }
+  }, [isOpen, selectedId, selectedVariant]);
+
+  if (!isOpen) return null;
+
+  const draftOption = options.find((o) => o.id === draftId);
+  const variants = draftOption?.variants || [];
+
+  const handlePick = (option) => {
+    setDraftId(option.id);
+    if (option.variants && option.variants.length > 0) {
+      const firstV =
+        typeof option.variants[0] === "object"
+          ? option.variants[0].name
+          : option.variants[0];
+      const match = option.variants.find(
+        (v) => (typeof v === "object" ? v.name : v) === draftVariant,
+      );
+      setDraftVariant(
+        match ? (typeof match === "object" ? match.name : match) : firstV,
+      );
+    } else {
+      setDraftVariant(null);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (!draftOption) return;
+    onConfirm(draftOption, draftVariant);
+    onClose();
+  };
 
   return (
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">
-        Choose Crust <span className="text-red-500">*</span>
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {crusts.map((crust) => {
-          const crustId = crust._id || crust.id;
-          const selectedId = selectedCrust?._id || selectedCrust?.id;
-          const isSelected = crustId === selectedId;
+    <div className="fixed inset-0 z-70 flex items-end sm:items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-[#111] border border-zinc-800 sm:rounded-2xl rounded-t-2xl w-full sm:max-w-lg max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+          <h3 className="text-white font-semibold">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-500 hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-          return (
-            <button
-              key={crustId}
-              type="button"
-              onClick={() => onSelect(crust)}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all text-left cursor-pointer ${isSelected
-                ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                : "border-zinc-700 hover:border-zinc-500"
-                }`}
-            >
-              <div className="flex flex-col">
-                <div className="flex items-start justify-between p-3">
-                  <h4 className="text-white font-medium text-sm line-clamp-1 flex-1 mr-2">
-                    {crust.name}
-                  </h4>
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected
-                      ? "border-amber-500 bg-amber-500"
-                      : "border-zinc-600"
+        <div className="overflow-y-auto p-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            {options.map((option) => {
+              const isSelected = option.id === draftId;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handlePick(option)}
+                  className={`flex flex-col items-center gap-1.5 rounded-lg border-2 p-2 transition-all cursor-pointer ${isSelected
+                    ? "border-amber-500 bg-amber-500/10"
+                    : "border-zinc-700 hover:border-zinc-500"
+                    }`}
+                >
+                  <div className="relative w-14 h-14 rounded-md overflow-hidden bg-zinc-700">
+                    {option.image ? (
+                      <Image
+                        src={getImageUrl(option.image)}
+                        alt={option.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[9px] text-zinc-500">
+                        N/A
+                      </div>
+                    )}
+                    {isSelected && (
+                      <div className="absolute top-0.5 right-0.5 bg-amber-500 rounded-full p-0.5">
+                        <Check size={10} className="text-black" />
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-gray-300 text-center line-clamp-2">
+                    {option.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="border-t border-zinc-800 p-4 space-y-3">
+          {variants.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {variants.map((v) => {
+                const vName = typeof v === "object" ? v.name : v;
+                const vPrice =
+                  typeof v === "object"
+                    ? v.price
+                    : draftOption?.variantPrices?.[v] || 0;
+                const isSelected = draftVariant === vName;
+                return (
+                  <button
+                    key={vName}
+                    type="button"
+                    onClick={() => setDraftVariant(vName)}
+                    className={`px-3 py-1.5 rounded-lg text-xs capitalize transition-all cursor-pointer ${isSelected
+                        ? "bg-amber-500 text-black font-medium"
+                        : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
                       }`}
                   >
-                    {isSelected && <Check size={12} className="text-black" />}
-                  </div>
-                </div>
-                <div className="relative w-full aspect-[4/3] bg-zinc-700">
-                  <Image
-                    src={getImageUrl(crust.image)}
-                    alt={crust.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-              </div>
-            </button>
-          );
-        })}
+                    {vName} {vPrice > 0 ? `(+$${vPrice})` : ""}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={!draftOption}
+            className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-zinc-700 disabled:text-gray-400 text-black font-bold py-3 rounded-lg transition-all cursor-pointer"
+          >
+            Select
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==================== MULTI-SELECT MODAL (Toppings / Addons) ====================
+// Compact trigger button + full-screen modal for multi-select sections.
+// Selections apply immediately (same handlers as before); "Done" just closes.
+const SectionTrigger = ({ icon, label, summary, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="w-full flex items-center gap-3 bg-zinc-800/80 border border-zinc-700 hover:border-amber-500/50 rounded-lg px-3 py-2.5 transition-all text-left mb-4 cursor-pointer"
+  >
+    {icon}
+    <div className="flex-1 min-w-0">
+      <p className="text-white font-medium text-sm">{label}</p>
+      {summary && <p className="text-[11px] text-amber-400 mt-0.5">{summary}</p>}
+    </div>
+    <span className="flex items-center gap-0.5 text-amber-400 text-xs font-semibold flex-shrink-0">
+      {summary ? "Edit" : "Add"}
+      <ChevronRight size={14} />
+    </span>
+  </button>
+);
+
+const MultiSelectModal = ({ isOpen, onClose, title, children }) => {
+  useBodyScrollLock(isOpen);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-70 flex items-end sm:items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-[#111] border border-zinc-800 sm:rounded-2xl rounded-t-2xl w-full sm:max-w-lg max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+          <h3 className="text-white font-semibold">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-500 hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto p-4">{children}</div>
+
+        <div className="border-t border-zinc-800 p-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-lg transition-all cursor-pointer"
+          >
+            Done
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -119,11 +318,11 @@ const SizeSelector = ({ sizes, selectedSize, onSelect, selectedCrust }) => {
   if (!sizes || sizes.length === 0) return null;
 
   return (
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">
+    <div className="mb-4">
+      <h3 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
         Select Size <span className="text-red-500">*</span>
       </h3>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {sizes.map((size, index) => {
           const sizeKey = size.name.toLowerCase();
           const isSizeAvailable =
@@ -138,269 +337,24 @@ const SizeSelector = ({ sizes, selectedSize, onSelect, selectedCrust }) => {
               type="button"
               onClick={() => isSizeAvailable && onSelect(size)}
               disabled={!isSizeAvailable}
-              className={`px-6 py-3 rounded-xl text-sm font-medium transition-all min-w-[100px] text-center ${!isSizeAvailable
+              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all min-w-[72px] text-center ${!isSizeAvailable
                 ? "bg-zinc-800/30 text-gray-600 cursor-not-allowed border border-zinc-700/50 opacity-40"
                 : isSelected
-                  ? "bg-amber-500 text-black shadow-lg shadow-amber-500/30 scale-105 cursor-pointer"
+                  ? "bg-amber-500 text-black shadow-md shadow-amber-500/30 cursor-pointer"
                   : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700 cursor-pointer"
                 }`}
             >
               <div className="font-bold">{size.name}</div>
-              <div className="text-xs opacity-80">${size.price}</div>
+              <div className="text-[10px] opacity-80">${size.price}</div>
             </button>
           );
         })}
       </div>
       {selectedCrust && (
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-[10px] text-gray-500 mt-1.5">
           Sizes enabled are based on selected crust ({selectedCrust.name})
         </p>
       )}
-    </div>
-  );
-};
-
-// ==================== SAUCE SELECTOR ====================
-const SauceSelector = ({
-  sauces,
-  selectedSauce,
-  onSelect,
-  selectedVariant,
-  onVariantSelect,
-}) => {
-  if (!sauces || sauces.length === 0) return null;
-
-  const getVariantPrice = (sauce, variant) => {
-    if (sauce?.variant_prices && sauce.variant_prices[variant] !== undefined) {
-      return Number(sauce.variant_prices[variant]) || 0;
-    }
-    return 0;
-  };
-
-  return (
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">Sauces</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {sauces.map((sauce) => {
-          const sauceId = sauce._id || sauce.id;
-          const isSelected =
-            (selectedSauce?._id || selectedSauce?.id) === sauceId;
-          const variantKeys = sauce.variants
-            ? Object.keys(sauce.variants).filter(
-              (key) => sauce.variants[key] === true,
-            )
-            : [];
-
-          return (
-            <div
-              key={sauceId}
-              onClick={() => onSelect(sauce)}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${isSelected
-                ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                : "border-zinc-700 hover:border-zinc-500"
-                }`}
-            >
-              <div className="flex items-center gap-3 p-3">
-                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
-                  <Image
-                    src={getImageUrl(sauce.image)}
-                    alt={sauce.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-medium text-sm line-clamp-1">
-                    {sauce.name}
-                  </h4>
-                </div>
-                <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
-                    ? "border-amber-500 bg-amber-500"
-                    : "border-zinc-600"
-                    }`}
-                >
-                  {isSelected && <Check size={12} className="text-black" />}
-                </div>
-              </div>
-
-              {isSelected && variantKeys.length > 0 && (
-                <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {variantKeys.map((variant) => {
-                      const isVariantSelected = selectedVariant === variant;
-                      const variantPrice = getVariantPrice(sauce, variant);
-                      return (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onVariantSelect(variant);
-                          }}
-                          className={`px-2.5 py-1 rounded text-xs transition-all cursor-pointer ${isVariantSelected
-                            ? "bg-amber-500 text-black font-medium"
-                            : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
-                            }`}
-                        >
-                          <span className="capitalize">{variant}</span>
-
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-// ==================== CHEESE SELECTOR ====================
-const CheeseSelector = ({
-  cheeses,
-  selectedCheese,
-  onSelect,
-  selectedVariant,
-  onVariantSelect,
-}) => {
-  if (!cheeses || cheeses.length === 0) return null;
-
-  const getVariantPrice = (cheese, variant) => {
-    if (
-      cheese?.variant_prices &&
-      cheese.variant_prices[variant] !== undefined
-    ) {
-      return Number(cheese.variant_prices[variant]) || 0;
-    }
-    return 0;
-  };
-
-  const noCheeseOption = {
-    id: "no-cheese",
-    name: "No Cheese",
-    image: null,
-    isNoCheese: true,
-  };
-
-  const allOptions = [...cheeses, noCheeseOption];
-
-  return (
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">Cheeses</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {allOptions.map((cheese) => {
-          const isNoCheese = cheese.isNoCheese;
-          const cheeseId = isNoCheese ? "no-cheese" : cheese._id || cheese.id;
-          const isSelected = isNoCheese
-            ? selectedCheese === "no-cheese"
-            : (selectedCheese?._id || selectedCheese?.id) === cheeseId;
-
-          const variantKeys =
-            !isNoCheese && cheese.variants
-              ? Object.keys(cheese.variants).filter(
-                (key) => cheese.variants[key] === true,
-              )
-              : [];
-
-          return (
-            <div
-              key={cheeseId}
-              onClick={() => {
-                if (isNoCheese) {
-                  onSelect("no-cheese");
-                  onVariantSelect(null);
-                } else {
-                  onSelect(cheese);
-                  if (cheese.variants) {
-                    const keys = Object.keys(cheese.variants).filter(
-                      (k) => cheese.variants[k] === true,
-                    );
-                    if (keys.length > 0) {
-                      onVariantSelect(keys[0]);
-                    }
-                  }
-                }
-              }}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${isSelected
-                ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                : "border-zinc-700 hover:border-zinc-500"
-                } ${isNoCheese ? "bg-zinc-800/30" : ""}`}
-            >
-              <div className="flex flex-col">
-                <div className="flex items-start justify-between p-3">
-                  <h4
-                    className={`text-white font-medium text-sm line-clamp-1 flex-1 mr-2 ${isNoCheese ? "text-gray-400" : ""
-                      }`}
-                  >
-                    {cheese.name}
-                  </h4>
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected
-                      ? "border-amber-500 bg-amber-500"
-                      : "border-zinc-600"
-                      }`}
-                  >
-                    {isSelected && <Check size={12} className="text-black" />}
-                  </div>
-                </div>
-
-                {!isNoCheese && cheese.image && (
-                  <div className="relative w-full aspect-[4/3] bg-zinc-700">
-                    <Image
-                      src={getImageUrl(cheese.image)}
-                      alt={cheese.name}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                )}
-
-                {isNoCheese && (
-                  <div className="w-full aspect-[4/3] bg-zinc-800/30 flex items-center justify-center border-t border-zinc-700/30">
-                    <span className="text-zinc-500 text-xs">
-                      No cheese selected
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {!isNoCheese && isSelected && variantKeys.length > 0 && (
-                <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {variantKeys.map((variant) => {
-                      const isVariantSelected = selectedVariant === variant;
-                      const variantPrice = getVariantPrice(cheese, variant);
-                      return (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onVariantSelect(variant);
-                          }}
-                          className={`px-2.5 py-1 rounded text-xs transition-all cursor-pointer ${isVariantSelected
-                            ? "bg-amber-500 text-black font-medium"
-                            : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
-                            }`}
-                        >
-                          <span className="capitalize">{variant}</span>
-
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
 };
@@ -410,11 +364,11 @@ const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
   if (!seasonings || seasonings.length === 0) return null;
 
   return (
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">
+    <div className="mb-4">
+      <h3 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
         Choose Seasonings
       </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {seasonings.map((seasoning, index) => {
           const isSelected = selectedSeasonings.some(
             (s) => s.name === seasoning.name,
@@ -430,17 +384,17 @@ const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
                 : "border-zinc-700 hover:border-zinc-500"
                 }`}
             >
-              <div className="flex items-center justify-between p-4">
-                <h4 className="text-white font-medium text-sm flex-1 mr-2">
+              <div className="flex items-center justify-between px-3 py-2.5">
+                <h4 className="text-white font-medium text-xs flex-1 mr-2">
                   {seasoning.name}
                 </h4>
                 <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
+                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
                     ? "border-amber-500 bg-amber-500"
                     : "border-zinc-600"
                     }`}
                 >
-                  {isSelected && <Check size={12} className="text-black" />}
+                  {isSelected && <Check size={10} className="text-black" />}
                 </div>
               </div>
             </button>
@@ -451,213 +405,287 @@ const SeasoningSelector = ({ seasonings, selectedSeasonings, onSelect }) => {
   );
 };
 
-// ==================== ADDON SECTION ====================
-const AddonSection = ({
-  category,
-  addons,
-  selectedAddons,
-  onSelect,
+// ==================== PLACEMENT & TOPPINGS MODAL ====================
+const PlacementCircle = ({ placement, isSelected }) => {
+  const fillColor = isSelected ? "#f59e0b" : "#9ca3af";
+  const strokeColor = isSelected ? "#f59e0b" : "#6b7280";
+
+  if (placement === "left") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
+        <path d="M10 1.5 A 8.5 8.5 0 0 0 10 18.5 Z" fill={fillColor} />
+      </svg>
+    );
+  }
+
+  if (placement === "whole") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="8.5" fill={fillColor} stroke={strokeColor} strokeWidth="2" />
+      </svg>
+    );
+  }
+
+  if (placement === "right") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
+        <path d="M10 1.5 A 8.5 8.5 0 0 1 10 18.5 Z" fill={fillColor} />
+      </svg>
+    );
+  }
+
+  return null;
+};
+
+const formatCategoryName = (cat) => {
+  if (!cat) return "Other Toppings";
+  return cat
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+};
+
+const ToppingsModal = ({
+  isOpen,
+  onClose,
+  groupedAddons = {},
+  selectedAddons = [],
+  onSelectAddon,
   onVariantChange,
+  onClearAll,
+  totalAddonsPrice = 0,
 }) => {
-  if (!addons || addons.length === 0) return null;
+  useBodyScrollLock(isOpen);
 
-  const [selectedVariants, setSelectedVariants] = useState({});
-  const [selectedPlacements, setSelectedPlacements] = useState({});
-
-  useEffect(() => {
-    const defaultVariants = {};
-    const defaultPlacements = {};
-    addons.forEach((addon) => {
-      const addonId = addon._id || addon.id;
-      if (addon.variants && Array.isArray(addon.variants) && addon.variants.length > 0) {
-        const normalVariant =
-          addon.variants.find((v) => v.name?.toLowerCase() === "normal") ||
-          addon.variants[0];
-        if (!selectedVariants[addonId]) {
-          defaultVariants[addonId] = normalVariant;
-          defaultPlacements[addonId] = "whole";
-        }
-      }
-    });
-    if (Object.keys(defaultVariants).length > 0) {
-      setSelectedVariants((prev) => ({ ...prev, ...defaultVariants }));
-      setSelectedPlacements((prev) => ({ ...prev, ...defaultPlacements }));
-    }
-  }, [addons]);
-
-  const handleVariantSelect = (addonId, variant, e) => {
-    e.stopPropagation();
-    setSelectedVariants((prev) => ({ ...prev, [addonId]: variant }));
-    if (onVariantChange) {
-      onVariantChange(addonId, "variant", variant);
-    }
-  };
-
-  const handlePlacementSelect = (addonId, placement, e) => {
-    e.stopPropagation();
-    setSelectedPlacements((prev) => ({ ...prev, [addonId]: placement }));
-    if (onVariantChange) {
-      onVariantChange(addonId, "placement", placement);
-    }
-  };
-
-  const formatCategoryName = (cat) => {
-    if (!cat) return "Other Toppings";
-    return cat
-      .split("_")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-  };
-
-  // Placement Circle Component
-  const PlacementCircle = ({ placement, isSelected }) => {
-    const fillColor = isSelected ? "#f59e0b" : "#9ca3af";
-    const bgColor = isSelected ? "#f59e0b" : "transparent";
-    const strokeColor = isSelected ? "#f59e0b" : "#6b7280";
-
-    if (placement === "left") {
-      return (
-        <svg width="20" height="20" viewBox="0 0 20 20">
-          <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
-          <path
-            d="M10 1.5 A 8.5 8.5 0 0 0 10 18.5 Z"
-            fill={fillColor}
-          />
-        </svg>
-      );
-    }
-
-    if (placement === "whole") {
-      return (
-        <svg width="20" height="20" viewBox="0 0 20 20">
-          <circle cx="10" cy="10" r="8.5" fill={fillColor} stroke={strokeColor} strokeWidth="2" />
-        </svg>
-      );
-    }
-
-    if (placement === "right") {
-      return (
-        <svg width="20" height="20" viewBox="0 0 20 20">
-          <circle cx="10" cy="10" r="8.5" fill="none" stroke={strokeColor} strokeWidth="2" />
-          <path
-            d="M10 1.5 A 8.5 8.5 0 0 1 10 18.5 Z"
-            fill={fillColor}
-          />
-        </svg>
-      );
-    }
-
-    return null;
-  };
+  const categories = useMemo(() => Object.keys(groupedAddons || {}), [groupedAddons]);
+  if (!isOpen) return null;
 
   return (
-    <div className="mb-6">
-      <h4 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">
-        {formatCategoryName(category)}
-      </h4>
-      <div className="grid grid-cols-1 gap-3">
-        {addons.map((addon) => {
-          const addonId = addon._id || addon.id;
-          const isSelected = selectedAddons.some(
-            (a) => (a._id || a.id) === addonId,
-          );
-          const currentVariant = selectedVariants[addonId];
-          const currentPlacement = selectedPlacements[addonId] || "whole";
-          const hasVariants =
-            addon.variants && Array.isArray(addon.variants) && addon.variants.length > 0;
+    <div className="fixed inset-0 z-70 flex items-end sm:items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="mx-5 md:mx-10 relative bg-[#111] border border-zinc-800 sm:rounded-2xl rounded-t-2xl w-full sm:max-w-2xl md:max-w-3xl max-h-[95vh] sm:max-h-[95vh] flex flex-col shadow-2xl overflow-hidden z-10">
+        {/* Narrow Header */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-800 bg-zinc-900/90">
+          <div className="flex items-center gap-2">
+            <h3 className="text-white font-semibold text-sm">
+              Choose Toppings
+            </h3>
+            {selectedAddons.length > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500 text-black">
+                {selectedAddons.length}
+              </span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-          return (
-            <div
-              key={addonId}
-              onClick={() => onSelect(addon)}
-              className={`bg-zinc-800/50 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${isSelected
-                ? "border-amber-500 shadow-lg shadow-amber-500/20"
-                : "border-zinc-700 hover:border-zinc-500"
-                }`}
-            >
-              <div className="flex items-center gap-3 p-3">
-                <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-zinc-700">
-                  <Image
-                    src={getImageUrl(addon.image)}
-                    alt={addon.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-medium text-sm line-clamp-1">
-                    {addon.name}
+        {/* Scrollable Toppings List */}
+        <div className="overflow-y-auto p-4 sm:p-5 space-y-5 flex-1 min-h-0">
+          {categories.map((category) => {
+            const matchingAddons = groupedAddons[category] || [];
+            if (matchingAddons.length === 0) return null;
+
+            return (
+              <div key={category} className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-3 bg-amber-500 rounded-full" />
+                  <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                    {formatCategoryName(category)} ({matchingAddons.length})
                   </h4>
-                  {isSelected && (
-                    <p className="text-[11px] text-amber-400/90 mt-0.5 capitalize">
-                      {currentVariant?.name || "normal"} · {currentPlacement}
-                    </p>
-                  )}
                 </div>
-                <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected
-                    ? "border-amber-500 bg-amber-500"
-                    : "border-zinc-600"
-                    }`}
-                >
-                  {isSelected && <Check size={12} className="text-black" />}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {matchingAddons.map((addon) => {
+                    const addonId = addon._id || addon.id;
+                    const selected = selectedAddons.find(
+                      (a) => (a._id || a.id) === addonId
+                    );
+                    const isSelected = !!selected;
+                    const currentVariant =
+                      selected?._selectedVariant ||
+                      addon.variants?.find((v) => v.name?.toLowerCase() === "normal") ||
+                      addon.variants?.[0];
+                    const currentPlacement = selected?._selectedPlacement || "whole";
+                    const hasVariants =
+                      addon.variants &&
+                      Array.isArray(addon.variants) &&
+                      addon.variants.length > 0;
+
+                    const displayPrice =
+                      Number(currentVariant?.price) ||
+                      Number(addon.price) ||
+                      Number(addon.variants?.[0]?.price) ||
+                      0;
+
+                    return (
+                      <div
+                        key={addonId}
+                        className={`rounded-xl border-2 transition-all p-2.5 flex flex-col justify-between gap-2 select-none ${isSelected
+                          ? "bg-amber-500/10 border-amber-500 shadow-md shadow-amber-500/10"
+                          : "bg-zinc-800/40 border-zinc-800 hover:border-zinc-700"
+                          }`}
+                      >
+                        {/* Card header / trigger */}
+                        <div
+                          className="flex items-center gap-3 cursor-pointer"
+                          onClick={() => onSelectAddon(addon)}
+                        >
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 border border-zinc-700/50 flex-shrink-0">
+                            <Image
+                              src={getImageUrl(addon.image)}
+                              alt={addon.name}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-white font-medium text-xs sm:text-sm line-clamp-1">
+                              {addon.name}
+                            </h5>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-amber-400 font-bold text-xs">
+                                {displayPrice > 0 ? `+$${displayPrice}` : "Included"}
+                              </span>
+                              {isSelected && (
+                                <span className="text-[10px] text-zinc-400 capitalize">
+                                  · {currentVariant?.name || "normal"} ({currentPlacement})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div
+                            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${isSelected
+                              ? "border-amber-500 bg-amber-500 text-black"
+                              : "border-zinc-600 hover:border-zinc-500"
+                              }`}
+                          >
+                            {isSelected && <Check size={12} strokeWidth={3} />}
+                          </div>
+                        </div>
+
+                        {/* Controls when selected */}
+                        {isSelected && (
+                          <div className="pt-2 border-t border-zinc-700/50 flex flex-wrap items-center justify-between gap-2">
+                            {/* Variants (Normal, Extra, etc.) */}
+                            {hasVariants ? (
+                              <div className="flex flex-wrap gap-1">
+                                {addon.variants.map((v, vIdx) => {
+                                  const isVSelected = currentVariant?.name === v.name;
+                                  const vPrice = Number(v.price) || 0;
+                                  return (
+                                    <button
+                                      key={vIdx}
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onVariantChange(addonId, "variant", v);
+                                      }}
+                                      className={`px-2 py-0.5 rounded text-[11px] font-medium transition-all cursor-pointer ${isVSelected
+                                        ? "bg-amber-500 text-black shadow-sm"
+                                        : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+                                        }`}
+                                    >
+                                      <span className="capitalize">{v.name}</span>
+                                      {vPrice > 0 && (
+                                        <span className="ml-1 text-[10px] opacity-80">
+                                          +${vPrice}
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            ) : <div />}
+
+                            {/* Placement (Left, Whole, Right) */}
+                            <div className="flex items-center gap-1 bg-zinc-950/70 p-0.5 rounded-lg border border-zinc-800 ml-auto">
+                              {PIZZA_PLACEMENT_OPTIONS.map((opt) => {
+                                const isPSelected = currentPlacement === opt.name;
+                                return (
+                                  <button
+                                    key={opt.name}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onVariantChange(addonId, "placement", opt.name);
+                                    }}
+                                    className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center ${isPSelected
+                                      ? "bg-amber-500/20 border border-amber-500/50"
+                                      : "bg-transparent border border-transparent hover:bg-zinc-800"
+                                      }`}
+                                    title={opt.label}
+                                  >
+                                    <PlacementCircle
+                                      placement={opt.name}
+                                      isSelected={isPSelected}
+                                    />
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-
-              {isSelected && hasVariants && (
-                <div className="px-3 pb-3 pt-0 border-t border-zinc-700/50">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
-                    <div className="flex flex-wrap gap-1.5 flex-1">
-                      {addon.variants.map((v, vIdx) => {
-                        const isVSelected = currentVariant?.name === v.name;
-                        const vPrice = Number(v.price) || 0;
-                        return (
-                          <button
-                            key={vIdx}
-                            type="button"
-                            onClick={(e) => handleVariantSelect(addonId, v, e)}
-                            className={`px-2.5 py-1 rounded text-xs transition-all cursor-pointer ${isVSelected
-                              ? "bg-amber-500 text-black font-medium"
-                              : "bg-zinc-700/50 text-gray-400 hover:bg-zinc-700 hover:text-white"
-                              }`}
-                          >
-                            <span className="capitalize">{v.name}</span>
-
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="flex gap-1.5 flex-shrink-0">
-                      {PIZZA_PLACEMENT_OPTIONS.map((opt) => {
-                        const isPSelected = currentPlacement === opt.name;
-                        return (
-                          <button
-                            key={opt.name}
-                            type="button"
-                            onClick={(e) =>
-                              handlePlacementSelect(addonId, opt.name, e)
-                            }
-                            className={`p-1 rounded transition-all cursor-pointer flex items-center justify-center ${isPSelected
-                              ? "bg-amber-500/20 border border-amber-500/50"
-                              : "bg-zinc-700/50 border border-transparent hover:bg-zinc-700"
-                              }`}
-                            title={opt.label}
-                          >
-                            <PlacementCircle
-                              placement={opt.name}
-                              isSelected={isPSelected}
-                            />
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
+            );
+          })}
+          {categories.length === 0 && (
+            <div className="py-12 text-center text-zinc-500 text-sm">
+              No toppings available.
             </div>
-          );
-        })}
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-zinc-800 p-4 bg-zinc-900/95 backdrop-blur-sm flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
+              Selected Toppings
+            </p>
+            <p className="text-sm font-bold text-white">
+              {selectedAddons.length} item{selectedAddons.length === 1 ? "" : "s"}
+              {totalAddonsPrice > 0 && (
+                <span className="text-amber-400 font-bold ml-1.5">
+                  (+${totalAddonsPrice.toFixed(2)})
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {selectedAddons.length > 0 && (
+              <button
+                type="button"
+                onClick={onClearAll}
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-red-400 hover:bg-zinc-800/80 transition-colors cursor-pointer"
+              >
+                Clear All
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-amber-500/20 active:scale-95"
+            >
+              Done
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -675,14 +703,14 @@ const SpecialInstructions = ({
   const hasBake = instructions.bake && instructions.bake.length > 0;
 
   return (
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-400 mb-3">
+    <div className="mb-4">
+      <h3 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
         Special Instructions
       </h3>
 
       {hasCut && (
-        <div className="mb-3">
-          <h4 className="text-xs text-gray-500 mb-1.5">Cut</h4>
+        <div className="mb-2">
+          <h4 className="text-[10px] text-gray-500 mb-1">Cut</h4>
           <div className="flex flex-wrap gap-1.5">
             {instructions.cut.map((item, index) => {
               const isSelected =
@@ -693,7 +721,7 @@ const SpecialInstructions = ({
                   key={index}
                   type="button"
                   onClick={() => onSelect("cut", item)}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${isSelected
+                  className={`px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${isSelected
                     ? "bg-amber-500 text-black font-medium"
                     : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
                     }`}
@@ -708,7 +736,7 @@ const SpecialInstructions = ({
 
       {hasBake && (
         <div>
-          <h4 className="text-xs text-gray-500 mb-1.5">Bake</h4>
+          <h4 className="text-[10px] text-gray-500 mb-1">Bake</h4>
           <div className="flex flex-wrap gap-1.5">
             {instructions.bake.map((item, index) => {
               const isSelected =
@@ -719,7 +747,7 @@ const SpecialInstructions = ({
                   key={index}
                   type="button"
                   onClick={() => onSelect("bake", item)}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${isSelected
+                  className={`px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${isSelected
                     ? "bg-amber-500 text-black font-medium"
                     : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
                     }`}
@@ -831,6 +859,7 @@ export default function BuildYourPizzaClient({
   relatedItems = [],
 }) {
   const dispatch = useDispatch();
+  const { cartsList } = useSelector((state) => state.cartDrawer);
 
   const crusts = useMemo(
     () => crustsData?.data?.crusts || [],
@@ -859,6 +888,55 @@ export default function BuildYourPizzaClient({
     }, {});
   }, [allAddonsList]);
 
+  // Normalized option lists for the Crust / Sauce / Cheese picker modal
+  const crustOptions = useMemo(
+    () =>
+      crusts.map((crust) => ({
+        id: crust._id || crust.id,
+        name: crust.name,
+        image: crust.image,
+        variants: null,
+        _raw: crust,
+      })),
+    [crusts],
+  );
+
+  const sauceOptions = useMemo(
+    () =>
+      sauces.map((sauce) => ({
+        id: sauce._id || sauce.id,
+        name: sauce.name,
+        image: sauce.image,
+        variants: sauce.variants
+          ? Object.keys(sauce.variants).filter((k) => sauce.variants[k] === true)
+          : [],
+        _raw: sauce,
+      })),
+    [sauces],
+  );
+
+  const cheeseOptions = useMemo(
+    () => [
+      ...cheeses.map((cheese) => ({
+        id: cheese._id || cheese.id,
+        name: cheese.name,
+        image: cheese.image,
+        variants: cheese.variants
+          ? Object.keys(cheese.variants).filter((k) => cheese.variants[k] === true)
+          : [],
+        _raw: cheese,
+      })),
+      {
+        id: "no-cheese",
+        name: "No Cheese",
+        image: null,
+        variants: [],
+        _raw: "no-cheese",
+      },
+    ],
+    [cheeses],
+  );
+
   // Selections
   const [selectedCrust, setSelectedCrust] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -876,6 +954,15 @@ export default function BuildYourPizzaClient({
 
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  // Reset it if the cart gets cleared elsewhere (e.g. "Clear All" in the
+  // cart drawer) - otherwise the button stays stuck on "Added to Cart!"
+  // until a full page reload.
+  useEffect(() => {
+    if (cartsList.length === 0) {
+      setIsInCart(false);
+    }
+  }, [cartsList]);
 
   // Auto select first crust
   useEffect(() => {
@@ -977,7 +1064,10 @@ export default function BuildYourPizzaClient({
   }, [selectedAddons]);
 
   const mainProductPrice =
-    basePrice + sauceExtraPrice + cheeseExtraPrice + addonsExtraPrice;
+    basePrice +
+    sauceExtraPrice +
+    cheeseExtraPrice +
+    addonsExtraPrice;
 
   // Handlers
   const handleCrustSelect = (crust) => setSelectedCrust(crust);
@@ -1167,10 +1257,10 @@ export default function BuildYourPizzaClient({
     addonsList.length > 0 ||
     extraList.length > 0;
 
-  // ==================== ADD TO CART ====================
-  const handleAddToCart = () => {
-    setIsAddingToCart(true);
-
+  // Builds the cart-item payload for the custom pizza. Shared by "Add to
+  // Cart" (dispatched into the persistent cart) and "Instant Order" (handed
+  // straight to the instant-order modal without touching the cart).
+  const buildMainCartItem = () => {
     const yourSelectionParts = [];
     if (selectedSize) yourSelectionParts.push(`Size: ${selectedSize.name}`);
     if (selectedCrust) yourSelectionParts.push(`Crust: ${selectedCrust.name}`);
@@ -1217,37 +1307,42 @@ export default function BuildYourPizzaClient({
       ? `${selectedSauce.name} (${selectedSauceVariant})`
       : null;
 
-    // 1. Add custom pizza to cart
-    dispatch(
-      singleAddToCartsList({
-        productId: "build-custom-pizza",
-        name: "Build Custom PIZZA",
-        image: selectedCrust?.image || "/home/special_menu/pizzas.png",
-        price: mainProductPrice,
-        quantity: 1,
-        "Your Selection": yourSelectionText,
-        yourSelection: yourSelectionText,
-        Addons: allAddonsData,
-        addons: allAddonsData,
-        size: selectedSize?.name || null,
-        crust: selectedCrust?.name || null,
-        sauce: sauceText,
-        cheese: cheeseText,
-        seasonings: selectedSeasonings.map((s) => s.name).sort(),
-        instructions: {
-          cut:
-            selectedInstructions.cut.length > 0
-              ? selectedInstructions.cut.map((s) => s.name).join(", ")
-              : null,
-          bake:
-            selectedInstructions.bake.length > 0
-              ? selectedInstructions.bake.map((s) => s.name).join(", ")
-              : null,
-        },
-      }),
-    );
+    return {
+      productId: "build-custom-pizza",
+      name: "Build Custom PIZZA",
+      image: selectedCrust?.image || "/home/special_menu/pizzas.png",
+      price: mainProductPrice,
+      quantity: 1,
+      "Your Selection": yourSelectionText,
+      yourSelection: yourSelectionText,
+      Addons: allAddonsData,
+      addons: allAddonsData,
+      size: selectedSize?.name || null,
+      crust: selectedCrust?.name || null,
+      sauce: sauceText,
+      cheese: cheeseText,
+      seasonings: selectedSeasonings.map((s) => s.name).sort(),
+      instructions: {
+        cut:
+          selectedInstructions.cut.length > 0
+            ? selectedInstructions.cut.map((s) => s.name).join(", ")
+            : null,
+        bake:
+          selectedInstructions.bake.length > 0
+            ? selectedInstructions.bake.map((s) => s.name).join(", ")
+            : null,
+      },
+    };
+  };
 
-    // 2. Add each selected "You May Also Like" item separately
+  // ==================== ADD TO CART ====================
+  const handleAddToCart = () => {
+    setIsAddingToCart(true);
+
+    // 1. Add custom pizza to cart
+    dispatch(singleAddToCartsList(buildMainCartItem()));
+
+    // 2. Add each selected "Addons" item separately
     Object.values(selectedRelatedItems).forEach((entry) => {
       if (entry.quantity > 0) {
         dispatch(
@@ -1267,6 +1362,33 @@ export default function BuildYourPizzaClient({
       setIsInCart(true);
       toast.success("Build Custom PIZZA added to cart!");
     }, 400);
+  };
+
+  const [isInstantOrderOpen, setIsInstantOrderOpen] = useState(false);
+  const [instantOrderItem, setInstantOrderItem] = useState(null);
+
+  const handleInstantOrder = () => {
+    const mainItem = buildMainCartItem();
+    setInstantOrderItem({
+      ...mainItem,
+      cartItemId: `instant-${mainItem.productId}-${Date.now()}`,
+    });
+    setIsInstantOrderOpen(true);
+  };
+
+  // Crust / Sauce / Cheese / Toppings picker modal
+  const [activeModal, setActiveModal] = useState(null); // null | "crust" | "sauce" | "cheese" | "toppings"
+
+  const handleCrustConfirm = (option) => handleCrustSelect(option._raw);
+
+  const handleSauceConfirm = (option, variant) => {
+    handleSauceSelect(option._raw);
+    if (variant) setSelectedSauceVariant(variant);
+  };
+
+  const handleCheeseConfirm = (option, variant) => {
+    handleCheeseSelect(option._raw);
+    if (variant) setSelectedCheeseVariant(variant);
   };
 
   const previewImage = selectedCrust?.image || "/home/special_menu/pizzas.png";
@@ -1345,7 +1467,7 @@ export default function BuildYourPizzaClient({
                         <div className="flex items-center gap-2 mt-2 mb-1.5">
                           <div className="w-1 h-3 bg-amber-500 rounded-full" />
                           <h4 className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">
-                            You May Also Like
+                            Addons
                           </h4>
                         </div>
                         {extraList.map((extra, i) => (
@@ -1362,30 +1484,6 @@ export default function BuildYourPizzaClient({
 
             {/* ===== RIGHT COLUMN: BUILD CONTROLS ===== */}
             <div className="p-6 md:p-10">
-              {/* Mobile Sticky Selection Summary */}
-              {hasSelection && (
-                <div className="block md:hidden sticky top-16 z-10 -mx-6 px-4 py-3 mb-4 bg-gradient-to-b from-zinc-900/95 to-zinc-900/80 border-b border-zinc-800/60 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-1 h-4 bg-amber-500 rounded-full" />
-                    <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-                      Your Selection
-                    </h4>
-                  </div>
-                  <div className="space-y-1 text-xs">
-                    {basics.length > 0 && (
-                      <p className="text-gray-300">{basics.join(", ")}</p>
-                    )}
-                    {sauce && <p className="text-gray-400">{sauce}</p>}
-                    {cheese && <p className="text-gray-400">{cheese}</p>}
-                    {addonsList.length > 0 && (
-                      <p className="text-gray-400">
-                        Addons: {addonsList.length} items
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
               {/* Title & Price Header */}
               <div className="flex flex-wrap items-baseline justify-between gap-2 mb-6">
                 <h1 className="text-3xl md:text-4xl font-bold text-white">
@@ -1397,11 +1495,15 @@ export default function BuildYourPizzaClient({
               </div>
 
               {/* 1. CHOOSE CRUST */}
-              <CrustSelector
-                crusts={crusts}
-                selectedCrust={selectedCrust}
-                onSelect={handleCrustSelect}
-              />
+              {crusts.length > 0 && (
+                <OptionTrigger
+                  label="Crust"
+                  required
+                  image={selectedCrust?.image}
+                  name={selectedCrust?.name}
+                  onClick={() => setActiveModal("crust")}
+                />
+              )}
 
               {/* 2. SELECT SIZE */}
               <SizeSelector
@@ -1412,22 +1514,38 @@ export default function BuildYourPizzaClient({
               />
 
               {/* 3. SAUCES */}
-              <SauceSelector
-                sauces={sauces}
-                selectedSauce={selectedSauce}
-                onSelect={handleSauceSelect}
-                selectedVariant={selectedSauceVariant}
-                onVariantSelect={setSelectedSauceVariant}
-              />
+              {sauces.length > 0 && (
+                <OptionTrigger
+                  label="Sauce"
+                  image={selectedSauce?.image}
+                  name={selectedSauce?.name}
+                  variant={selectedSauce ? selectedSauceVariant : null}
+                  onClick={() => setActiveModal("sauce")}
+                />
+              )}
 
               {/* 4. CHEESES */}
-              <CheeseSelector
-                cheeses={cheeses}
-                selectedCheese={selectedCheese}
-                onSelect={handleCheeseSelect}
-                selectedVariant={selectedCheeseVariant}
-                onVariantSelect={setSelectedCheeseVariant}
-              />
+              {cheeses.length > 0 && (
+                <OptionTrigger
+                  label="Cheese"
+                  image={
+                    selectedCheese && selectedCheese !== "no-cheese"
+                      ? selectedCheese.image
+                      : null
+                  }
+                  name={
+                    selectedCheese === "no-cheese"
+                      ? "No Cheese"
+                      : selectedCheese?.name
+                  }
+                  variant={
+                    selectedCheese && selectedCheese !== "no-cheese"
+                      ? selectedCheeseVariant
+                      : null
+                  }
+                  onClick={() => setActiveModal("cheese")}
+                />
+              )}
 
               {/* 5. CHOOSE SEASONINGS */}
               <SeasoningSelector
@@ -1436,23 +1554,72 @@ export default function BuildYourPizzaClient({
                 onSelect={handleSeasoningSelect}
               />
 
-              {/* 6. ADDONS (Grouped by Category) */}
+              {/* 6. TOPPINGS (MODAL TRIGGER) */}
               {Object.keys(groupedAddons).length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-100 mb-3 bg-zinc-800/80 p-4 rounded-lg flex items-center gap-2 border border-zinc-700">
-                    <SlidersHorizontal size={16} className="text-amber-400" />
-                    <span>Pizza Add-ons & Toppings</span>
-                  </h3>
-                  {Object.keys(groupedAddons).map((category) => (
-                    <AddonSection
-                      key={category}
-                      category={category}
-                      addons={groupedAddons[category]}
-                      selectedAddons={selectedAddons}
-                      onSelect={handleAddonSelect}
-                      onVariantChange={handleAddonVariantChange}
-                    />
-                  ))}
+                <div className="mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setActiveModal("toppings")}
+                    className="w-full flex items-center justify-between gap-3 bg-zinc-800/50 hover:bg-zinc-800/80 border border-zinc-700 hover:border-amber-500/50 rounded-xl p-3.5 transition-all text-left group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">
+                            Toppings
+                          </span>
+                          {selectedAddons.length > 0 && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-black">
+                              {selectedAddons.length}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-white font-medium text-sm truncate mt-0.5">
+                          {selectedAddons.length > 0
+                            ? selectedAddons.map((a) => a.name).join(", ")
+                            : "Choose your toppings"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="flex items-center gap-1 text-amber-400 text-xs font-semibold flex-shrink-0">
+                      {selectedAddons.length > 0 ? "Edit" : "Choose"}
+                      <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    </span>
+                  </button>
+
+                  {/* Selected toppings chips preview */}
+                  {selectedAddons.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2.5 px-0.5">
+                      {selectedAddons.map((addon) => {
+                        const addonId = addon._id || addon.id;
+                        const v = addon._selectedVariant?.name || "normal";
+                        const p = addon._selectedPlacement || "whole";
+                        return (
+                          <span
+                            key={addonId}
+                            className="inline-flex items-center gap-1.5 bg-zinc-800/90 border border-zinc-700/80 text-zinc-200 text-xs px-2.5 py-1 rounded-lg"
+                          >
+                            <span className="text-white font-medium">{addon.name}</span>
+                            <span className="text-[10px] text-amber-400/90 capitalize">
+                              ({v} · {p})
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddonSelect(addon);
+                              }}
+                              className="text-zinc-400 hover:text-red-400 ml-0.5 transition-colors cursor-pointer"
+                              title="Remove topping"
+                            >
+                              <X size={12} />
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1465,14 +1632,14 @@ export default function BuildYourPizzaClient({
 
               {/* 8. YOU MAY ALSO LIKE */}
               {relatedItems && relatedItems.length > 0 && (
-                <div className="mt-8 pt-6 border-t border-zinc-800">
-                  <div className="flex items-center gap-2 mb-4">
+                <div className="mt-6 pt-4 border-t border-zinc-800">
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="w-1 h-4 bg-amber-500 rounded-full" />
-                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                      You May Also Like
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      Addons
                     </h3>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     {relatedItems.map((item, idx) => {
                       const itemId = item._id || item.id;
                       return (
@@ -1492,35 +1659,95 @@ export default function BuildYourPizzaClient({
                 </div>
               )}
 
-              {/* 9. STICKY ADD TO CART BUTTON */}
+              {/* 9. STICKY ADD TO CART / INSTANT ORDER BUTTONS */}
               <div className="sticky bottom-0 z-20 -mx-6 md:-mx-10 -mb-6 md:-mb-10 p-3 bg-black/80 backdrop-blur-md border-t border-zinc-800/80 mt-8 rounded-t-xl">
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  disabled={isAddingToCart}
-                  className={`w-full font-bold py-3.5 px-6 rounded-lg transition-all duration-300 shadow-lg cursor-pointer ${isInCart
-                    ? "bg-green-600 text-white hover:bg-green-700"
-                    : "bg-amber-500 text-black hover:bg-amber-600 active:scale-[0.99]"
-                    }`}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    {isInCart ? (
-                      <>
-                        <Check size={18} />
-                        <span>Added to Cart (${mainProductPrice.toFixed(2)})</span>
-                      </>
-                    ) : (
-                      <span>
-                        Add to Cart - ${mainProductPrice.toFixed(2)}
-                      </span>
-                    )}
-                  </span>
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    disabled={isAddingToCart}
+                    className={`flex-1 font-bold lg:py-3.5 p-2 lg:px-6 rounded-lg transition-all duration-300 shadow-lg cursor-pointer ${isInCart
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "bg-amber-500 text-black hover:bg-amber-600 active:scale-[0.99]"
+                      }`}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      {isInCart ? (
+                        <>
+                          <span>Added to Cart (${mainProductPrice.toFixed(2)})</span>
+                        </>
+                      ) : (
+                        <span>
+                          Add to Cart - ${mainProductPrice.toFixed(2)}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleInstantOrder}
+                    disabled={isAddingToCart}
+                    className="flex-1 font-bold lg:py-3.5 p-2 lg:px-6 rounded-lg transition-all duration-300 shadow-lg border border-amber-500 text-amber-400 hover:bg-amber-500/10 active:scale-[0.99] cursor-pointer"
+                  >
+                    Instant Order
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <InstantOrderModal
+        isOpen={isInstantOrderOpen}
+        onClose={() => setIsInstantOrderOpen(false)}
+        items={instantOrderItem ? [instantOrderItem] : []}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "crust"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Crust"
+        options={crustOptions}
+        selectedId={selectedCrust?._id || selectedCrust?.id}
+        selectedVariant={null}
+        onConfirm={handleCrustConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "sauce"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Sauce"
+        options={sauceOptions}
+        selectedId={selectedSauce?._id || selectedSauce?.id}
+        selectedVariant={selectedSauceVariant}
+        onConfirm={handleSauceConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "cheese"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Cheese"
+        options={cheeseOptions}
+        selectedId={
+          selectedCheese === "no-cheese"
+            ? "no-cheese"
+            : selectedCheese?._id || selectedCheese?.id
+        }
+        selectedVariant={selectedCheeseVariant}
+        onConfirm={handleCheeseConfirm}
+      />
+
+      <ToppingsModal
+        isOpen={activeModal === "toppings"}
+        onClose={() => setActiveModal(null)}
+        groupedAddons={groupedAddons}
+        selectedAddons={selectedAddons}
+        onSelectAddon={handleAddonSelect}
+        onVariantChange={handleAddonVariantChange}
+        onClearAll={() => setSelectedAddons([])}
+        totalAddonsPrice={addonsExtraPrice}
+      />
     </section>
   );
 }

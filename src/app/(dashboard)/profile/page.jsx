@@ -504,9 +504,6 @@ export default function ProfilePage() {
                 <h3 className="text-xl font-bold text-white">
                   Change Password
                 </h3>
-                <p className="text-gray-400 text-sm mt-1">
-                  Default Password: <span className="font-bold">12345678</span>
-                </p>
               </div>
               <button
                 onClick={() => setIsPasswordModalOpen(false)}

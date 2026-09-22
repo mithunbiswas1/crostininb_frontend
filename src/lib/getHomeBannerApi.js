@@ -36,7 +36,7 @@ export async function getHomeBannerList({
   const res = await fetch(
     `${API_BASE_URL}get-home-banner-list?${params.toString()}`,
     {
-      cache: "no-store",
+      next: { revalidate: 60 },
     },
   );
 

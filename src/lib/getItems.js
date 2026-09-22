@@ -69,10 +69,10 @@ export async function getCardItems({
   if (is_addon !== undefined && is_addon !== "")
     params.append("is_addon", is_addon);
 
-  const url = `${API_BASE_URL}get-card-items?${params.toString()}&_t=${Date.now()}`;
+  const url = `${API_BASE_URL}get-card-items?${params.toString()}`;
 
   const res = await fetch(url, {
-    cache: "no-store",
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {
@@ -158,10 +158,10 @@ export async function getItemsByCategorySlug(
   if (is_addon !== undefined && is_addon !== "")
     params.append("is_addon", is_addon);
 
-  const url = `${API_BASE_URL}get-items-by-category-slug/${categorySlug}?${params.toString()}&_t=${Date.now()}`;
-  console.log(url, "urlddd");
+  const url = `${API_BASE_URL}get-items-by-category-slug/${categorySlug}?${params.toString()}`;
+
   const res = await fetch(url, {
-    cache: "no-store",
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {

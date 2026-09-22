@@ -6,8 +6,6 @@ import CategorySection from "./_components/CategorySection";
 import FlatDiscount from "./_components/FlatDiscount";
 import SpecialMenu from "./_components/SpecialMenu";
 import TestimonialsSection from "./_components/TestimonialsSection";
-import WhyChooseUs from "./_components/WhyChooseUs";
-import AboutSection from "./_components/AboutSection";
 import ChefSpecial from "./_components/ChefSpecial";
 
 import { getCardItems } from "@/lib/getItems";
@@ -15,7 +13,6 @@ import { getActiveCategories } from "@/lib/getCategory";
 import { getHomeBannerList } from "@/lib/getHomeBannerApi";
 import { getHomeCompanyList } from "@/lib/getHomeCompanyApi";
 import { getTestimonialList } from "@/lib/getTestimonialApi";
-import { getAbout } from "@/lib/getAboutApi";
 
 export async function generateMetadata() { }
 
@@ -27,7 +24,6 @@ export default async function Home() {
     flatDiscountData,
     specialMenuData,
     chefSpecialData,
-    about,
     companiesData,
     testimonialsData,
   ] = await Promise.all([
@@ -36,7 +32,6 @@ export default async function Home() {
     getCardItems({ limit: 3, sections: "6a780fd4d2e5dfda5ce63991" }),
     getCardItems({ limit: 8, sections: "6a76b8e413fb4c5b2edaf4b2" }),
     getCardItems({ limit: 8, sections: "6a7c162075f50850dfe38c32" }),
-    getAbout(),
     getHomeCompanyList(),
     getTestimonialList(),
   ]);
@@ -64,9 +59,6 @@ export default async function Home() {
       )}
       {chefSpecialItems.length > 0 && <ChefSpecial items={chefSpecialItems} />}
       {specialMenuItems.length > 0 && <SpecialMenu items={specialMenuItems} />}
-
-      <WhyChooseUs />
-      <AboutSection aboutData={about} />
 
       {/* <OurFeatures companies={companies} /> */}
 

@@ -22,7 +22,7 @@ export const orderApi = apiSlice.injectEndpoints({
         url: endpoints.order.getOrdersByUser,
         method: "GET",
       }),
-      providesTags: ["Profile"],
+      providesTags: ["Order"],
     }),
 
     cancelOrder: builder.mutation({
