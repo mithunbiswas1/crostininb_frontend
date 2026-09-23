@@ -1093,15 +1093,22 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
 
   // Track selected variants for sauce and cheese
   const [selectedSauceVariant, setSelectedSauceVariant] = useState(null);
-  const [selectedCheeseVariant, setSelectedCheeseVariant] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [selectedTypeVariant, setSelectedTypeVariant] = useState(null);
+  const [selectedDressing, setSelectedDressing] = useState(null);
+  const [selectedDressingVariant, setSelectedDressingVariant] = useState(null);
+  const [selectedSaladAddon, setSelectedSaladAddon] = useState(null);
+  const [selectedSaladAddonVariant, setSelectedSaladAddonVariant] = useState(null);
+  const [selectedSaladMod, setSelectedSaladMod] = useState(null);
+  const [selectedSaladModVariant, setSelectedSaladModVariant] = useState(null);
+  const [selectedModify, setSelectedModify] = useState(null);
+  const [selectedModifyVariant, setSelectedModifyVariant] = useState(null);
   const [selectedSideSalads, setSelectedSideSalads] = useState([]);
 
   const [isCrustSelected, setIsCrustSelected] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [activeModal, setActiveModal] = useState(null); // null | "crust" | "sauce" | "cheese" | "toppings"
+  const [activeModal, setActiveModal] = useState(null); // null | "crust" | "sauce" | "cheese" | "type" | "dressing" | "saladAddon" | "saladMod" | "modify" | "sideSalad" | "toppings"
 
   // Normalized option lists for the Crust / Sauce / Cheese picker modal
   const crustOptions = useMemo(
@@ -1178,6 +1185,70 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     [item.types],
   );
 
+  const dressingOptions = useMemo(
+    () =>
+      (item.dressings || []).map((dressing) => ({
+        id: dressing._id || dressing.id,
+        name: dressing.name,
+        image: dressing.image,
+        variants: dressing.variants || [],
+        variantPrices: (dressing.variants || []).reduce((acc, v) => {
+          acc[v.name] = v.price;
+          return acc;
+        }, {}),
+        _raw: dressing,
+      })),
+    [item.dressings],
+  );
+
+  const saladAddonOptions = useMemo(
+    () =>
+      (item.salad_addons || []).map((addon) => ({
+        id: addon._id || addon.id,
+        name: addon.name,
+        image: addon.image,
+        variants: addon.variants || [],
+        variantPrices: (addon.variants || []).reduce((acc, v) => {
+          acc[v.name] = v.price;
+          return acc;
+        }, {}),
+        _raw: addon,
+      })),
+    [item.salad_addons],
+  );
+
+  const saladModsOptions = useMemo(
+    () =>
+      (item.salad_mods || []).map((mod) => ({
+        id: mod._id || mod.id,
+        name: mod.name,
+        image: mod.image,
+        variants: mod.variants || [],
+        variantPrices: (mod.variants || []).reduce((acc, v) => {
+          acc[v.name] = v.price;
+          return acc;
+        }, {}),
+        _raw: mod,
+      })),
+    [item.salad_mods],
+  );
+
+  const modifyOptions = useMemo(
+    () =>
+      (item.modifies || []).map((mod) => ({
+        id: mod._id || mod.id,
+        name: mod.name,
+        image: mod.image,
+        variants: mod.variants || [],
+        variantPrices: (mod.variants || []).reduce((acc, v) => {
+          acc[v.name] = v.price;
+          return acc;
+        }, {}),
+        _raw: mod,
+      })),
+    [item.modifies],
+  );
+
   const handleCrustConfirm = (option) => {
     if (option._raw) {
       handleCrustSelect(option._raw);
@@ -1205,6 +1276,34 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     if (option._raw) {
       setSelectedType(option._raw);
       setSelectedTypeVariant(variant || null);
+    }
+  };
+
+  const handleDressingConfirm = (option, variant) => {
+    if (option._raw) {
+      setSelectedDressing(option._raw);
+      setSelectedDressingVariant(variant || null);
+    }
+  };
+
+  const handleSaladAddonConfirm = (option, variant) => {
+    if (option._raw) {
+      setSelectedSaladAddon(option._raw);
+      setSelectedSaladAddonVariant(variant || null);
+    }
+  };
+
+  const handleSaladModConfirm = (option, variant) => {
+    if (option._raw) {
+      setSelectedSaladMod(option._raw);
+      setSelectedSaladModVariant(variant || null);
+    }
+  };
+
+  const handleModifyConfirm = (option, variant) => {
+    if (option._raw) {
+      setSelectedModify(option._raw);
+      setSelectedModifyVariant(variant || null);
     }
   };
 
@@ -1250,6 +1349,14 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     selectedCheeseVariant,
     selectedType,
     selectedTypeVariant,
+    selectedDressing,
+    selectedDressingVariant,
+    selectedSaladAddon,
+    selectedSaladAddonVariant,
+    selectedSaladMod,
+    selectedSaladModVariant,
+    selectedModify,
+    selectedModifyVariant,
     selectedSideSalads,
     selectedSeasonings,
     selectedAddons,
@@ -1270,6 +1377,10 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   const hasSauces = item.sauces && item.sauces.length > 0;
   const hasCheeses = item.cheeses && item.cheeses.length > 0;
   const hasTypes = item.types && item.types.length > 0;
+  const hasDressings = item.dressings && item.dressings.length > 0;
+  const hasSaladAddons = item.salad_addons && item.salad_addons.length > 0;
+  const hasSaladMods = item.salad_mods && item.salad_mods.length > 0;
+  const hasModifies = item.modifies && item.modifies.length > 0;
   const hasSideSalads = item.side_salads && item.side_salads.length > 0;
   const hasGroupedAddons =
     item.grouped_addons && Object.keys(item.grouped_addons).length > 0;
@@ -1336,6 +1447,50 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       }
     }
   }, [hasTypes, item.types, selectedType]);
+
+  // Auto-select first dressing if available
+  useEffect(() => {
+    if (hasDressings && item.dressings.length > 0 && !selectedDressing) {
+      const first = item.dressings[0];
+      setSelectedDressing(first);
+      if (first.variants && first.variants.length > 0) {
+        setSelectedDressingVariant(first.variants[0].name);
+      }
+    }
+  }, [hasDressings, item.dressings, selectedDressing]);
+
+  // Auto-select first salad addon if available
+  useEffect(() => {
+    if (hasSaladAddons && item.salad_addons.length > 0 && !selectedSaladAddon) {
+      const first = item.salad_addons[0];
+      setSelectedSaladAddon(first);
+      if (first.variants && first.variants.length > 0) {
+        setSelectedSaladAddonVariant(first.variants[0].name);
+      }
+    }
+  }, [hasSaladAddons, item.salad_addons, selectedSaladAddon]);
+
+  // Auto-select first salad mod if available
+  useEffect(() => {
+    if (hasSaladMods && item.salad_mods.length > 0 && !selectedSaladMod) {
+      const first = item.salad_mods[0];
+      setSelectedSaladMod(first);
+      if (first.variants && first.variants.length > 0) {
+        setSelectedSaladModVariant(first.variants[0].name);
+      }
+    }
+  }, [hasSaladMods, item.salad_mods, selectedSaladMod]);
+
+  // Auto-select first modify if available
+  useEffect(() => {
+    if (hasModifies && item.modifies.length > 0 && !selectedModify) {
+      const first = item.modifies[0];
+      setSelectedModify(first);
+      if (first.variants && first.variants.length > 0) {
+        setSelectedModifyVariant(first.variants[0].name);
+      }
+    }
+  }, [hasModifies, item.modifies, selectedModify]);
 
   // Auto-select first cut instruction if available
   useEffect(() => {
@@ -1612,6 +1767,42 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       total += Number(v?.price) || 0;
     }
 
+    // Dressing variant price
+    if (selectedDressing && selectedDressingVariant) {
+      const v = selectedDressing.variants?.find(
+        (varItem) =>
+          varItem.name?.toLowerCase() === selectedDressingVariant?.toLowerCase(),
+      );
+      total += Number(v?.price) || 0;
+    }
+
+    // Salad addon variant price
+    if (selectedSaladAddon && selectedSaladAddonVariant) {
+      const v = selectedSaladAddon.variants?.find(
+        (varItem) =>
+          varItem.name?.toLowerCase() === selectedSaladAddonVariant?.toLowerCase(),
+      );
+      total += Number(v?.price) || 0;
+    }
+
+    // Salad mod variant price
+    if (selectedSaladMod && selectedSaladModVariant) {
+      const v = selectedSaladMod.variants?.find(
+        (varItem) =>
+          varItem.name?.toLowerCase() === selectedSaladModVariant?.toLowerCase(),
+      );
+      total += Number(v?.price) || 0;
+    }
+
+    // Modify variant price
+    if (selectedModify && selectedModifyVariant) {
+      const v = selectedModify.variants?.find(
+        (varItem) =>
+          varItem.name?.toLowerCase() === selectedModifyVariant?.toLowerCase(),
+      );
+      total += Number(v?.price) || 0;
+    }
+
     // Side salad variant prices
     total += selectedSideSalads.reduce((sum, s) => {
       const v = s._selectedVariant || s.variants?.[0];
@@ -1688,6 +1879,26 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         `Type: ${selectedType.name} (${selectedTypeVariant || "Regular"})`,
       );
     }
+    if (selectedDressing) {
+      yourSelectionParts.push(
+        `Dressing: ${selectedDressing.name} (${selectedDressingVariant || "Regular"})`,
+      );
+    }
+    if (selectedSaladAddon) {
+      yourSelectionParts.push(
+        `Salad Addon: ${selectedSaladAddon.name} (${selectedSaladAddonVariant || "Regular"})`,
+      );
+    }
+    if (selectedSaladMod) {
+      yourSelectionParts.push(
+        `Salad Mod: ${selectedSaladMod.name} (${selectedSaladModVariant || "Regular"})`,
+      );
+    }
+    if (selectedModify) {
+      yourSelectionParts.push(
+        `Modify: ${selectedModify.name} (${selectedModifyVariant || "Regular"})`,
+      );
+    }
     if (selectedSideSalads.length > 0) {
       const saladsText = selectedSideSalads
         .map((s) => `${s.name} (${s._selectedVariant?.name || "Regular"})`)
@@ -1726,6 +1937,18 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       cheese: cheeseText,
       type: selectedType
         ? `${selectedType.name} (${selectedTypeVariant || "Regular"})`
+        : null,
+      dressing: selectedDressing
+        ? `${selectedDressing.name} (${selectedDressingVariant || "Regular"})`
+        : null,
+      saladAddon: selectedSaladAddon
+        ? `${selectedSaladAddon.name} (${selectedSaladAddonVariant || "Regular"})`
+        : null,
+      saladMod: selectedSaladMod
+        ? `${selectedSaladMod.name} (${selectedSaladModVariant || "Regular"})`
+        : null,
+      modify: selectedModify
+        ? `${selectedModify.name} (${selectedModifyVariant || "Regular"})`
         : null,
       sideSalads: selectedSideSalads.map(
         (s) => `${s.name} (${s._selectedVariant?.name || "Regular"})`
@@ -1924,6 +2147,46 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       typeDisplay = `${selectedType.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
     }
 
+    let dressingDisplay = null;
+    if (selectedDressing) {
+      const v = selectedDressingVariant || "Regular";
+      const varItem = selectedDressing.variants?.find(
+        (vi) => vi.name?.toLowerCase() === v?.toLowerCase(),
+      );
+      const price = Number(varItem?.price) || 0;
+      dressingDisplay = `${selectedDressing.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
+    }
+
+    let saladAddonDisplay = null;
+    if (selectedSaladAddon) {
+      const v = selectedSaladAddonVariant || "Regular";
+      const varItem = selectedSaladAddon.variants?.find(
+        (vi) => vi.name?.toLowerCase() === v?.toLowerCase(),
+      );
+      const price = Number(varItem?.price) || 0;
+      saladAddonDisplay = `${selectedSaladAddon.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
+    }
+
+    let saladModDisplay = null;
+    if (selectedSaladMod) {
+      const v = selectedSaladModVariant || "Regular";
+      const varItem = selectedSaladMod.variants?.find(
+        (vi) => vi.name?.toLowerCase() === v?.toLowerCase(),
+      );
+      const price = Number(varItem?.price) || 0;
+      saladModDisplay = `${selectedSaladMod.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
+    }
+
+    let modifyDisplay = null;
+    if (selectedModify) {
+      const v = selectedModifyVariant || "Regular";
+      const varItem = selectedModify.variants?.find(
+        (vi) => vi.name?.toLowerCase() === v?.toLowerCase(),
+      );
+      const price = Number(varItem?.price) || 0;
+      modifyDisplay = `${selectedModify.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
+    }
+
     const sideSaladsList = selectedSideSalads.map((s) => {
       const v = s._selectedVariant?.name || "Regular";
       const price = Number(s._selectedVariant?.price) || 0;
@@ -1956,15 +2219,43 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         return `${entry.item.name} x${entry.quantity}  ${p > 0 ? `+$${p % 1 === 0 ? p : p.toFixed(2)}` : "Included"}`;
       });
 
-    return { basics, sauce, cheese, type: typeDisplay, sideSaladsList, addonsList, extraList };
+    return {
+      basics,
+      sauce,
+      cheese,
+      type: typeDisplay,
+      dressing: dressingDisplay,
+      saladAddon: saladAddonDisplay,
+      saladMod: saladModDisplay,
+      modify: modifyDisplay,
+      sideSaladsList,
+      addonsList,
+      extraList,
+    };
   };
 
-  const { basics, sauce, cheese, type: typeDisplay, sideSaladsList, addonsList, extraList } = getSelectionDisplay();
+  const {
+    basics,
+    sauce,
+    cheese,
+    type: typeDisplay,
+    dressing: dressingDisplay,
+    saladAddon: saladAddonDisplay,
+    saladMod: saladModDisplay,
+    modify: modifyDisplay,
+    sideSaladsList,
+    addonsList,
+    extraList,
+  } = getSelectionDisplay();
   const hasSelection =
     basics.length > 0 ||
     sauce ||
     cheese ||
     typeDisplay ||
+    dressingDisplay ||
+    saladAddonDisplay ||
+    saladModDisplay ||
+    modifyDisplay ||
     sideSaladsList.length > 0 ||
     addonsList.length > 0 ||
     extraList.length > 0;
@@ -2064,6 +2355,18 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                     {cheese && <p className="text-xs text-gray-400">{cheese}</p>}
                     {typeDisplay && (
                       <p className="text-xs text-gray-400">{typeDisplay}</p>
+                    )}
+                    {dressingDisplay && (
+                      <p className="text-xs text-gray-400">{dressingDisplay}</p>
+                    )}
+                    {saladAddonDisplay && (
+                      <p className="text-xs text-gray-400">{saladAddonDisplay}</p>
+                    )}
+                    {saladModDisplay && (
+                      <p className="text-xs text-gray-400">{saladModDisplay}</p>
+                    )}
+                    {modifyDisplay && (
+                      <p className="text-xs text-gray-400">{modifyDisplay}</p>
                     )}
                     {sideSaladsList.length > 0 && (
                       <div className="pt-2">
@@ -2206,6 +2509,50 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                   name={selectedType?.name}
                   variant={selectedTypeVariant}
                   onClick={() => setActiveModal("type")}
+                />
+              )}
+
+              {/* ===== DRESSING ===== */}
+              {hasDressings && (
+                <OptionTrigger
+                  label="Dressing"
+                  image={selectedDressing?.image}
+                  name={selectedDressing?.name}
+                  variant={selectedDressingVariant}
+                  onClick={() => setActiveModal("dressing")}
+                />
+              )}
+
+              {/* ===== SALAD ADDON ===== */}
+              {hasSaladAddons && (
+                <OptionTrigger
+                  label="Salad Addon"
+                  image={selectedSaladAddon?.image}
+                  name={selectedSaladAddon?.name}
+                  variant={selectedSaladAddonVariant}
+                  onClick={() => setActiveModal("saladAddon")}
+                />
+              )}
+
+              {/* ===== SALAD MODS ===== */}
+              {hasSaladMods && (
+                <OptionTrigger
+                  label="Salad Mod"
+                  image={selectedSaladMod?.image}
+                  name={selectedSaladMod?.name}
+                  variant={selectedSaladModVariant}
+                  onClick={() => setActiveModal("saladMod")}
+                />
+              )}
+
+              {/* ===== MODIFY ===== */}
+              {hasModifies && (
+                <OptionTrigger
+                  label="Modify Option"
+                  image={selectedModify?.image}
+                  name={selectedModify?.name}
+                  variant={selectedModifyVariant}
+                  onClick={() => setActiveModal("modify")}
                 />
               )}
 
@@ -2531,6 +2878,46 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         selectedId={selectedType?._id || selectedType?.id}
         selectedVariant={selectedTypeVariant}
         onConfirm={handleTypeConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "dressing"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Dressing"
+        options={dressingOptions}
+        selectedId={selectedDressing?._id || selectedDressing?.id}
+        selectedVariant={selectedDressingVariant}
+        onConfirm={handleDressingConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "saladAddon"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Salad Addon"
+        options={saladAddonOptions}
+        selectedId={selectedSaladAddon?._id || selectedSaladAddon?.id}
+        selectedVariant={selectedSaladAddonVariant}
+        onConfirm={handleSaladAddonConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "saladMod"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Salad Mod"
+        options={saladModsOptions}
+        selectedId={selectedSaladMod?._id || selectedSaladMod?.id}
+        selectedVariant={selectedSaladModVariant}
+        onConfirm={handleSaladModConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "modify"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Modify Option"
+        options={modifyOptions}
+        selectedId={selectedModify?._id || selectedModify?.id}
+        selectedVariant={selectedModifyVariant}
+        onConfirm={handleModifyConfirm}
       />
 
       <SideSaladsModal
