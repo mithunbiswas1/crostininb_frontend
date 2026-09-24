@@ -1093,6 +1093,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
 
   // Track selected variants for sauce and cheese
   const [selectedSauceVariant, setSelectedSauceVariant] = useState(null);
+  const [selectedCheeseVariant, setSelectedCheeseVariant] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [selectedTypeVariant, setSelectedTypeVariant] = useState(null);
   const [selectedDressing, setSelectedDressing] = useState(null);
