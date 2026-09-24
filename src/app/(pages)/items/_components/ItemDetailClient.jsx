@@ -1106,12 +1106,14 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   const [selectedModifyVariant, setSelectedModifyVariant] = useState(null);
   const [selectedFlavour, setSelectedFlavour] = useState(null);
   const [selectedFlavourVariant, setSelectedFlavourVariant] = useState(null);
+  const [selectedMakeItWith, setSelectedMakeItWith] = useState(null);
+  const [selectedMakeItWithVariant, setSelectedMakeItWithVariant] = useState(null);
   const [selectedSideSalads, setSelectedSideSalads] = useState([]);
 
   const [isCrustSelected, setIsCrustSelected] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [activeModal, setActiveModal] = useState(null); // null | "crust" | "sauce" | "cheese" | "type" | "dressing" | "saladAddon" | "saladMod" | "modify" | "sideSalad" | "toppings"
+  const [activeModal, setActiveModal] = useState(null); // null | "crust" | "sauce" | "cheese" | "type" | "dressing" | "saladAddon" | "saladMod" | "modify" | "flavour" | "makeItWith" | "sideSalad" | "toppings"
 
   // Normalized option lists for the Crust / Sauce / Cheese picker modal
   const crustOptions = useMemo(
@@ -1268,6 +1270,22 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     [item.flavours],
   );
 
+  const makeItWithOptions = useMemo(
+    () =>
+      (item.make_it_with || []).map((m) => ({
+        id: m._id || m.id,
+        name: m.name,
+        image: m.image,
+        variants: m.variants || [],
+        variantPrices: (m.variants || []).reduce((acc, v) => {
+          acc[v.name] = v.price;
+          return acc;
+        }, {}),
+        _raw: m,
+      })),
+    [item.make_it_with],
+  );
+
   const handleCrustConfirm = (option) => {
     if (option._raw) {
       handleCrustSelect(option._raw);
@@ -1333,6 +1351,13 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     }
   };
 
+  const handleMakeItWithConfirm = (option, variant) => {
+    if (option._raw) {
+      setSelectedMakeItWith(option._raw);
+      setSelectedMakeItWithVariant(variant || null);
+    }
+  };
+
   const handleSideSaladSelect = (salad) => {
     setSelectedSideSalads((prev) => {
       const saladId = salad._id || salad.id;
@@ -1385,6 +1410,8 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     selectedModifyVariant,
     selectedFlavour,
     selectedFlavourVariant,
+    selectedMakeItWith,
+    selectedMakeItWithVariant,
     selectedSideSalads,
     selectedSeasonings,
     selectedAddons,
@@ -1410,6 +1437,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   const hasSaladMods = item.salad_mods && item.salad_mods.length > 0;
   const hasModifies = item.modifies && item.modifies.length > 0;
   const hasFlavours = item.flavours && item.flavours.length > 0;
+  const hasMakeItWith = item.make_it_with && item.make_it_with.length > 0;
   const hasSideSalads = item.side_salads && item.side_salads.length > 0;
   const hasGroupedAddons =
     item.grouped_addons && Object.keys(item.grouped_addons).length > 0;
@@ -1531,6 +1559,17 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       }
     }
   }, [hasFlavours, item.flavours, selectedFlavour]);
+
+  // Auto-select first make it with if available
+  useEffect(() => {
+    if (hasMakeItWith && item.make_it_with.length > 0 && !selectedMakeItWith) {
+      const first = item.make_it_with[0];
+      setSelectedMakeItWith(first);
+      if (first.variants && first.variants.length > 0) {
+        setSelectedMakeItWithVariant(first.variants[0].name);
+      }
+    }
+  }, [hasMakeItWith, item.make_it_with, selectedMakeItWith]);
 
   // Auto-select first cut instruction if available
   useEffect(() => {
@@ -1852,6 +1891,15 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       total += Number(v?.price) || 0;
     }
 
+    // Make It With variant price
+    if (selectedMakeItWith && selectedMakeItWithVariant) {
+      const v = selectedMakeItWith.variants?.find(
+        (varItem) =>
+          varItem.name?.toLowerCase() === selectedMakeItWithVariant?.toLowerCase(),
+      );
+      total += Number(v?.price) || 0;
+    }
+
     // Side salad variant prices
     total += selectedSideSalads.reduce((sum, s) => {
       const v = s._selectedVariant || s.variants?.[0];
@@ -1953,6 +2001,11 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         `Flavour: ${selectedFlavour.name} (${selectedFlavourVariant || "Regular"})`,
       );
     }
+    if (selectedMakeItWith) {
+      yourSelectionParts.push(
+        `Make It With: ${selectedMakeItWith.name} (${selectedMakeItWithVariant || "Regular"})`,
+      );
+    }
     if (selectedSideSalads.length > 0) {
       const saladsText = selectedSideSalads
         .map((s) => `${s.name} (${s._selectedVariant?.name || "Regular"})`)
@@ -2006,6 +2059,12 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         : null,
       flavour: selectedFlavour
         ? `${selectedFlavour.name} (${selectedFlavourVariant || "Regular"})`
+        : null,
+      makeItWith: selectedMakeItWith
+        ? `${selectedMakeItWith.name} (${selectedMakeItWithVariant || "Regular"})`
+        : null,
+      make_it_with: selectedMakeItWith
+        ? `${selectedMakeItWith.name} (${selectedMakeItWithVariant || "Regular"})`
         : null,
       sideSalads: selectedSideSalads.map(
         (s) => `${s.name} (${s._selectedVariant?.name || "Regular"})`
@@ -2254,6 +2313,16 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       flavourDisplay = `${selectedFlavour.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
     }
 
+    let makeItWithDisplay = null;
+    if (selectedMakeItWith) {
+      const v = selectedMakeItWithVariant || "Regular";
+      const varItem = selectedMakeItWith.variants?.find(
+        (vi) => vi.name?.toLowerCase() === v?.toLowerCase(),
+      );
+      const price = Number(varItem?.price) || 0;
+      makeItWithDisplay = `${selectedMakeItWith.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
+    }
+
     const sideSaladsList = selectedSideSalads.map((s) => {
       const v = s._selectedVariant?.name || "Regular";
       const price = Number(s._selectedVariant?.price) || 0;
@@ -2296,6 +2365,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       saladMod: saladModDisplay,
       modify: modifyDisplay,
       flavour: flavourDisplay,
+      makeItWith: makeItWithDisplay,
       sideSaladsList,
       addonsList,
       extraList,
@@ -2312,6 +2382,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     saladMod: saladModDisplay,
     modify: modifyDisplay,
     flavour: flavourDisplay,
+    makeItWith: makeItWithDisplay,
     sideSaladsList,
     addonsList,
     extraList,
@@ -2326,6 +2397,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     saladModDisplay ||
     modifyDisplay ||
     flavourDisplay ||
+    makeItWithDisplay ||
     sideSaladsList.length > 0 ||
     addonsList.length > 0 ||
     extraList.length > 0;
@@ -2440,6 +2512,9 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                     )}
                     {flavourDisplay && (
                       <p className="text-xs text-gray-400">{flavourDisplay}</p>
+                    )}
+                    {makeItWithDisplay && (
+                      <p className="text-xs text-gray-400">{makeItWithDisplay}</p>
                     )}
                     {sideSaladsList.length > 0 && (
                       <div className="pt-2">
@@ -2637,6 +2712,17 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                   name={selectedFlavour?.name}
                   variant={selectedFlavourVariant}
                   onClick={() => setActiveModal("flavour")}
+                />
+              )}
+
+              {/* ===== MAKE IT WITH ===== */}
+              {hasMakeItWith && (
+                <OptionTrigger
+                  label="Make It With"
+                  image={selectedMakeItWith?.image}
+                  name={selectedMakeItWith?.name}
+                  variant={selectedMakeItWithVariant}
+                  onClick={() => setActiveModal("makeItWith")}
                 />
               )}
 
@@ -3012,6 +3098,16 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         selectedId={selectedFlavour?._id || selectedFlavour?.id}
         selectedVariant={selectedFlavourVariant}
         onConfirm={handleFlavourConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "makeItWith"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Make It With"
+        options={makeItWithOptions}
+        selectedId={selectedMakeItWith?._id || selectedMakeItWith?.id}
+        selectedVariant={selectedMakeItWithVariant}
+        onConfirm={handleMakeItWithConfirm}
       />
 
       <SideSaladsModal
