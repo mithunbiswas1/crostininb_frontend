@@ -1104,6 +1104,8 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   const [selectedSaladModVariant, setSelectedSaladModVariant] = useState(null);
   const [selectedModify, setSelectedModify] = useState(null);
   const [selectedModifyVariant, setSelectedModifyVariant] = useState(null);
+  const [selectedFlavour, setSelectedFlavour] = useState(null);
+  const [selectedFlavourVariant, setSelectedFlavourVariant] = useState(null);
   const [selectedSideSalads, setSelectedSideSalads] = useState([]);
 
   const [isCrustSelected, setIsCrustSelected] = useState(false);
@@ -1250,6 +1252,22 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     [item.modifies],
   );
 
+  const flavourOptions = useMemo(
+    () =>
+      (item.flavours || []).map((flavour) => ({
+        id: flavour._id || flavour.id,
+        name: flavour.name,
+        image: flavour.image,
+        variants: flavour.variants || [],
+        variantPrices: (flavour.variants || []).reduce((acc, v) => {
+          acc[v.name] = v.price;
+          return acc;
+        }, {}),
+        _raw: flavour,
+      })),
+    [item.flavours],
+  );
+
   const handleCrustConfirm = (option) => {
     if (option._raw) {
       handleCrustSelect(option._raw);
@@ -1308,6 +1326,13 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     }
   };
 
+  const handleFlavourConfirm = (option, variant) => {
+    if (option._raw) {
+      setSelectedFlavour(option._raw);
+      setSelectedFlavourVariant(variant || null);
+    }
+  };
+
   const handleSideSaladSelect = (salad) => {
     setSelectedSideSalads((prev) => {
       const saladId = salad._id || salad.id;
@@ -1358,6 +1383,8 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     selectedSaladModVariant,
     selectedModify,
     selectedModifyVariant,
+    selectedFlavour,
+    selectedFlavourVariant,
     selectedSideSalads,
     selectedSeasonings,
     selectedAddons,
@@ -1382,6 +1409,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
   const hasSaladAddons = item.salad_addons && item.salad_addons.length > 0;
   const hasSaladMods = item.salad_mods && item.salad_mods.length > 0;
   const hasModifies = item.modifies && item.modifies.length > 0;
+  const hasFlavours = item.flavours && item.flavours.length > 0;
   const hasSideSalads = item.side_salads && item.side_salads.length > 0;
   const hasGroupedAddons =
     item.grouped_addons && Object.keys(item.grouped_addons).length > 0;
@@ -1492,6 +1520,17 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       }
     }
   }, [hasModifies, item.modifies, selectedModify]);
+
+  // Auto-select first flavour if available
+  useEffect(() => {
+    if (hasFlavours && item.flavours.length > 0 && !selectedFlavour) {
+      const first = item.flavours[0];
+      setSelectedFlavour(first);
+      if (first.variants && first.variants.length > 0) {
+        setSelectedFlavourVariant(first.variants[0].name);
+      }
+    }
+  }, [hasFlavours, item.flavours, selectedFlavour]);
 
   // Auto-select first cut instruction if available
   useEffect(() => {
@@ -1804,6 +1843,15 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       total += Number(v?.price) || 0;
     }
 
+    // Flavour variant price
+    if (selectedFlavour && selectedFlavourVariant) {
+      const v = selectedFlavour.variants?.find(
+        (varItem) =>
+          varItem.name?.toLowerCase() === selectedFlavourVariant?.toLowerCase(),
+      );
+      total += Number(v?.price) || 0;
+    }
+
     // Side salad variant prices
     total += selectedSideSalads.reduce((sum, s) => {
       const v = s._selectedVariant || s.variants?.[0];
@@ -1900,6 +1948,11 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         `Modify: ${selectedModify.name} (${selectedModifyVariant || "Regular"})`,
       );
     }
+    if (selectedFlavour) {
+      yourSelectionParts.push(
+        `Flavour: ${selectedFlavour.name} (${selectedFlavourVariant || "Regular"})`,
+      );
+    }
     if (selectedSideSalads.length > 0) {
       const saladsText = selectedSideSalads
         .map((s) => `${s.name} (${s._selectedVariant?.name || "Regular"})`)
@@ -1950,6 +2003,9 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         : null,
       modify: selectedModify
         ? `${selectedModify.name} (${selectedModifyVariant || "Regular"})`
+        : null,
+      flavour: selectedFlavour
+        ? `${selectedFlavour.name} (${selectedFlavourVariant || "Regular"})`
         : null,
       sideSalads: selectedSideSalads.map(
         (s) => `${s.name} (${s._selectedVariant?.name || "Regular"})`
@@ -2188,6 +2244,16 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       modifyDisplay = `${selectedModify.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
     }
 
+    let flavourDisplay = null;
+    if (selectedFlavour) {
+      const v = selectedFlavourVariant || "Regular";
+      const varItem = selectedFlavour.variants?.find(
+        (vi) => vi.name?.toLowerCase() === v?.toLowerCase(),
+      );
+      const price = Number(varItem?.price) || 0;
+      flavourDisplay = `${selectedFlavour.name} (${v})  ${price > 0 ? `+$${price}` : "Included"}`;
+    }
+
     const sideSaladsList = selectedSideSalads.map((s) => {
       const v = s._selectedVariant?.name || "Regular";
       const price = Number(s._selectedVariant?.price) || 0;
@@ -2229,6 +2295,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
       saladAddon: saladAddonDisplay,
       saladMod: saladModDisplay,
       modify: modifyDisplay,
+      flavour: flavourDisplay,
       sideSaladsList,
       addonsList,
       extraList,
@@ -2244,6 +2311,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     saladAddon: saladAddonDisplay,
     saladMod: saladModDisplay,
     modify: modifyDisplay,
+    flavour: flavourDisplay,
     sideSaladsList,
     addonsList,
     extraList,
@@ -2257,6 +2325,7 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
     saladAddonDisplay ||
     saladModDisplay ||
     modifyDisplay ||
+    flavourDisplay ||
     sideSaladsList.length > 0 ||
     addonsList.length > 0 ||
     extraList.length > 0;
@@ -2368,6 +2437,9 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                     )}
                     {modifyDisplay && (
                       <p className="text-xs text-gray-400">{modifyDisplay}</p>
+                    )}
+                    {flavourDisplay && (
+                      <p className="text-xs text-gray-400">{flavourDisplay}</p>
                     )}
                     {sideSaladsList.length > 0 && (
                       <div className="pt-2">
@@ -2554,6 +2626,17 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                   name={selectedModify?.name}
                   variant={selectedModifyVariant}
                   onClick={() => setActiveModal("modify")}
+                />
+              )}
+
+              {/* ===== FLAVOUR ===== */}
+              {hasFlavours && (
+                <OptionTrigger
+                  label="Flavour"
+                  image={selectedFlavour?.image}
+                  name={selectedFlavour?.name}
+                  variant={selectedFlavourVariant}
+                  onClick={() => setActiveModal("flavour")}
                 />
               )}
 
@@ -2919,6 +3002,16 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
         selectedId={selectedModify?._id || selectedModify?.id}
         selectedVariant={selectedModifyVariant}
         onConfirm={handleModifyConfirm}
+      />
+
+      <PizzaOptionModal
+        isOpen={activeModal === "flavour"}
+        onClose={() => setActiveModal(null)}
+        title="Choose Flavour"
+        options={flavourOptions}
+        selectedId={selectedFlavour?._id || selectedFlavour?.id}
+        selectedVariant={selectedFlavourVariant}
+        onConfirm={handleFlavourConfirm}
       />
 
       <SideSaladsModal
