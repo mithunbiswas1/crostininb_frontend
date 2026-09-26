@@ -23,10 +23,11 @@ import {
 } from "@/redux/features/Slice/CartDrawerSlice";
 import InstantOrderModal from "@/components/checkout/InstantOrderModal";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import SafeImage from "@/components/shared/SafeImage";
 
 // Helper function to get image URL
 const getImageUrl = (path) => {
-  if (!path) return "/placeholder.png";
+  if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
@@ -136,20 +137,14 @@ const OptionTrigger = ({ label, required, image, name, variant, onClick }) => (
     onClick={onClick}
     className="w-full flex items-center gap-3 bg-zinc-800/50 border border-zinc-700 hover:border-amber-500/50 rounded-lg p-2.5 transition-all text-left mb-4 cursor-pointer"
   >
-    <div className="relative w-11 h-11 rounded-md overflow-hidden bg-zinc-700 flex-shrink-0">
-      {image ? (
-        <Image
-          src={getImageUrl(image)}
-          alt={name || label}
-          fill
-          className="object-cover"
-          unoptimized
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-[8px] text-zinc-500">
-          N/A
-        </div>
-      )}
+    <div className="relative w-11 h-11 rounded-md overflow-hidden bg-gray-400 flex-shrink-0">
+      <SafeImage
+        src={getImageUrl(image)}
+        alt={name || label}
+        fill
+        className="object-cover"
+        fallbackClassName="bg-gray-400"
+      />
     </div>
     <div className="flex-1 min-w-0">
       <p className="text-[10px] text-gray-400 uppercase tracking-wide">
@@ -250,20 +245,14 @@ const PizzaOptionModal = ({
                       : "border-zinc-700 hover:border-zinc-500"
                   }`}
                 >
-                  <div className="relative w-14 h-14 rounded-md overflow-hidden bg-zinc-700">
-                    {option.image ? (
-                      <Image
-                        src={getImageUrl(option.image)}
-                        alt={option.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[9px] text-zinc-500">
-                        N/A
-                      </div>
-                    )}
+                  <div className="relative w-14 h-14 rounded-md overflow-hidden bg-gray-400">
+                    <SafeImage
+                      src={getImageUrl(option.image)}
+                      alt={option.name}
+                      fill
+                      className="object-cover"
+                      fallbackClassName="bg-gray-400"
+                    />
                     {isSelected && (
                       <div className="absolute top-0.5 right-0.5 bg-amber-500 rounded-full p-0.5">
                         <Check size={10} className="text-black" />
@@ -529,13 +518,13 @@ const ToppingsModal = ({
                           className="flex items-center gap-3 cursor-pointer"
                           onClick={() => onSelectAddon(addon)}
                         >
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 border border-zinc-700/50 flex-shrink-0">
-                            <Image
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-400 border border-zinc-700/50 flex-shrink-0">
+                            <SafeImage
                               src={getImageUrl(addon.image)}
                               alt={addon.name}
                               fill
                               className="object-cover"
-                              unoptimized
+                              fallbackClassName="bg-gray-400"
                             />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -764,13 +753,13 @@ const SideSaladsModal = ({
                     className="flex items-center gap-3 cursor-pointer"
                     onClick={() => onSelectSalad(salad)}
                   >
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 border border-zinc-700/50 flex-shrink-0">
-                      <Image
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-400 border border-zinc-700/50 flex-shrink-0">
+                      <SafeImage
                         src={getImageUrl(salad.image)}
                         alt={salad.name}
                         fill
                         className="object-cover"
-                        unoptimized
+                        fallbackClassName="bg-gray-400"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1051,13 +1040,13 @@ const RelatedItemCard = ({
         </div>
 
         {/* Bottom section: Image (exact Crusts card style) */}
-        <div className="relative w-full aspect-[4/3] bg-zinc-700 overflow-hidden">
-          <Image
+        <div className="relative w-full aspect-[4/3] bg-gray-400 overflow-hidden">
+          <SafeImage
             src={getImageUrl(item.image)}
             alt={item.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            unoptimized
+            fallbackClassName="bg-gray-400"
           />
 
           {!isAvailable && (
@@ -2420,14 +2409,14 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
           <div className="grid grid-cols-1 md:grid-cols-2">
             {/* ===== IMAGE SECTION (left col, sticky container) ===== */}
             <div className="bg-zinc-900 rounded-tl-2xl rounded-bl-2xl">
-              <div className="relative h-80 md:h-[500px] overflow-hidden rounded-tl-2xl">
-                <Image
+              <div className="relative h-80 md:h-[500px] overflow-hidden rounded-tl-2xl bg-gray-400">
+                <SafeImage
                   src={getImageUrl(images[currentImageIndex])}
                   alt={item.name}
                   fill
                   className="object-cover"
                   priority
-                  unoptimized
+                  fallbackClassName="bg-gray-400"
                 />
 
                 {!item.is_available && (
@@ -2463,17 +2452,17 @@ export default function ItemDetailClient({ item, addonItems = [] }) {
                     <button
                       key={index}
                       onClick={() => goToImage(index)}
-                      className={`relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${currentImageIndex === index
+                      className={`relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-400 border-2 transition-all ${currentImageIndex === index
                         ? "border-amber-400"
                         : "border-transparent hover:border-zinc-600"
                         }`}
                     >
-                      <Image
+                      <SafeImage
                         src={getImageUrl(img)}
                         alt={`${item.name} ${index + 1}`}
                         fill
                         className="object-cover"
-                        unoptimized
+                        fallbackClassName="bg-gray-400"
                       />
                     </button>
                   ))}

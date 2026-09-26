@@ -1,7 +1,7 @@
 // src/components/shared/FoodCard.jsx
 
-import Image from "next/image";
 import Link from "next/link";
+import SafeImage from "@/components/shared/SafeImage";
 import { baseUriBackend } from "@/redux/url/url";
 
 const FoodCard = ({ item }) => {
@@ -19,6 +19,10 @@ const FoodCard = ({ item }) => {
     item.variation?.offer_price || item.variation?.regular_price || 0;
   const originalPrice = item.variation?.regular_price || 0;
 
+  const imageUrl = item.image
+    ? `${baseUriBackend}${item.image.replace(/^\/+/, "")}`
+    : null;
+
   return (
     <Link
       href={`/items/${item.slug}`}
@@ -32,13 +36,13 @@ const FoodCard = ({ item }) => {
       )}
 
       {/* Image */}
-      <div className="relative h-44 w-full">
-        <Image
-          src={`${baseUriBackend}${item.image}`}
+      <div className="relative h-44 w-full bg-gray-400 overflow-hidden">
+        <SafeImage
+          src={imageUrl}
           alt={item.name}
           fill
           className="object-cover"
-          unoptimized={true}
+          fallbackClassName="bg-gray-400"
         />
       </div>
 

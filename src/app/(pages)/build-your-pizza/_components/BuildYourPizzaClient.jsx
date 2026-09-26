@@ -20,10 +20,11 @@ import { baseUriBackend } from "@/redux/url/url";
 import { singleAddToCartsList } from "@/redux/features/Slice/CartDrawerSlice";
 import InstantOrderModal from "@/components/checkout/InstantOrderModal";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import SafeImage from "@/components/shared/SafeImage";
 
 // Helper function to get image URL
 const getImageUrl = (path) => {
-  if (!path) return "/home/special_menu/pizzas.png";
+  if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
@@ -71,20 +72,14 @@ const OptionTrigger = ({ label, required, image, name, variant, onClick }) => (
     onClick={onClick}
     className="w-full flex items-center gap-3 bg-zinc-800/50 border border-zinc-700 hover:border-amber-500/50 rounded-lg p-2.5 transition-all text-left mb-4 cursor-pointer"
   >
-    <div className="relative w-11 h-11 rounded-md overflow-hidden bg-zinc-700 flex-shrink-0">
-      {image ? (
-        <Image
-          src={getImageUrl(image)}
-          alt={name || label}
-          fill
-          className="object-cover"
-          unoptimized
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-[8px] text-zinc-500">
-          N/A
-        </div>
-      )}
+    <div className="relative w-11 h-11 rounded-md overflow-hidden bg-gray-400 flex-shrink-0">
+      <SafeImage
+        src={getImageUrl(image)}
+        alt={name || label}
+        fill
+        className="object-cover"
+        fallbackClassName="bg-gray-400"
+      />
     </div>
     <div className="flex-1 min-w-0">
       <p className="text-[10px] text-gray-400 uppercase tracking-wide">
@@ -184,20 +179,14 @@ const PizzaOptionModal = ({
                     : "border-zinc-700 hover:border-zinc-500"
                     }`}
                 >
-                  <div className="relative w-14 h-14 rounded-md overflow-hidden bg-zinc-700">
-                    {option.image ? (
-                      <Image
-                        src={getImageUrl(option.image)}
-                        alt={option.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[9px] text-zinc-500">
-                        N/A
-                      </div>
-                    )}
+                  <div className="relative w-14 h-14 rounded-md overflow-hidden bg-gray-400">
+                    <SafeImage
+                      src={getImageUrl(option.image)}
+                      alt={option.name}
+                      fill
+                      className="object-cover"
+                      fallbackClassName="bg-gray-400"
+                    />
                     {isSelected && (
                       <div className="absolute top-0.5 right-0.5 bg-amber-500 rounded-full p-0.5">
                         <Check size={10} className="text-black" />
@@ -541,13 +530,13 @@ const ToppingsModal = ({
                           className="flex items-center gap-3 cursor-pointer"
                           onClick={() => onSelectAddon(addon)}
                         >
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 border border-zinc-700/50 flex-shrink-0">
-                            <Image
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-400 border border-zinc-700/50 flex-shrink-0">
+                            <SafeImage
                               src={getImageUrl(addon.image)}
                               alt={addon.name}
                               fill
                               className="object-cover"
-                              unoptimized
+                              fallbackClassName="bg-gray-400"
                             />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -836,13 +825,13 @@ const RelatedItemCard = ({
           </div>
         </div>
 
-        <div className="relative w-full aspect-[4/3] bg-zinc-700 overflow-hidden">
-          <Image
+        <div className="relative w-full aspect-[4/3] bg-gray-400 overflow-hidden">
+          <SafeImage
             src={getImageUrl(item.image)}
             alt={item.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            unoptimized
+            fallbackClassName="bg-gray-400"
           />
         </div>
       </div>
@@ -1411,14 +1400,14 @@ export default function BuildYourPizzaClient({
             {/* ===== LEFT COLUMN: PREVIEW & STICKY SELECTION ===== */}
             <div className="bg-zinc-900 rounded-tl-2xl rounded-bl-2xl">
               <div className="relative h-80 md:h-[480px] overflow-hidden rounded-tl-2xl bg-zinc-950 flex items-center justify-center p-6">
-                <div className="relative w-72 h-72 md:w-96 md:h-96">
-                  <Image
+                <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden bg-gray-400 flex items-center justify-center">
+                  <SafeImage
                     src={getImageUrl(previewImage)}
                     alt="Build Custom Pizza"
                     fill
                     className="object-contain drop-shadow-[0_20px_50px_rgba(245,158,11,0.2)]"
                     priority
-                    unoptimized
+                    fallbackClassName="rounded-full bg-gray-400"
                   />
                 </div>
                 <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/30 text-amber-400 text-xs font-semibold">
